@@ -21,7 +21,7 @@ namespace Utilities
 #ifndef DXERROR
 #define DXERROR(a)	{ OutputDebugString(a); OutputDebugString("\n"); return false; }
 
-void GetFilesInDirectory(const string& _dir, vector<string>& _list, string* extToIgnore = NULL);
-void GetFoldersInDirectory(const string& _dir, vector<string>& _list, string* folderToIgnore = NULL);
+void GetFilesInDirectory(const string& _dir, vector<string>& _files, vector<string>* extToIgnore = NULL);
+void GetFoldersInDirectory(const string& _dir, vector<string>& _folders, vector<string>* folderToIgnore = NULL);
 }
 #endif

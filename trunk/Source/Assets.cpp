@@ -124,8 +124,10 @@ CAssetsUnits::CAssetsUnits()
 const int CAssetsUnits::LoadAssets(int index)
 {
 	// get all the folders in the "Resources/Units/" directory
-	vector<string> folders;
-	Utilities::GetFoldersInDirectory(GetPath(), folders, &string("XML")); // ignore the XML folder, that's for the abilitiesManager
+	vector<string> folders; vector<string> toIgnore;
+	toIgnore.push_back(string("XML"));
+	toIgnore.push_back(string(".svn"));
+	Utilities::GetFoldersInDirectory(GetPath(), folders, &toIgnore); // ignore the XML folder, that's for the abilitiesManager
 	vector<string>::iterator iter, end;
 
 	for (iter = folders.begin(), end = folders.end(); iter != end; ++iter)
@@ -135,7 +137,9 @@ const int CAssetsUnits::LoadAssets(int index)
 		// now get all the files in the current unit folder
 		vector<string> files; 
 		string currDir = GetPath() + (*iter) + "/";
-		Utilities::GetFilesInDirectory(currDir, files);
+		toIgnore.clear();
+		toIgnore.push_back(string("svn"));
+		Utilities::GetFilesInDirectory(currDir, files, &toIgnore);
 		// format of file name:	 --- example "UMKnight_Attack_12_128.png"
 		// UMKnight = unit name
 		// Attack	= anim name
