@@ -1,0 +1,87 @@
+I will not keep version numbers at this point, just the dates and the changes.
+
+==============================================================================
+The game's state before 6/29/2010
+-------------------------------
+HUD frame, resources, and buttons displaying
+Map drawing, scrolling, tile picking
+Units displaying, adding, removing, selectable (yours & enemy), attack and run animations (of Unmounted Knight)
+Basic window functionality foundation
+
+
+6/29/2010 - (began keeping this change log)
+---------
+Finished custom window functionality (with title or without)
+	- dynamically creating windows (size, position, options and their positions)
+ 	  and populating with a given set of data
+Added menu window, with ability to resume and exit
+
+
+7/1/2010
+--------
+Created QB current selected ability selector
+Created QB image
+Added Quick Bar (QB) functionality
+	- Moving abilities on QB
+	- Selecting abilities on QB
+	- Removing abilities on QB
+
+
+7/2/2010
+--------
+Create and populate combat ability window
+Created "Charge" and "Flank" ability icons
+
+
+7/3/2010
+--------
+Added images to combat ability window
+Allowed combat abilities to be selected and added to QB
+Added Quick Bar (QB) functionality
+	- Adding objects from combat abilities window to QB
+
+
+7/4/2010
+--------
+Added Unmounted Knight's death and hit animation sprite sheets
+
+
+7/6/2010
+--------
+Created Battle Manager to handle two units duking it out
+Created basic damage formula for battles
+Damage able to be dealt to units, update on HUD
+
+
+7/7/2010
+--------
+Created turn flow
+	- reworked player/unit/map interaction
+	- added current player's list of units
+	- functionality to skip current unit and move onto next
+	- functionality to end current player's turn and begin next player's turn
+
+
+7/8/2010
+--------
+Revamped Battle Manager to handle attack AND defense abilities for attacker/defender
+Revamped Unit combat abilities to have attacking AND defending properties and functionality
+Movement and attacks subtract from unit's stamina based on each ability's cost
+
+
+7/9/2010
+--------
+Minor fixes and tweaks to turn flow
+HUD displays current player's name
+
+
+7/10/2010
+---------
+Corrected adjacent tiles calculation
+Created framework for pathfinding and tile distances calculation
+Implemented rudimentary right-click movement
+
+
+7/11/2010
+---------
+Added pathfinding (A-Star) algorithm and other related functions (not implemented yet)
