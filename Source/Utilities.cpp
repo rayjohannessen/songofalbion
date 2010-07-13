@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#include "Utilities.h"
+
 namespace Utilities
 {
 	string GetExtension(const string& fileName)
@@ -11,12 +13,8 @@ namespace Utilities
 			ext += fileName[ind++];
 		return ext;
 	}
-	void GetFilesInDirectory(const string& _dir, vector<string>& _list, string* extToIgnore )
+	void GetFilesInDirectory(const string& _dir, vector<string>& _files, vector<string>* extToIgnore )
 	{
-		string toIgnore = "bad";
-		if(extToIgnore)
-			toIgnore = *extToIgnore;
-
 		WIN32_FIND_DATA data;
 		char dir[MAX_PATH + 1];
 		if (_dir[_dir.length()] == '\\')
@@ -28,22 +26,37 @@ namespace Utilities
 		if (h == NULL)
 			return;
 
-		while (FindNextFile(h, &data))
+		string name;
+		if (extToIgnore)
 		{
-			string name = data.cFileName;
-			if (name != "Thumbs.db" && name != ".." && GetExtension(name) != toIgnore)
-					_list.push_back(data.cFileName);
+			while (FindNextFile(h, &data))
+			{
+				name = data.cFileName;
+				bool ignore = false;
+				for (unsigned i = 0; i < extToIgnore->size(); ++i)
+				{
+					if ((*extToIgnore)[i] == GetExtension(name))
+					{ ignore = true; break; }
+				}
+				if (name != "Thumbs.db" && name != ".." && !ignore)
+						_files.push_back(data.cFileName);
+			}
+		} 
+		else
+		{
+			while (FindNextFile(h, &data))
+			{
+				name = data.cFileName;
+				if (name != "Thumbs.db" && name != "..")
+					_files.push_back(data.cFileName);	
+			}
 		}
 
 		FindClose(h);
 	}
 
-	void GetFoldersInDirectory(const string& _dir, vector<string>& _list, string* folderToIgnore )
+	void GetFoldersInDirectory(const string& _dir, vector<string>& _folders, vector<string>* folderToIgnore )
 	{
-		string toIgnore = "bad";
-		if(folderToIgnore)
-			toIgnore = *folderToIgnore;
-
 		WIN32_FIND_DATA data;
 		char dir[MAX_PATH + 1];
 		if (_dir[_dir.length()] == '\\')
@@ -55,11 +68,30 @@ namespace Utilities
 		if (h == NULL)
 			return;
 
-		while (FindNextFile(h, &data))
+		string name;
+		if (folderToIgnore)
 		{
-			string name = data.cFileName;
-			if (name != "Thumbs.db" && name != ".." && name != toIgnore)
-				_list.push_back(data.cFileName);
+			while (FindNextFile(h, &data))
+			{
+				name = data.cFileName;
+				bool ignore = false;
+				for (unsigned i = 0; i < folderToIgnore->size(); ++i)
+				{
+					if ((*folderToIgnore)[i] == name)
+					{ ignore = true; break; }
+				}
+				if (name != "Thumbs.db" && name != ".." && !ignore)
+					_folders.push_back(data.cFileName);
+			}
+		} 
+		else
+		{
+			while (FindNextFile(h, &data))
+			{
+				name = data.cFileName;
+				if (name != "Thumbs.db" && name != "..")
+					_folders.push_back(data.cFileName);	
+			}
 		}
 
 		FindClose(h);
