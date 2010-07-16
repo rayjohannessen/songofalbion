@@ -240,7 +240,7 @@ void ObjectManager::Shutdown()
 	RemoveAll();
 }
 
-CUnit* ObjectManager::IsSpaceOccupied(const point& coord, const CPlayer* const currPlayer)
+CUnit* ObjectManager::IsSpaceOccupied(const point& coord)
 {
 	int numUnits = 0;
 	CUnit* pUnit = NULL;
@@ -249,7 +249,7 @@ CUnit* ObjectManager::IsSpaceOccupied(const point& coord, const CPlayer* const c
 	for ( ; m_iPlayersIter != m_iPlayersIterEnd; ++m_iPlayersIter)
 	{
 		CPlayer* player = (*m_iPlayersIter);
-		if (player == currPlayer)
+		if (player == Globals::GetCurrPlayer())
 			continue;
 		numUnits = player->GetNumUnits();
 		for (int i = 0; i < numUnits; ++i)

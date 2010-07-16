@@ -9,6 +9,9 @@
 #include "HUD.h"
 #include "NonCombatSkill.h"
 #include "CombatSkill.h"
+#include "Pathfinding.h"
+#include "Map.h"
+using namespace Pathfinding;
 
 CObject::CObject() :
 	m_nImageID(-1),
@@ -126,6 +129,13 @@ CCombatSkill* CObject::GetCurrDefaultAbility(eButtonName& defType)
 		return m_pCurrDefenseAbility; 
 }
 
+void CObject::FindPathToTarget(const point& tileCoord, Path &path)
+{
+	path.clear();
+	A_Star(Globals::g_pMap->GetL1Tiles()[m_ptCoord.y * Globals::g_pMap->GetNumCols() + m_ptCoord.x], 
+		Globals::g_pMap->GetL1Tiles()[tileCoord.y * Globals::g_pMap->GetNumCols() + tileCoord.x], path, 
+		/*this,*/ Globals::g_pMap->GetL1Tiles(), Globals::g_pMap->GetL2Tiles(), Globals::g_pMap->GetNumColsRows());
+}
 
 //////////////////////////////////////////////////////////////////////////
 // PRIVATE

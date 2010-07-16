@@ -2,13 +2,13 @@
 
 #include "Structs.h"
 
-point::operator pointf()
+point::operator pointf() const
 {
 	return pointf((float)x, (float)y);
 }
 
 
-pointf::operator point()
+pointf::operator point() const
 {
 	return point((int)x, (int)y);
 }

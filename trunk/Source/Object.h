@@ -10,6 +10,8 @@
 #include "Assets.h"
 #include "ButtonDefines.h"
 #include "AbilityObjectBase.h"
+#include "Pathfinding.h"
+using namespace Pathfinding;
 
 enum eObjType	{OBJ_CITY, OBJ_UNIT, OBJ_BUILDING, };
 enum eAbSelType { AST_ATTACK = MOUSE_LEFT, AST_DEFENSE = MOUSE_RIGHT, };
@@ -72,7 +74,8 @@ public:
 
 	// uses the map's viewport to determine if the object needs to be rendered
 	bool TestOnScreen(const rect& viewPort);
-
+	bool IsOnQuickBar(const CQuickBarObject& qbObj);
+	void FindPathToTarget(const point& tileCoord, Path& path);
 
 	//////////////////////////////////////////////////////////////////////////
 	// accessors
@@ -101,14 +104,14 @@ public:
 	// returns the unlocked abilities for this object and the passed in eButtonName
 	inline UnlockedAbilitiesMap& GetAbilitiesMap()							{ return m_mAbilities;				}
 	inline const Abilities& GetUnlockedAbilities(eButtonName buttonName)	{ return m_mAbilities[buttonName];	}
-	bool IsOnQuickBar(const CQuickBarObject& qbObj);
+
 
 	//////////////////////////////////////////////////////////////////////////
 	// mutators
 	inline void SetImageID(int id)			{m_nImageID = id;	}
 	inline void SetSrcRect(rect& r)			{m_rSrc = r;		}
 	inline void SetColor(DWORD clr)			{m_dwColor = clr;	}
-	inline void SetCoord(point& coord)		{m_ptCoord = coord; }
+	inline void SetCoord(const point& coord){m_ptCoord = coord; }
 	virtual void SetScrnPos(point& sPos)	{m_ptScreenPos.x = (float)sPos.x + (float)m_ptOffset.x; m_ptScreenPos.y = (float)sPos.y + (float)m_ptOffset.y;}
 	inline void SetFaction(char* faction)	{m_szFaction = faction;}
 	inline void SetHovered(bool bIsHovered) {m_bHovered = bIsHovered;}

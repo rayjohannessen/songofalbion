@@ -14,8 +14,6 @@
 #include "ObjectManager.h"
 #include "AnimationDefinesEnums.h"
 #include "CombatSkill.h"
-#include "Pathfinding.h"
-using namespace Pathfinding;
 
 #if _DEBUG
 	static bool debug = true;	// draw debug info in debug mode only
@@ -38,7 +36,6 @@ CMap::CMap() :
 	m_nOSy(Y_OS),
 	m_pTimer(NULL)
 {
-	m_strCurrVersion = "TED-Version-1.1";
 	//////////////////////////////////////////////////////////////////////////
 	// TODO:: temps, make sure to remove
 	m_nCurrPlaceType = MSA_SELECT;
@@ -53,6 +50,7 @@ CMap::CMap() :
 	gInputToDirection[DIK_NUMPAD7] = DIR_NW;
 	gInputToDirection[DIK_NUMPAD8] = DIR_N;
 	gInputToDirection[DIK_NUMPAD9] = DIR_NE;
+	m_InputMapEndIter = gInputToDirection.end();
 }
 
 CMap* CMap::GetInstance()
@@ -67,7 +65,7 @@ void CMap::NewMap()
 
 }
 
-point CMap::IsoTilePlot(point& pt)
+point CMap::IsoTilePlot(const point& pt) const
 {
 	point newPt( pt.x * g_TileWidth + (pt.y & 1) * (g_TileWidth >> 1) + m_nOSx - (int)m_fScrollX,
 					pt.y * (g_TileHeight >> 1) + m_nOSy - (int)m_fScrollY);
@@ -172,11 +170,14 @@ eMapInputRet CMap::Input(double fElapsedTime, POINT& mouse)
 	// TODO:: need to get specific buttons differently, they might be in different spots for each unit/object
 	// disband unit / destroy building
 	if ( Globals::g_pDI->KeyDown(DIK_LCONTROL) && Globals::g_pDI->KeyPressed(DIK_D) )
+	{
 		if (m_pCurrPlayerSelectedObj && m_pCurrPlayerSelectedObj->GetType() == OBJ_UNIT)
 			Globals::g_pHUD->GetButton(BL_SLOT_2_2)->SimulatePressed();
+	}
 	else
 		// scrolling - keyboard & mouse
 		HandleViewScroll(mouse, fElapsedTime);
+
 	// unit movement
 	HandleMovement(fElapsedTime, mouse);
 
@@ -199,53 +200,76 @@ eMapInputRet CMap::Input(double fElapsedTime, POINT& mouse)
 void CMap::HandleMovement( double fElapsedTime, POINT& mouse )
 {
 	// handle movement, only if there is a selected object (and it's a unit)
-	if ( m_pCurrPlayerSelectedObj && m_pCurrPlayerSelectedObj->GetType() == OBJ_UNIT && ((CUnit*)m_pCurrPlayerSelectedObj)->GetStamina() > 0)
+	if ( m_pCurrPlayerSelectedObj && m_pCurrPlayerSelectedObj->GetType() == OBJ_UNIT )
 	{
-		m_InputMapEndIter = gInputToDirection.end();
 		// if we have a valid direction input key that is pressed, start to make the move
 		if ((m_InputMapIter = gInputToDirection.find(Globals::g_pDI->GetBufferedDIKCodeEx())) != m_InputMapEndIter)
 		{
 			eAnimationDirections facing = m_InputMapIter->second;
 			int newX = m_pCurrPlayerSelectedObj->GetCoord().x;
 			int newY = m_pCurrPlayerSelectedObj->GetCoord().y;		
-
 			FindNewCoord(facing, newY, newX);
-			DoMove(newX, newY, facing);
+
+			DetermineMoveSpecifics(point(newX, newY));
 		}
 	}
 }
-bool CMap::GoodMove(int x, int y, int id)
+bool CMap::DetermineMoveSpecifics(const point& pt)
 {
+	// determine if there's an enemy there, if so, see if it's already selected or not
 	CUnit* pTarget = NULL;
-	if ((pTarget = Globals::g_pObjManager->IsSpaceOccupied(point(x, y), Globals::GetCurrPlayer())))
+	if ( (pTarget = Globals::g_pObjManager->IsSpaceOccupied(pt)) )
 	{
 		if ( !m_pEnemyObj )	// there's not currently a target, so just select as new target
 		{
 			m_pEnemyObj = pTarget;
 			m_pEnemyObj->SetColor(DARKRED);
 			m_pEnemyObj->SetHovered(true);
-			((CUnit*)m_pCurrPlayerSelectedObj)->FaceTarget(m_pEnemyObj->GetCoord());
 		}
 		else
 		{
-			if (pTarget != m_pEnemyObj)	// in case there's already a target selected, simply select it (NO attack)
-			{	// unselect current target
+			if (pTarget != m_pEnemyObj)	// in case there's already a target selected, simply select it (NO attack) and deselect current
+			{	// deselect current target
 				m_pEnemyObj->SetColor(WHITE);
 				m_pEnemyObj->SetHovered(false);
 				// set the new target
 				m_pEnemyObj = pTarget;
 				m_pEnemyObj->SetColor(DARKRED);
 				m_pEnemyObj->SetHovered(true);
-				((CUnit*)m_pCurrPlayerSelectedObj)->FaceTarget(m_pEnemyObj->GetCoord());
 			}
-			else
-				InitiateAttack();
+			else	// otherwise, the current target was clicked again, begin pathfinding to determine if reachable
+			{
+				// find the path
+				m_pCurrPlayerSelectedObj->FindPathToTarget(pt, m_vPath);
+				if (m_vPath.size())
+				{
+// TODO:: find and display path(s) available when unit is first clicked
+					CUnit* unit = ((CUnit*)m_pCurrPlayerSelectedObj);
+					if (DetermineTotalMoveCost(true) <= unit->GetStamina())
+					{
+						unit->SetNewPath(&m_vPath);
+						return true;
+					}
+				}
+			}
 		}
-		return false;
 	}
-	return (x < m_nNumCols && x > -1 && y < m_nNumRows && y > -1 
-			&& m_pTilesL1[id].Flag() != FLAG_COLLISION
-			&& m_pTilesL2[id].Flag() != FLAG_COLLISION && !pTarget);
+	else	// we're just moving to an empty space, begin pathfinding to determine if reachable
+	{
+		// find the path
+		m_pCurrPlayerSelectedObj->FindPathToTarget(pt, m_vPath);
+		if (m_vPath.size())
+		{
+			// TODO:: find and display path(s) available when unit is first clicked
+			CUnit* unit = ((CUnit*)m_pCurrPlayerSelectedObj);
+			if (DetermineTotalMoveCost(false) <= unit->GetStamina())
+			{
+				unit->SetNewPath(&m_vPath);
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 CObject* CMap::HoverObject(point& coord)
@@ -790,27 +814,39 @@ void CMap::HandleMouseInput()
 	// attacking target (if there is a target), selecting if no target
 	else if (Globals::g_pDI->MouseButtonPressed(MOUSE_RIGHT) && m_rViewport.IsPointInRect(m_ptMouseScrn))
 	{
-		// TODO:: TEMP
-#ifdef _DEBUG
-		float dist = SqrDist(IsoTilePlot(m_ptCurrMouseTile), IsoTilePlot(lastCoordClicked));
-		DebugWnd->DebugFloat(dist, &string("Sqr Distance"));
-#endif
-
 		// moving with mouse
-		if (m_pCurrPlayerSelectedObj && m_pCurrPlayerSelectedObj->GetType() == OBJ_UNIT)
+		if (m_pCurrPlayerSelectedObj && m_pCurrPlayerSelectedObj->GetType() == OBJ_UNIT) // a unit has already been selected (of the current player)
 		{
-			int newDir = 0;
-			if (((CUnit*)m_pCurrPlayerSelectedObj)->FaceTarget(m_ptCurrMouseTile, &newDir, false))
-				DoMove(m_ptCurrMouseTile.x, m_ptCurrMouseTile.y, (eAnimationDirections)newDir);
-		}
+			if (m_pCurrHoverObject)	// some object is being right-clicked now
+			{
+					// right-clicking on current player's object, show extra info
+				if (m_pCurrHoverObject->GetFactionID() == Globals::g_pCurrPlayer->GetProfile()->nFactionID)
+				{	// TODO:: display stats or something extra
 
-		if (m_pCurrHoverObject)				// TODO::what to do when right-clicking on an object? display special stats...something extra?
-		{
-
-		}
-		else if (!m_pCurrHoverObject)		// TODO::what to use right-clicking on a non-object? map info?
-		{
-
+				} 
+				else// an enemy object is being right-clicked
+				{
+					if (m_pEnemyObj)	
+					{
+						if (m_pCurrHoverObject == m_pEnemyObj) // right-clicking to attack an already-selected enemy object
+						{
+							DetermineMoveSpecifics(m_ptCurrMouseTile);
+						} 
+						else
+						{
+							Select(m_pCurrHoverObject);
+						}
+					} 
+					else	// right-clicking enemy object
+					{
+						Select(m_pCurrHoverObject);
+					}
+				}
+			} 
+			else	// then we're just moving to open terrain
+			{
+				DetermineMoveSpecifics(m_ptCurrMouseTile);
+			}
 		}
 	}
 }
@@ -1012,7 +1048,13 @@ void CMap::Select(CObject* const obj)
 
 		// if there's an enemy already selected, and curr player's is an OBJ_UNIT, determine if we need to face it
 		if (m_pEnemyObj && m_pCurrPlayerSelectedObj->GetType() == OBJ_UNIT)
-			((CUnit*)m_pCurrPlayerSelectedObj)->FaceTarget(m_pEnemyObj->GetCoord());
+		{
+			((CUnit*)m_pCurrPlayerSelectedObj)->FindPathToTarget(m_pEnemyObj->GetCoord(), m_vPath);
+			// NOTE: face the obj only if the m_pCurrPlayerSelectedObj can "see" it
+			// for now, that means one tile away
+			if (m_vPath.size() == 1)	
+				((CUnit*)m_pCurrPlayerSelectedObj)->FaceTarget(m_pEnemyObj->GetCoord());
+		}
 		Globals::g_pHUD->SetInitialQBSlots(obj, obj->GetQBSlots());
 	} 
 	// selecting an enemy
@@ -1020,7 +1062,9 @@ void CMap::Select(CObject* const obj)
 	{
 		// if the object being selected is already selected, and the curr player has a UNIT selected, attack it
 		if (m_pEnemyObj == obj && dynamic_cast<CUnit *>(m_pCurrPlayerSelectedObj) )
-			InitiateAttack();
+		{
+			DetermineMoveSpecifics(m_pEnemyObj->GetCoord());
+		}
 		else if (m_pEnemyObj)	// there was another enemy object, deselect it first
 			Deselect(m_pEnemyObj);
 		m_pEnemyObj = obj;
@@ -1029,7 +1073,13 @@ void CMap::Select(CObject* const obj)
 
 		// if we have a unit selected, determine if we need to face the newly selected enemy
 		if (m_pCurrPlayerSelectedObj && m_pCurrPlayerSelectedObj->GetType() == OBJ_UNIT)
-			((CUnit*)m_pCurrPlayerSelectedObj)->FaceTarget(m_pEnemyObj->GetCoord());
+		{
+			((CUnit*)m_pCurrPlayerSelectedObj)->FindPathToTarget(m_pEnemyObj->GetCoord(), m_vPath);
+			// NOTE: face the obj only if the m_pCurrPlayerSelectedObj can "see" it
+			// for now, that means one tile away
+			if (m_vPath.size() == 1)	
+				((CUnit*)m_pCurrPlayerSelectedObj)->FaceTarget(m_pEnemyObj->GetCoord());
+		}
 	}
 
 	//BIT_ON(m_nMapFlags, MF_CENTER_MAP);
@@ -1037,22 +1087,22 @@ void CMap::Select(CObject* const obj)
 void CMap::InitiateAttack()
 {
 	CUnit* playerUnit = ((CUnit*)m_pCurrPlayerSelectedObj);
-	bool inRange = playerUnit->FaceTarget(m_pEnemyObj->GetCoord());
-	if (inRange && m_pEnemyObj->GetType() == OBJ_UNIT && playerUnit->GetCurrAttackAbility() &&
-		playerUnit->GetStamina() >= playerUnit->GetCurrAttackAbility()->GetCombatProps().AttackStam)	// only make the target face attacker if it's a unit
-	{
-		playerUnit->DecrementStamina(playerUnit->GetCurrAttackAbility()->GetCombatProps().AttackStam);
-		BIT_ON(m_nMapFlags, MF_ATTACKING);
+	playerUnit->FaceTarget(m_pEnemyObj->GetCoord());
 
-		// TODO:: units will not turn to face if a surprise attack is happening:
-		((CUnit*)m_pEnemyObj)->SetFacing(playerUnit->GetOppositeFacing());
-		
-		// animate attack..delay damage shown to user until attack is finished
-		if (playerUnit->GetCurrAnimString() != "Attack")
-			playerUnit->ChangeAnim("Attack");
-		playerUnit->GetCurrAnim().Play();
-		m_BattleMngr.Init(playerUnit, m_pEnemyObj);
-	}
+// TODO:: SETUP ATTACK WHERE ATTACKER GOES TO ENEMY TILE PART-WAY, DOES COMBAT, AND STAYS (unless a special ability allows it either to leave)
+	// also need to decrement stamina for the terrain cost
+
+	playerUnit->DecrementStamina(playerUnit->GetCurrAttackAbility()->GetCombatProps().AttackStam + 1 /*TEMPORARY 1 <<<*/);
+	BIT_ON(m_nMapFlags, MF_ATTACKING);
+
+	// TODO:: units will not turn to face if a surprise attack is happening:
+	((CUnit*)m_pEnemyObj)->SetFacing(playerUnit->GetOppositeFacing());
+	
+	// animate attack..delay damage shown to user until attack is finished
+	if (playerUnit->GetCurrAnimString() != "Attack")
+		playerUnit->ChangeAnim("Attack");
+	playerUnit->GetCurrAnim().Play();
+	m_BattleMngr.Init(playerUnit, m_pEnemyObj);
 }
 
 void CMap::ActionIfSelected(CObject* obj)
@@ -1143,23 +1193,27 @@ void CMap::SelectObj(CObject*& obj, bool deselectAll /*= false*/)
 
 void CMap::DoMove( int newX, int newY, eAnimationDirections facing )
 {
-	point nPt = point(newX, newY);
-	if (nPt != m_pCurrPlayerSelectedObj->GetCoord())
+	if (point(newX, newY) != m_pCurrPlayerSelectedObj->GetCoord())
 	{
-		int id = newY * m_nNumCols + newX;
-		if (GoodMove(newX, newY, id))
-		{
-			int cost = m_pTilesL1[id].TerrainCost() + m_pTilesL2[id].TerrainCost();
-			// TODO::temp, get actual terrain cost ^
-			cost = 1;
-			CUnit* currPlayerUnit = ((CUnit*)m_pCurrPlayerSelectedObj);
-			if (currPlayerUnit->Move(nPt, IsoTilePlot(nPt), cost, facing))
-			{
-				BIT_ON(m_nMapFlags, MF_MOVING);
-				if (currPlayerUnit->GetMoveToPos().x < 150 || currPlayerUnit->GetMoveToPos().x > m_nScreenWidth - 150
-					|| currPlayerUnit->GetMoveToPos().y < 150 || currPlayerUnit->GetMoveToPos().y > m_rViewport.bottom - 150)
-					BIT_ON(m_nMapFlags, MF_CENTER_MAP);
-			}
-		}
+		CUnit* currPlayerUnit = ((CUnit*)m_pCurrPlayerSelectedObj);
+		BIT_ON(m_nMapFlags, MF_MOVING);
+		if (currPlayerUnit->GetMoveToPos().x < 150 || currPlayerUnit->GetMoveToPos().x > m_nScreenWidth - 150
+			|| currPlayerUnit->GetMoveToPos().y < 150 || currPlayerUnit->GetMoveToPos().y > m_rViewport.bottom - 150)
+			BIT_ON(m_nMapFlags, MF_CENTER_MAP);
 	}
+}
+
+int  CMap::DetermineTotalMoveCost(bool attacking)
+{
+	PathIter iter = m_vPath.begin();
+	PathIter end = m_vPath.end();
+	int cost = 0;
+	for (; iter != end; ++iter)
+	{
+		// TODO:: put all layers of tiles into each tile
+		cost += (*iter)->TerrainCost();
+	}
+	if (attacking)
+		cost += m_pCurrPlayerSelectedObj->GetCurrAttackAbility()->GetCombatProps().AttackStam;
+	return cost;
 }

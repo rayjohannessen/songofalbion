@@ -85,3 +85,15 @@ Implemented rudimentary right-click movement
 7/11/2010
 ---------
 Added pathfinding (A-Star) algorithm and other related functions (not implemented yet)
+
+7/14/2010
+---------
+Implemented pathfinding
+	- Units may be moved by right-mouse or keyboard(only 1 space w/KB, so no real pathfinding done here)
+	- Unit movement requires adequate stamina
+	- Unit's may attack a unit at end of move, the path is determined and traversed by pathfinding
+
+
+
+
+
