@@ -21,7 +21,7 @@ struct point
 	{ return (pt.x == x && pt.y == y);}
 	bool operator!= (const point& pt)
 	{ return (pt.x != x || pt.y != y);}
-	operator pointf();
+	operator pointf() const;
 	void Offset(int osx, int osy) {x += osx; y += osy;}
 	void Offset(point os) {x += os.x; y += os.y;}
 };
@@ -63,7 +63,7 @@ struct pointf
 	{ return (pt.x == x && pt.y == y);}
 	bool operator!= (const pointf& pt)
 	{ return (pt.x != x || pt.y != y);}
-	operator point();
+	operator point() const;
 	inline bool IsWithinRange(const pointf& pt, float range = 5.0f)
 	{
 		return (pt.x - range < x && pt.x + range > x &&

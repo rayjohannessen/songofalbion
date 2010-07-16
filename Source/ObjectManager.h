@@ -32,7 +32,7 @@ public:
 	void Update(double fElapsed, const pointf* moveAmt = NULL);
 	void Render();
 
-	CUnit* IsSpaceOccupied(const point& coord, const CPlayer* const currPlayer);
+	CUnit* IsSpaceOccupied(const point& coord);
 
 	//////////////////////////////////////////////////////////////////////////
 	// turn-related

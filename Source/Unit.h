@@ -5,6 +5,7 @@
 #include "Animation.h"
 #include "ObjectDefines.h"
 class CUnit;
+class CTile;
 
 //////////////////////////////////////////////////////////////////////////
 // each unit will have a set of animations. They will simply be a set of
@@ -29,8 +30,24 @@ class CUnit : public CObject
 	pointf m_ptOriginalScrnOS;
 	pointf m_ptMoveToScreenPos;
 	UnitAnims m_mAnimations;
+	Path*  m_pPath;
+	PathIter m_iCurrPath;
 
 	void ClearAnims();
+	//////////////////////////////////////////////////////////////////////////
+	//	NextMove
+	//
+	//	coord	- the tile's coord the unit is moving to next
+	//	screenPos - the top-left screen position (x,y) of the target tile
+	//	cost	- the terrain cost of the next tile
+	//	facing	- the direction the unit needs to face when moving to the next tile
+	//
+	// NOTES: performs a map move, subtracts stamina, sets facing, plays run anim
+	//////////////////////////////////////////////////////////////////////////
+	void NextMove(const point& coord, int cost, eAnimationDirections facing);
+		
+	void StopMoving();
+
 public:
 	CUnit();
 	CUnit(CUnit& unit);
@@ -43,12 +60,6 @@ public:
 
 	// draws the unit at its current frame
 	void Render(const rect& viewPort);
-
-	// performs a map move, only if it has enough movement points remaining
-	// returns true if move was made
-	bool Move(point& coord, point& screenPos, int cost, eAnimationDirections facing);
-	void ChangeAnim(const string& animName);
-
 	void Update(double fTimeStep, const pointf* moveAmt = NULL);
 
 	//////////////////////////////////////////////////////////////////////////
@@ -57,13 +68,14 @@ public:
 	//
 	// returns true if target was within range
 	//////////////////////////////////////////////////////////////////////////
-	bool FaceTarget(const point& targetPt, int* newDir = NULL, bool setFacing = true);
-
+	void FaceTarget(const point& targetPt, int* newDir = NULL, bool setFacing = true);
+	void ChangeAnim(const string& animName);
 	bool MouseInRect(point& mousePt);
 
 	//////////////////////////////////////////////////////////////////////////
 	// accessors
- 	inline int GetNumAnims()	const		{ return m_nNumAnims;					}
+	inline eAnimationDirections GetOppositeFacing()	{ return (eAnimationDirections)gOppositeDirs[m_mAnimations[m_strCurrAnim]->CurrDir()]; }
+	inline int GetNumAnims()	const		{ return m_nNumAnims;					}
 	inline int GetUnitType()	const		{ return m_nUnitType;					}
 	inline int GetVitality()	const		{ return m_nVitality;					}
 	inline int GetMaxVit()		const		{ return m_nMaxVitality;				}
@@ -74,7 +86,6 @@ public:
 	inline int GetMP()			const		{ return m_nMagPts;						}
 	inline int GetMaxMagPts()   const    	{ return m_nMaxMP;						}
 	inline int GetRange()		const		{ return m_nRange;						}
-	inline eAnimationDirections GetOppositeFacing()	{ return (eAnimationDirections)gOppositeDirs[m_mAnimations[m_strCurrAnim]->CurrDir()]; }
 	inline string GetCurrAnimString()const	{ return m_strCurrAnim;					}
 	inline pointf GetOrigScOS() const		{ return m_ptOriginalScrnOS;			}
 	inline pointf GetMoveToPos()const		{ return m_ptMoveToScreenPos;			}
@@ -83,12 +94,13 @@ public:
 
 	//////////////////////////////////////////////////////////////////////////
 	// mutators
-	inline void SetFacing(eAnimationDirections facing)	{ m_mAnimations[m_strCurrAnim]->CurrDir(facing);			}
+	inline void SetFacing(eAnimationDirections facing)	{ m_mAnimations[m_strCurrAnim]->CurrDir(facing);	}
 	inline void AddToVitality(int amt)			{ m_nVitality += amt; if (m_nVitality < 0) m_nVitality = 0; }
 	inline void DecrementStamina(int decAmt)	{ m_nStamina -= decAmt;			}
 	inline void ResetStamina()					{ m_nStamina = m_nMaxStamina;	}
-	inline void SetScreenPosWithoutOS(const pointf& pt);
+	void SetNewPath(Path* const p);
 	void SetScrnPos(point& sPos);
+	inline void SetScreenPosWithoutOS(const pointf& pt);
 
 	CTriggerTimer m_Timer;
 };

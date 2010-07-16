@@ -10,8 +10,6 @@
 #include "CombatSkill.h"
 #include "NonCombatSkill.h"
 #include "ObjectManager.h"
-#include "Pathfinding.h"
-using namespace Pathfinding;
 using namespace UnitDefines;
 
 CUnit::~CUnit()
@@ -25,20 +23,21 @@ CUnit::~CUnit()
 	}
 }
 CUnit::CUnit() : 
-	CObject(),
-	m_nUnitType(-1),
-	m_nMaxVitality(0),
-	m_nVitality(0),
-	m_nAtt(0),
-	m_nDef(0),
-	m_nMaxStamina(0),
-	m_nStamina(0),
-	m_nMaxMP(0),
-	m_nMagPts(0),
-	m_nRange(1),
-	m_nNumAnims(0),
-	m_strCurrAnim("NONE"),
-	m_ptOriginalScrnOS(0.0f, 0.0f)
+CObject(),
+m_nUnitType(-1),
+m_nMaxVitality(0),
+m_nVitality(0),
+m_nAtt(0),
+m_nDef(0),
+m_nMaxStamina(0),
+m_nStamina(0),
+m_nMaxMP(0),
+m_nMagPts(0),
+m_nRange(1),
+m_nNumAnims(0),
+m_strCurrAnim("NONE"),
+m_ptOriginalScrnOS(0.0f, 0.0f),
+m_pPath(NULL)
 {
 }
 
@@ -51,7 +50,7 @@ CUnit::CUnit(CUnit& unit)
 
 CUnit::CUnit( int nUnitType, int type, point& coord, point& sPos, 
 			 string name, const char* faction, int factionID)
-			 : CObject(type, coord, sPos, name, faction, factionID)
+			 : CObject(type, coord, sPos, name, faction, factionID), m_pPath(NULL)
 {
 	// most units' source rects should be the same size, use default size for now (w=128, h=128)
 	m_nUnitType = nUnitType;
@@ -143,10 +142,32 @@ void CUnit::Update(double fTimeStep, const pointf* moveAmt)
 		}
 		else
 		{
-			m_mAnimations[m_strCurrAnim]->Stop();
-			ChangeAnim(gAnimNames[AT_ATTACK]);
-			m_ptScreenPos = m_ptMoveToScreenPos;
-			Globals::g_pMap->ToggleMapFlagOff(MF_MOVING);	// TODO:: determine a better way to handle this
+			// there are more tiles in the path
+			if ( (++m_iCurrPath) != m_pPath->end() )
+			{
+				if (!Globals::g_pMap->GetTarget())	// no target, just moving this whole path
+				{
+					TargetDirPair pair;
+					pair.first	= m_ptCoord.x - (*m_iCurrPath)->DestXID();
+					pair.second	= m_ptCoord.y - (*m_iCurrPath)->DestYID();
+					NextMove((*m_iCurrPath)->DestID(), (*m_iCurrPath)->TerrainCost(), Globals::g_CoordToDir[m_ptCoord.y & 1][pair]);
+				}
+				else if (Globals::g_pMap->GetTarget()->GetCoord() == (*m_iCurrPath)->DestID() &&
+						(*m_iCurrPath) == (*m_pPath)[m_pPath->size()-1])	// this last tile contains the target
+				{
+					// TODO:: setup attack and start it
+					// TODO:: determine how far the unit will move into the enemy's tile when attacking, and how that will all work
+					StopMoving();
+
+					// start attack
+					Globals::g_pMap->InitiateAttack();
+				}
+			}
+			// no more tiles, stop moving
+			else
+			{
+				StopMoving();
+			}
 		}
 	}
 	// update current animation
@@ -155,7 +176,6 @@ void CUnit::Update(double fTimeStep, const pointf* moveAmt)
 		// an anim has finished playing...maybe do something now...
 		if (IsAnimAttack(m_strCurrAnim))
 		{
-			//m_pCurrAbility->SetToUpdate(false);	// TODO:: complete ability apart from animation
 		}
 		else if (IsAnimHit(m_strCurrAnim))
 		{
@@ -185,51 +205,18 @@ void CUnit::Render( const rect& viewPort )
 	}
 }
 
-// performs a map move, only if it has enough movement points remaining
-// returns true if move was made
-bool CUnit::Move(point& coord, point& screenPos, int cost, eAnimationDirections facing)
-{
-	if (cost <= m_nStamina)
-	{
-		m_nStamina -= cost;
-		if (m_nStamina < 0)
-			m_nStamina = 0;
-		SetCoord(coord);	// set grid coord
-		m_ptMoveToScreenPos = (pointf)screenPos + (pointf)m_ptOffset;
-		m_strCurrAnim = gAnimNames[AT_RUN];
-		SetFacing(facing);
-		m_mAnimations[m_strCurrAnim]->Play(1, true);
-		return true;
-	}
-	return false;
-}
-
-bool CUnit::FaceTarget(const point& targetPt, int* newDir /*= NULL*/, bool setFacing /*= true*/)
+void CUnit::FaceTarget(const point& targetPt, int* newDir /*= NULL*/, bool setFacing /*= true*/)
 {
 	TargetDirPair pair;
 	pair.first	= m_ptCoord.x - targetPt.x;
 	pair.second	= m_ptCoord.y - targetPt.y;
 
-	// determine how many spaces away the target coord is
-
-	// TODO:: allow for unit to turn when WITHIN RANGE, instead of one tile away always
-	// only turn precise if the unit is a tile away
-	Path path;
-	A_Star(Globals::g_pMap->GetL1Tiles()[m_ptCoord.y * Globals::g_pMap->GetNumCols() + m_ptCoord.x], 
-		   Globals::g_pMap->GetL1Tiles()[targetPt.y * Globals::g_pMap->GetNumCols() + targetPt.x], path, 
-		   this, Globals::g_pMap->GetL1Tiles(), Globals::g_pMap->GetL2Tiles(), Globals::g_pMap->GetNumColsRows());
-
-	if (path.size())
-	{
-		// fetch direction to face from TargetDirMap that matches the correct "pair" of x and y differences
-		eAnimationDirections dir = Globals::g_CoordToDir[m_ptCoord.y & 1][pair]; 
-		if (setFacing)
-			SetFacing(dir);	
-		if (newDir)
-			*newDir = dir;
-		//return true;
-	}
-	return false;
+	// fetch direction to face from TargetDirMap that matches the correct "pair" of x and y differences
+	eAnimationDirections dir = Globals::g_CoordToDir[m_ptCoord.y & 1][pair]; 
+	if (setFacing)
+		SetFacing(dir);	
+	if (newDir)
+		*newDir = dir;
 }
 
 bool CUnit::MouseInRect(point& mousePt)
@@ -273,3 +260,52 @@ void CUnit::ClearAnims()
 	}
 }
 
+
+void CUnit::SetNewPath(Path* const p)	
+{ 
+	m_pPath = p;
+	m_iCurrPath = p->begin();
+	// see if the first tile contains the target
+	if (Globals::g_pMap->GetTarget() && (*m_iCurrPath)->DestID() == Globals::g_pMap->GetTarget()->GetCoord())
+	{
+		Globals::g_pMap->InitiateAttack();
+	}
+	else
+	{
+		ChangeAnim("Run");
+		m_mAnimations[m_strCurrAnim]->Play(); 
+		Globals::g_pMap->ToggleMapFlagOn(MF_MOVING);
+
+		TargetDirPair pair;
+		pair.first	= m_ptCoord.x - (*m_iCurrPath)->DestXID();
+		pair.second	= m_ptCoord.y - (*m_iCurrPath)->DestYID();
+		NextMove((*m_iCurrPath)->DestID(), (*m_iCurrPath)->TerrainCost(), Globals::g_CoordToDir[m_ptCoord.y & 1][pair]);
+	}
+}
+//////////////////////////////////////////////////////////////////////////
+//	PRIVATE FUNCTIONS
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// performs a map move, subtracts stamina, sets facing, plays run anim
+void CUnit::NextMove(const point& coord, int cost, eAnimationDirections facing)
+{
+	m_nStamina -= cost;
+	if (m_nStamina < 0)
+		m_nStamina = 0;
+	SetCoord(coord);	// set grid coord
+	m_ptMoveToScreenPos = (pointf)Globals::g_pMap->IsoTilePlot(coord) + (pointf)m_ptOffset;
+	m_strCurrAnim = gAnimNames[AT_RUN];
+	SetFacing(facing);
+	m_mAnimations[m_strCurrAnim]->Play(1, true);
+}
+
+void CUnit::StopMoving()
+{
+	m_mAnimations[m_strCurrAnim]->Stop();
+	ChangeAnim(gAnimNames[AT_ATTACK]);
+	m_ptScreenPos = m_ptMoveToScreenPos;
+	Globals::g_pMap->ToggleMapFlagOff(MF_MOVING);	// TODO:: determine a better way to handle this	
+	m_pPath->clear();
+}
+//////////////////////////////////////////////////////////////////////////

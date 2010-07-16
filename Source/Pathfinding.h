@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Tile.h"
-#include "Unit.h"
 
 //////////////////////////////////////////////////////////////////////////
 // For Song of Albion, with isometric tiles (128x64), a distance of 64 pixels
@@ -13,6 +12,7 @@
 //////////////////////////////////////////////////////////////////////////
 namespace Pathfinding
 {
+//	class CObject;
 	class CPFEntity 
 	{
 		CPFEntity*	m_pParent;
@@ -45,6 +45,7 @@ namespace Pathfinding
 	typedef deque<CPFEntity*> EntityDeque;
 	typedef deque<CPFEntity*>::const_iterator EntityDequeIter;
 	typedef deque<const CTile*> Path;
+	typedef deque<const CTile*>::const_iterator PathIter;
 	//////////////////////////////////////////////////////////////////////////
 	//	FUNCTION: A_Star
 	//	startTile - the tile to start pathfinding from
@@ -56,7 +57,7 @@ namespace Pathfinding
 	//
 	//	RETURN void
 	//////////////////////////////////////////////////////////////////////////
-	void	A_Star(const CTile& startTile, const CTile& targetTile, Path& path, const CUnit* const unit, const CTile* const tilesL1, const CTile* const tilesL2, point& numColsRows);
+	void	A_Star(const CTile& startTile, const CTile& targetTile, Path& path, /*const CObject* const unit,*/ const CTile* const tilesL1, const CTile* const tilesL2, point& numColsRows);
 
 
 

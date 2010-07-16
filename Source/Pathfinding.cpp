@@ -1,7 +1,9 @@
 #include "stdafx.h"
 
 #include "Pathfinding.h"
+#include "AnimationDefinesEnums.h"
 #include "Globals.h"
+#include "Object.h"
 
 namespace Pathfinding
 {
@@ -29,7 +31,8 @@ namespace Pathfinding
 
 	//////////////////////////////////////////////////////////////////////////
 	// A-Star search algorithm
-	void	A_Star(const CTile& startTile, const CTile& targetTile, Path& path, const CUnit* const unit, const CTile* const tilesL1, const CTile* const tilesL2, point& numColsRows)
+	void	A_Star(const CTile& startTile, const CTile& targetTile, Path& path, /*const CObject* const object,*/ 
+				   const CTile* const tilesL1, const CTile* const tilesL2, point& numColsRows)
 	{
 		// local variables needed for the algorithm
 		EntityMap created;
@@ -54,7 +57,7 @@ namespace Pathfinding
 				path.push_front(pCurrEntity->Tile());
 				while (pCurrEntity->Parent() && pCurrEntity->Parent()->Tile() != &startTile)
 				{
-					// TODO:: determine the farthest tile this unit can actually move
+					// TODO:: determine the farthest tile this object can actually reach
 					// and only put those tiles in the path
 					pCurrEntity = pCurrEntity->Parent();
 					path.push_front(pCurrEntity->Tile());
@@ -74,6 +77,8 @@ namespace Pathfinding
 				adjTileCoord += Globals::g_AdjTileOffsets[pCurrEntity->Tile()->DestYID() & 1][(eDirections)i];
 
 				// make sure this tile is on the map
+				// TODO:: determine if the tile has an enemy on it
+				// TODO:: Determine last tile unit can go to
 				if (adjTileCoord.x > -1 && adjTileCoord.x < numColsRows.x && adjTileCoord.y > -1 && adjTileCoord.y < numColsRows.y)
 				{					// standard x,y col/row to 1D array index formula
 					pTile = &tilesL1[adjTileCoord.y * numColsRows.x + adjTileCoord.x];

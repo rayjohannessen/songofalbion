@@ -3,6 +3,8 @@
 
 #include "Timer.h"
 #include "BattleManager.h"
+#include "Pathfinding.h"
+using namespace Pathfinding;
 
 class CUnit;
 class CGame;
@@ -11,7 +13,6 @@ class CObject;
 class CTile;
 class CFreeTile;
 enum eAnimationDirections;
-
 enum MapMovementFlags {FLAG_NONE, FLAG_COLLISION, FLAG_ENEMY_SPAWN, };
 enum Quadrants {TOP_LEFT, TOP_RIGHT, BTM_LEFT, BTM_RIGHT,};
 
@@ -58,6 +59,7 @@ class CMap
 	CBattleManager m_BattleMngr;
 	int m_nScreenWidth;
 	int m_nScreenHeight;
+	Path m_vPath;
 
 	// Mouse variables
 	int   m_nCurrMouseID;
@@ -117,8 +119,8 @@ class CMap
 	CObject* HoverObject(point& coord);
 	void Deselect(CObject*& obj);
 	void Select(CObject* const obj);
-	bool GoodMove(int x, int y, int id);
-	void InitiateAttack();
+	bool DetermineMoveSpecifics(const point& pt);
+	int  DetermineTotalMoveCost(bool attacking);
 //////////////////////////////////////////////////////////////////////////
 // Drawing map functions - private
 
@@ -182,7 +184,7 @@ public:
 	//
 	//	Return		:	The pixel point to draw at
 	//////////////////////////////////////////////////////////////////////////
-	point IsoTilePlot(point& pt);
+	point IsoTilePlot(const point& pt) const;
 
 	//////////////////////////////////////////////////////////////////////////
 	//	Function	:	DrawPlacingObj
@@ -219,6 +221,7 @@ public:
 	void SelectObj(CObject*& obj, bool deselectAll = false);
 	// deselects the obj on the map if it is selected (e.g., if a unit is destroyed that is selected)
 	void ActionIfSelected(CObject* obj);
+	void InitiateAttack();
 
 	//////////////////////////////////////////////////////////////////////////
 	// Accessors
