@@ -15,6 +15,7 @@ class CUnit : public CObject
 {
 	typedef map<string, CAnimation*> UnitAnims;
 
+	bool m_bMovingToAttack;
 	int m_nUnitType;
 	int m_nMaxVitality;
 	int m_nVitality;		// referred to as vitality
@@ -47,6 +48,7 @@ class CUnit : public CObject
 	void NextMove(const point& coord, int cost, eAnimationDirections facing);
 		
 	void StopMoving();
+	void BeginMoveToAttack();
 
 public:
 	CUnit();

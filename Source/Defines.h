@@ -62,3 +62,5 @@
 #define DEPTH_BUILDING		0.87f
 #define DEPTH_OBJECT		0.9f
 #define DEPTH_TILES			1.0f
+
+#define DEPTH_OS_FACTION	-0.01f

@@ -318,14 +318,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		//////////////////////////////////
 	}
 
+#ifdef _DEBUG
+	DebugWnd->Shutdown();
+#endif
 	/////////////////////////////////////////
 	//	Shutdown Game Here
 	/////////////////////////////////////////
 	Globals::g_pGame->Shutdown();
 
-#ifdef _DEBUG
-	DebugWnd->Shutdown();
-#endif
 	/////////////////////////////////////////
 	
 	//	Unregister the window class

@@ -221,7 +221,7 @@ public:
 	void SelectObj(CObject*& obj, bool deselectAll = false);
 	// deselects the obj on the map if it is selected (e.g., if a unit is destroyed that is selected)
 	void ActionIfSelected(CObject* obj);
-	void InitiateAttack();
+	void InitiateAttack(bool setfacing = true);
 
 	//////////////////////////////////////////////////////////////////////////
 	// Accessors
