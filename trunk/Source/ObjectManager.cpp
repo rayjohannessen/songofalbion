@@ -61,7 +61,7 @@ CObject* ObjectManager::StartTurn(CPlayer* currPlayer)
 	{
 		for (int i = 0; i < numUnits; ++i)
 		{
-			((CUnit*)currPlayer->GetUnits())[i].ResetStamina();
+			((CUnit*)currPlayer->GetUnits())[i].Reset();
 			m_lCurrPlayerObjects.push_back(&currPlayer->GetUnits()[i]);
 		}
 		m_iCurrObjIter = m_lCurrPlayerObjects.begin();

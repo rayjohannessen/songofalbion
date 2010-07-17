@@ -52,7 +52,7 @@ bool CBattleManager::Update(double dElapsedTime)
 
 bool CBattleManager::OnAbilityFinished( AbilityReturn *abilRet )
 {
-	// reset current
+	// reset current - should be done at the beginning of an object's turn
 	m_pCurrAbility->ResetResultsApplied();
 
 	CUnit* unit;
@@ -66,6 +66,7 @@ bool CBattleManager::OnAbilityFinished( AbilityReturn *abilRet )
 		if (m_pCurrAbility->GetCombatProps().CurrFreeCounters > 0)
 		{
 			// a free counter-attack
+			--m_pCurrAbility->GetCombatProps().CurrFreeCounters;
 			unit->ChangeAnim("Attack");
 			unit->GetCurrAnim().Play();
 			return false;
@@ -92,6 +93,7 @@ bool CBattleManager::OnAbilityFinished( AbilityReturn *abilRet )
 // 			Reset();
 // 			return true;
 // 		}
+		m_pDefender->GetCurrDefenseAbility()->GetCombatProps().CurrFreeCounters = m_pCurrAbility->GetCombatProps().CurrFreeCounters;
 		Reset();
 		return true;	// the attacker is done as well, signal to end this battle
 	}
