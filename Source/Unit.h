@@ -101,7 +101,7 @@ public:
 	inline void SetFacing(eAnimationDirections facing)	{ m_mAnimations[m_strCurrAnim]->CurrDir(facing);	}
 	inline void AddToVitality(int amt)			{ m_nVitality += amt; if (m_nVitality < 0) m_nVitality = 0; }
 	inline void DecrementStamina(int decAmt)	{ m_nStamina -= decAmt;			}
-	inline void ResetStamina()					{ m_nStamina = m_nMaxStamina;	}
+	void Reset();
 	void SetNewPath(Path* const p);
 	void SetScrnPos(point& sPos);
 	inline void SetScreenPosWithoutOS(const pointf& pt);

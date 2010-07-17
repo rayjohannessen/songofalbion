@@ -36,5 +36,4 @@ void CCombatSkill::Render()
 void CCombatSkill::ResetResultsApplied()
 {
 	CAbilityObjectBase::ResetResultsApplied();
-	m_CombatProps.CurrFreeCounters = m_CombatProps.FreeCounters;
 }

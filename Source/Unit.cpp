@@ -176,6 +176,13 @@ void CUnit::Update(double fTimeStep, const pointf* moveAmt)
 					Globals::g_pMap->ToggleMapFlagOff(MF_MOVING);
 					BeginMoveToAttack();
 				}
+				else	// there is a target, but the player is just moving to an open tile
+				{
+					TargetDirPair pair;
+					pair.first	= m_ptCoord.x - (*m_iCurrPath)->DestXID();
+					pair.second	= m_ptCoord.y - (*m_iCurrPath)->DestYID();
+					NextMove((*m_iCurrPath)->DestID(), (*m_iCurrPath)->TerrainCost(), Globals::g_CoordToDir[m_ptCoord.y & 1][pair]);
+				}
 			}
 			// no more tiles, stop moving
 			else
@@ -296,6 +303,12 @@ void CUnit::SetNewPath(Path* const p)
 		pair.second	= m_ptCoord.y - (*m_iCurrPath)->DestYID();
 		NextMove((*m_iCurrPath)->DestID(), (*m_iCurrPath)->TerrainCost(), Globals::g_CoordToDir[m_ptCoord.y & 1][pair]);
 	}
+}
+
+void CUnit::Reset()							
+{ 
+	m_nStamina = m_nMaxStamina; 
+	m_pCurrDefenseAbility->ResetFreeCounter();	
 }
 //////////////////////////////////////////////////////////////////////////
 //	PRIVATE FUNCTIONS

@@ -86,6 +86,7 @@ Implemented rudimentary right-click movement
 ---------
 Added pathfinding (A-Star) algorithm and other related functions (not implemented yet)
 
+
 7/14/2010
 ---------
 Implemented pathfinding
@@ -100,5 +101,15 @@ Battle Changes
 	- The attacking unit is required to actually move to the defender's tile (requiring stamina to move)
 	- Attacker moves halfway onto defender's tile, attacks, and stays until moved out, killed, or enemy is killed
 	- If attacker wins and is not in the center of the tile, it moves to the center after enemy disappears
+
+
+7/17/2010
+---------
+Battle tweaks and fixes
+	- Free counter attacks keep track of times used during a battle (can't be used infinitely now)
+	- Unit correctly pathfinds when an enemy target is selected and player moves to an open tile
+
+
+
 
 

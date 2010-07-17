@@ -47,6 +47,7 @@ public:
 	void Render();
 
 	void ResetResultsApplied();
+	inline void ResetFreeCounter()							{ m_CombatProps.CurrFreeCounters = m_CombatProps.FreeCounters;	}
 	inline CCombatAbilProperties& GetCombatProps()			{ return m_CombatProps; }
 	inline int	GetStaminaRequired(bool bGetAttackStam)		{ if (bGetAttackStam) return m_CombatProps.AttackStam; else return m_CombatProps.DefStam; }
 };
