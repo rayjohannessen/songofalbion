@@ -84,7 +84,7 @@ class CMap
 	int m_nTotalNumTiles;
 	int m_nCurrSelectedTile;	// where the mouse cursor is at on the map (tile ID)
 
-	int m_nOSx;	// offsets to account for the HUD frame
+	int m_nOSx;					// offsets to account for the HUD frame
 	int m_nOSy;
 	double m_fScrollX;			// the current scroll of the camera
 	double m_fScrollY;
