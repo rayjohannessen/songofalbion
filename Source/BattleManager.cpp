@@ -2,7 +2,6 @@
 
 #include "BattleManager.h"
 #include "ObjectManager.h"
-#include "Globals.h"
 #include "Unit.h"
 #include "Object.h"
 #include "Building.h"
@@ -12,7 +11,7 @@
 
 bool CBattleManager::Update(double dElapsedTime)
 {
-	if (!m_pCurrentObj)	// nothing to do, get out
+	if (!m_pCurrAbility)	// nothing to do, get out
 		return false;
 
 	bool battleComplete = false;
@@ -31,7 +30,6 @@ bool CBattleManager::Update(double dElapsedTime)
 		{
 			m_bPerformingDeath = false;
 			// TODO:: check if any units remain to continue the battle
-			//Globals::g_pObjManager->RemoveObj(Globals::GetPlayerByFactionID(m_pCurrentObj->GetFactionID()), m_pCurrentObj);
 			battleComplete = true;
 			Reset();
 		}
@@ -110,6 +108,12 @@ void CBattleManager::OnApplyDamages( AbilityReturn *abilRet )
 		m_pCurrentObj = (*iter);
 		((CUnit*)(*iter))->ChangeAnim("Death");
 		((CUnit*)(*iter))->GetCurrAnim().Play();
+		// find victor
+		// TODO:: adjust for multiple objects...
+		if (m_pCurrentObj == m_pDefender)
+			*m_pVictor = m_pAttacker;
+		else
+			*m_pVictor = m_pDefender;
 	}
 	
 	if (abilRet->ObjsToEliminate.size() > 0)	// TODO:: check for multiple objects & also -> same objects being hit/dying, only do death
@@ -137,17 +141,19 @@ CBattleManager::CBattleManager() :
 m_pAttacker(NULL),
 m_pDefender(NULL),
 m_pCurrentObj(NULL),
+m_pVictor(NULL),
 m_pOrigAttackerAbil(NULL),
 m_pOrigDefenderAbil(NULL),
 m_pCurrAbility(NULL)
 {
 
 }
-void CBattleManager::Init(CObject *attacker, CObject *defender)
+void CBattleManager::Init(CObject* attacker, CObject* defender, CObject*& mapsVictorObj)
 {
 	m_pAttacker = attacker;
 	m_pDefender = defender;
 	m_pCurrentObj = attacker;
+	m_pVictor  = &mapsVictorObj;
 
 	GetSetAbility(m_pOrigAttackerAbil, attacker, true);
 	GetSetAbility(m_pOrigDefenderAbil, defender, false);
@@ -196,5 +202,4 @@ void CBattleManager::Reset()
 	SAFE_DELETE(m_pOrigAttackerAbil);
 	SAFE_DELETE(m_pOrigDefenderAbil);
 	m_pCurrAbility = NULL;
-	m_pAttacker = m_pDefender = m_pCurrentObj = NULL;
 }

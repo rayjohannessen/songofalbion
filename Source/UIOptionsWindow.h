@@ -19,7 +19,7 @@ public:
 
 	CUIOptionsWindow( int imageID, CWindowVariablesBase* variables, bool hasCloseBtn = true );
 
-	~CUIOptionsWindow();
+	virtual ~CUIOptionsWindow();
 
 	//////////////////////////////////////////////////////////////////////////
 	//	Function:	Input

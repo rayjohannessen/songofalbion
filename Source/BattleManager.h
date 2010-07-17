@@ -15,6 +15,7 @@ class CBattleManager
 	CObject* m_pAttacker;
 	CObject* m_pDefender;
 	CObject* m_pCurrentObj;
+	CObject** m_pVictor;	// points to the map's member, set if it's the last "man" standing
 	// abilities of the objects
 	CCombatSkill* m_pOrigAttackerAbil;
 	CCombatSkill* m_pOrigDefenderAbil;
@@ -24,7 +25,7 @@ class CBattleManager
 	inline void Reset();
 public:
 	CBattleManager();
-	void Init(CObject* attacker, CObject* defender);
+	void Init(CObject* attacker, CObject* defender, CObject *& mapsDestObj);
 
 	// Update -- returns true if battle is finished
 	bool Update(double dElapsedTime);

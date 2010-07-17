@@ -15,6 +15,7 @@ class CUnit : public CObject
 {
 	typedef map<string, CAnimation*> UnitAnims;
 
+	bool m_bIsAtTileCenter;
 	bool m_bMovingToAttack;
 	int m_nUnitType;
 	int m_nMaxVitality;
@@ -77,6 +78,7 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	// accessors
 	inline eAnimationDirections GetOppositeFacing()	{ return (eAnimationDirections)gOppositeDirs[m_mAnimations[m_strCurrAnim]->CurrDir()]; }
+	inline bool IsAtCenter()	const		{ return m_bIsAtTileCenter;				}
 	inline int GetNumAnims()	const		{ return m_nNumAnims;					}
 	inline int GetUnitType()	const		{ return m_nUnitType;					}
 	inline int GetVitality()	const		{ return m_nVitality;					}

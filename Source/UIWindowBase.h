@@ -157,7 +157,7 @@ public:
 	{ 
 		m_pVariables = variables;
 	}
-	~CUIWindowBase() { SAFE_DELETE(m_pVariables); }
+	virtual ~CUIWindowBase() { SAFE_DELETE(m_pVariables); }
 
 	// return the index of the button pressed
 	virtual eReturnCode  Input(POINT mouse, CUIWindowBase* window = NULL) = 0;

@@ -94,6 +94,11 @@ Implemented pathfinding
 	- Unit's may attack a unit at end of move, the path is determined and traversed by pathfinding
 
 
-
+7/16/2010
+---------
+Battle Changes
+	- The attacking unit is required to actually move to the defender's tile (requiring stamina to move)
+	- Attacker moves halfway onto defender's tile, attacks, and stays until moved out, killed, or enemy is killed
+	- If attacker wins and is not in the center of the tile, it moves to the center after enemy disappears
 
 
