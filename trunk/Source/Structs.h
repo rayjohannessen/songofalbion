@@ -64,16 +64,17 @@ struct pointf
 	bool operator!= (const pointf& pt)
 	{ return (pt.x != x || pt.y != y);}
 	operator point() const;
-	inline bool IsWithinRange(const pointf& pt, float range = 5.0f)
+	inline bool IsWithinRange(const pointf& pt, float range = 5.0f) const
 	{
 		return (pt.x - range < x && pt.x + range > x &&
 				pt.y - range < y && pt.y + range > y);
 	}
 	void Offset(float osx, float osy) {x += osx; y += osy;}
 	void Offset(const pointf& os) {x += os.x; y += os.y;}
+	inline float Length() const { return sqrt(x * x + y * y);	}
 	inline void Normalize()
 	{
-		float mag = sqrt(x * x + y * y); 
+		float mag = Length(); 
 		x = x / mag;
 		y = y / mag;
 	}

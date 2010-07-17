@@ -24,6 +24,7 @@ CUnit::~CUnit()
 }
 CUnit::CUnit() : 
 CObject(),
+m_bMovingToAttack(false),
 m_nUnitType(-1),
 m_nMaxVitality(0),
 m_nVitality(0),
@@ -120,7 +121,7 @@ void CUnit::Update(double fTimeStep, const pointf* moveAmt)
 	if (moveAmt) // account for scrolling of the map
 		CObject::Update(fTimeStep, moveAmt);
 
-	if (m_Timer.Update())
+	if (m_Timer.Update())	// death timer...need to change if a timer is needed for another trigger as well
 		Globals::g_pObjManager->RemoveObj(Globals::GetPlayerByFactionID(GetFactionID()), this);
 
 	if (IsAnimRun(m_strCurrAnim))
@@ -130,20 +131,26 @@ void CUnit::Update(double fTimeStep, const pointf* moveAmt)
 			if (moveAmt)
 				m_ptMoveToScreenPos += *moveAmt;
 			// need to update position, move towards target position
-			pointf newPos, dir, moveAmt;
+			pointf newPos, dir, newAmt;
 			newPos	= m_ptScreenPos;
 			dir		= (m_ptMoveToScreenPos - newPos);
 			dir.Normalize();
-			moveAmt = dir * (float)fTimeStep * MOVE_SPEED;
-			newPos  = newPos + moveAmt;
-			m_rSelectionRect += moveAmt;
+			newAmt = dir * (float)fTimeStep * MOVE_SPEED;
+			newPos  = newPos + newAmt;
+			m_rSelectionRect += newAmt;
 	
 			SetScreenPosWithoutOS(newPos);	// set screen position
 		}
 		else
 		{
+			if (m_bMovingToAttack)	// we've reached the target point, time to begin attack
+			{
+				// start attack
+				m_bMovingToAttack = false;
+				Globals::g_pMap->InitiateAttack(false);
+			}
 			// there are more tiles in the path
-			if ( (++m_iCurrPath) != m_pPath->end() )
+			else if ( (++m_iCurrPath) != m_pPath->end() )
 			{
 				if (!Globals::g_pMap->GetTarget())	// no target, just moving this whole path
 				{
@@ -155,12 +162,10 @@ void CUnit::Update(double fTimeStep, const pointf* moveAmt)
 				else if (Globals::g_pMap->GetTarget()->GetCoord() == (*m_iCurrPath)->DestID() &&
 						(*m_iCurrPath) == (*m_pPath)[m_pPath->size()-1])	// this last tile contains the target
 				{
-					// TODO:: setup attack and start it
 					// TODO:: determine how far the unit will move into the enemy's tile when attacking, and how that will all work
-					StopMoving();
-
-					// start attack
-					Globals::g_pMap->InitiateAttack();
+					// begin moving to target's tile (halfway)
+					Globals::g_pMap->ToggleMapFlagOff(MF_MOVING);	// TODO:: determine a better way to handle this	
+					BeginMoveToAttack();
 				}
 			}
 			// no more tiles, stop moving
@@ -268,12 +273,12 @@ void CUnit::SetNewPath(Path* const p)
 	// see if the first tile contains the target
 	if (Globals::g_pMap->GetTarget() && (*m_iCurrPath)->DestID() == Globals::g_pMap->GetTarget()->GetCoord())
 	{
-		Globals::g_pMap->InitiateAttack();
+		BeginMoveToAttack();
 	}
 	else
 	{
-		ChangeAnim("Run");
-		m_mAnimations[m_strCurrAnim]->Play(); 
+		ChangeAnim(gAnimNames[AT_RUN]);
+		m_mAnimations[m_strCurrAnim]->Play(1, true); 
 		Globals::g_pMap->ToggleMapFlagOn(MF_MOVING);
 
 		TargetDirPair pair;
@@ -307,5 +312,22 @@ void CUnit::StopMoving()
 	m_ptScreenPos = m_ptMoveToScreenPos;
 	Globals::g_pMap->ToggleMapFlagOff(MF_MOVING);	// TODO:: determine a better way to handle this	
 	m_pPath->clear();
+}
+
+void CUnit::BeginMoveToAttack()
+{
+	DecrementStamina((*m_iCurrPath)->TerrainCost());
+	pointf dir = (pointf)Globals::g_pMap->IsoTilePlot(Globals::g_pMap->GetTarget()->GetCoord()) - m_ptScreenPos;
+	float hl = dir.Length() * 0.5f;
+	dir.Normalize();
+	m_ptMoveToScreenPos = m_ptScreenPos + (dir * hl) + (pointf)m_ptOffset;
+	m_bMovingToAttack = true;
+	TargetDirPair pair;
+	pair.first	= m_ptCoord.x - (*m_iCurrPath)->DestXID();
+	pair.second	= m_ptCoord.y - (*m_iCurrPath)->DestYID();
+	m_strCurrAnim = gAnimNames[AT_RUN];
+	SetFacing(Globals::g_CoordToDir[m_ptCoord.y & 1][pair]);
+	m_mAnimations[m_strCurrAnim]->Play(1, true);
+	SetCoord(Globals::g_pMap->GetTarget()->GetCoord());	// set grid coord
 }
 //////////////////////////////////////////////////////////////////////////

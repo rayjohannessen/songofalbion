@@ -1084,15 +1084,16 @@ void CMap::Select(CObject* const obj)
 
 	//BIT_ON(m_nMapFlags, MF_CENTER_MAP);
 }
-void CMap::InitiateAttack()
+void CMap::InitiateAttack(bool setfacing /*= true*/)
 {
 	CUnit* playerUnit = ((CUnit*)m_pCurrPlayerSelectedObj);
-	playerUnit->FaceTarget(m_pEnemyObj->GetCoord());
+	if (setfacing)
+		playerUnit->FaceTarget(m_pEnemyObj->GetCoord());
 
 // TODO:: SETUP ATTACK WHERE ATTACKER GOES TO ENEMY TILE PART-WAY, DOES COMBAT, AND STAYS (unless a special ability allows it either to leave)
 	// also need to decrement stamina for the terrain cost
 
-	playerUnit->DecrementStamina(playerUnit->GetCurrAttackAbility()->GetCombatProps().AttackStam + 1 /*TEMPORARY 1 <<<*/);
+	playerUnit->DecrementStamina(playerUnit->GetCurrAttackAbility()->GetCombatProps().AttackStam);
 	BIT_ON(m_nMapFlags, MF_ATTACKING);
 
 	// TODO:: units will not turn to face if a surprise attack is happening:
