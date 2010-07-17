@@ -34,7 +34,8 @@ CMap::CMap() :
 	frames(0),
 	m_nOSx(X_OS),
 	m_nOSy(Y_OS),
-	m_pTimer(NULL)
+	m_pTimer(NULL),
+	m_pVictor(NULL)
 {
 	//////////////////////////////////////////////////////////////////////////
 	// TODO:: temps, make sure to remove
@@ -130,10 +131,10 @@ void CMap::DrawTiles()
 
 void CMap::DrawPlacingObj()
 {
-	if (placeObj)
+	if (m_pPlaceObj)
 	{
-		placeObj->SetScrnPos(IsoTilePlot(m_ptCurrMouseTile));
-		placeObj->Render(m_rViewport);
+		m_pPlaceObj->SetScrnPos(IsoTilePlot(m_ptCurrMouseTile));
+		m_pPlaceObj->Render(m_rViewport);
 	}
 }
 void CMap::Update(double dElapsedTime)
@@ -186,6 +187,7 @@ eMapInputRet CMap::Input(double fElapsedTime, POINT& mouse)
 
 	if (NULL != (m_pCurrHoverObject = HoverObject(m_ptCurrMouseTile)) )
 	{
+		m_ptCurrMouseTile = m_pCurrHoverObject->GetCoord();	// set mouse to hover object's tile NO MATTER WHAT
 		m_pCurrHoverObject->SetHovered(true);
 		if (m_pCurrHoverObject->GetFactionID() == Globals::GetCurrPlayer()->GetProfile()->nFactionID)
 			m_pCurrHoverObject->SetColor(DARKBLUE);
@@ -245,10 +247,21 @@ bool CMap::DetermineMoveSpecifics(const point& pt)
 				{
 // TODO:: find and display path(s) available when unit is first clicked
 					CUnit* unit = ((CUnit*)m_pCurrPlayerSelectedObj);
-					if (DetermineTotalMoveCost(true) <= unit->GetStamina())
+					if (m_vPath[0]->DestID() != m_pCurrPlayerSelectedObj->GetCoord())	// make sure the units aren't on the same tile first
 					{
-						unit->SetNewPath(&m_vPath);
-						return true;
+						if (DetermineTotalMoveCost(true) <= unit->GetStamina())
+						{
+							unit->SetNewPath(&m_vPath);
+							return true;
+						}
+					} 
+					else	// same tile, just start attacking now
+					{
+						if (unit->GetStamina() >= unit->GetCurrAttackAbility()->GetCombatProps().AttackStam)
+						{
+							m_vPath.clear();
+							InitiateAttack(false);
+						}
 					}
 				}
 			}
@@ -312,7 +325,7 @@ void CMap::Init(int screenWidth, int screenHeight)
 	LoadMap("Resources/Map/test.dat");
 	m_nCurrMouseID = Globals::g_pAssets->GetGUIasts()->Mouse();
 
-	placeObj = m_pEnemyObj = NULL;
+	m_pPlaceObj = m_pEnemyObj = m_pVictor = NULL;
 	m_pCurrHoverObject = NULL;
 
 	m_pTimer = new CTriggerTimer(false, false);
@@ -323,7 +336,7 @@ void CMap::Shutdown()
 	SAFE_DELETE_ARRAY(m_pTilesL1);
 	SAFE_DELETE_ARRAY(m_pTilesL2);
 	SAFE_DELETE_ARRAY(m_pFreeTiles);
-	SAFE_DELETE(placeObj);
+	SAFE_DELETE(m_pPlaceObj);
 	SAFE_DELETE(m_pTimer);
 }
 
@@ -798,10 +811,10 @@ void CMap::HandleMouseInput()
 			SelectObj(m_pCurrHoverObject);
 		}
 		// adding an object
-		else if (m_nCurrPlaceType < MSA_ADDING && placeObj)
+		else if (m_nCurrPlaceType < MSA_ADDING && m_pPlaceObj)
 		{
-			placeObj->SetCoord(m_ptCurrMouseTile);
-			Globals::g_pObjManager->AddObject(Globals::GetCurrPlayer(), placeObj, IsoTilePlot(m_ptCurrMouseTile));
+			m_pPlaceObj->SetCoord(m_ptCurrMouseTile);
+			Globals::g_pObjManager->AddObject(Globals::GetCurrPlayer(), m_pPlaceObj, IsoTilePlot(m_ptCurrMouseTile));
 		}
 		// removing an object
 		else if (m_nCurrPlaceType == MSA_REMOVE)
@@ -970,25 +983,25 @@ bool CMap::HandleKBInput()
 	if (Globals::g_pDI->KeyPressed(DIK_1))
 	{
 		m_nCurrPlaceType = MSA_CITY;
-		if (placeObj)
-			delete placeObj;
-		placeObj = new CCity(OBJ_CITY, CITY_CELTIC, 1, m_ptCurrMouseTile, IsoTilePlot(m_ptCurrMouseTile), "Sycharth",
+		if (m_pPlaceObj)
+			delete m_pPlaceObj;
+		m_pPlaceObj = new CCity(OBJ_CITY, CITY_CELTIC, 1, m_ptCurrMouseTile, IsoTilePlot(m_ptCurrMouseTile), "Sycharth",
 							Globals::GetCurrPlayer()->GetProfile()->name.c_str(), Globals::GetCurrPlayer()->GetProfile()->nFactionID);
 	}
 	else if (Globals::g_pDI->KeyPressed(DIK_2))
 	{
 		m_nCurrPlaceType = MSA_UNIT;
-		if (placeObj)
-			delete placeObj;
-		placeObj = new CUnit(UnitDefines::UNIT_UMKNIGHT, OBJ_UNIT, m_ptCurrMouseTile, IsoTilePlot(m_ptCurrMouseTile), "UMKnight",
+		if (m_pPlaceObj)
+			delete m_pPlaceObj;
+		m_pPlaceObj = new CUnit(UnitDefines::UNIT_UMKNIGHT, OBJ_UNIT, m_ptCurrMouseTile, IsoTilePlot(m_ptCurrMouseTile), "UMKnight",
 							Globals::GetCurrPlayer()->GetProfile()->name.c_str(), Globals::GetCurrPlayer()->GetProfile()->nFactionID);
 	}
 	else if (Globals::g_pDI->KeyPressed(DIK_3))
 	{
 		m_nCurrPlaceType = MSA_BUILDING;
-		if (placeObj)
-			delete placeObj;
-		placeObj = new CBuilding(BLDG_CASTLE, OBJ_BUILDING, m_ptCurrMouseTile, IsoTilePlot(m_ptCurrMouseTile), "Castle",
+		if (m_pPlaceObj)
+			delete m_pPlaceObj;
+		m_pPlaceObj = new CBuilding(BLDG_CASTLE, OBJ_BUILDING, m_ptCurrMouseTile, IsoTilePlot(m_ptCurrMouseTile), "Castle",
 							Globals::GetCurrPlayer()->GetProfile()->name.c_str(), Globals::GetCurrPlayer()->GetProfile()->nFactionID);
 	}
 	else if (Globals::g_pDI->KeyPressed(DIK_5))
@@ -1051,8 +1064,8 @@ void CMap::Select(CObject* const obj)
 		{
 			((CUnit*)m_pCurrPlayerSelectedObj)->FindPathToTarget(m_pEnemyObj->GetCoord(), m_vPath);
 			// NOTE: face the obj only if the m_pCurrPlayerSelectedObj can "see" it
-			// for now, that means one tile away
-			if (m_vPath.size() == 1)	
+			// for now, that means one tile away, don't bother changing facing if they're on the same tile
+			if (m_vPath.size() == 1 && m_pEnemyObj->GetCoord() != m_pCurrPlayerSelectedObj->GetCoord())	
 				((CUnit*)m_pCurrPlayerSelectedObj)->FaceTarget(m_pEnemyObj->GetCoord());
 		}
 		Globals::g_pHUD->SetInitialQBSlots(obj, obj->GetQBSlots());
@@ -1077,7 +1090,7 @@ void CMap::Select(CObject* const obj)
 			((CUnit*)m_pCurrPlayerSelectedObj)->FindPathToTarget(m_pEnemyObj->GetCoord(), m_vPath);
 			// NOTE: face the obj only if the m_pCurrPlayerSelectedObj can "see" it
 			// for now, that means one tile away
-			if (m_vPath.size() == 1)	
+			if (m_vPath.size() == 1 && m_pEnemyObj->GetCoord() != m_pCurrPlayerSelectedObj->GetCoord())	
 				((CUnit*)m_pCurrPlayerSelectedObj)->FaceTarget(m_pEnemyObj->GetCoord());
 		}
 	}
@@ -1103,7 +1116,7 @@ void CMap::InitiateAttack(bool setfacing /*= true*/)
 	if (playerUnit->GetCurrAnimString() != "Attack")
 		playerUnit->ChangeAnim("Attack");
 	playerUnit->GetCurrAnim().Play();
-	m_BattleMngr.Init(playerUnit, m_pEnemyObj);
+	m_BattleMngr.Init(playerUnit, m_pEnemyObj, m_pVictor);
 }
 
 void CMap::ActionIfSelected(CObject* obj)

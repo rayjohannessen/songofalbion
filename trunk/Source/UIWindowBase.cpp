@@ -61,7 +61,6 @@ m_dwTitleColor(titleColor)
 
 	// place the options at the correct positions in the window
 	SetOptionPositions(optionProps, optionHeight, numOptions);
-
 }
 
 void CWindowVariablesBase::SetOptionPositions( const OptionProps &optionProps, int optionHeight, unsigned numOptions )

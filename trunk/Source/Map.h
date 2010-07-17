@@ -71,7 +71,8 @@ class CMap
 	CObject* m_pCurrHoverObject;
 	CObject* m_pCurrPlayerSelectedObj;
 	CObject* m_pEnemyObj;
-	CObject* placeObj;
+	CObject* m_pPlaceObj;
+	CObject* m_pVictor;
 
 	// Map variables
 	int m_nMapFlags;
@@ -229,6 +230,7 @@ public:
 	inline CObject* GetSelectedObject()			{ return m_pCurrPlayerSelectedObj;  }
 	inline CObject* GetTarget()					{ return m_pEnemyObj;		 }
 	inline CObject* GetHoverObject()			{ return m_pCurrHoverObject; }
+	inline CObject* GetVictor()	const			{ return m_pVictor;		 }
 	inline const rect& GetViewport()   			{ return m_rViewport;		 }
 	inline const pointf* GetTotalFrameScroll()	{ if (m_ptTotalMapScroll.x != 0.0f || m_ptTotalMapScroll.y != 0.0f) return &m_ptTotalMapScroll; else return NULL;}
 	inline int GetScreenWidth()		const		{ return m_nScreenWidth;	 }

@@ -41,6 +41,8 @@ void CHUD::Shutdown()
 {
 	SAFE_DELETE(g_pObjButtonsMap);
 	SAFE_DELETE(m_pQuickBar);
+	for (unsigned i = 0; i < m_vWindows.size(); ++i)
+		SAFE_DELETE(m_vWindows[i]);
 }
 
 void CHUD::Render()
