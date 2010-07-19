@@ -110,6 +110,10 @@ Battle tweaks and fixes
 	- Unit correctly pathfinds when an enemy target is selected and player moves to an open tile
 
 
-
+7/19/2010
+---------
+Battle tweaks
+	- Units now face each other (EAST/WEST only) during combat, the defender steps back and the attacker stands on 		the same tile opposite him.
+	- bug fixed where you could right-click on the currently selected unit and stamina would be used as if moving, 		but nothing would happen
 
 

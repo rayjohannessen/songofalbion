@@ -159,7 +159,7 @@ void CUnit::Update(double fTimeStep, const pointf* moveAmt)
 				Globals::g_pMap->InitiateAttack(false);
 			}
 			// there are more tiles in the path
-			else if (m_pPath->size() && (++m_iCurrPath) != m_pPath->end() )
+			else if (m_pPath && m_pPath->size() && (++m_iCurrPath) != m_pPath->end() )
 			{
 				if (!Globals::g_pMap->GetTarget())	// no target, just moving this whole path
 				{
@@ -336,28 +336,77 @@ void CUnit::StopMoving()
 	ChangeAnim(gAnimNames[AT_ATTACK]);
 	m_ptScreenPos = m_ptMoveToScreenPos;
 	Globals::g_pMap->ToggleMapFlagOff(MF_MOVING);
-	m_pPath->clear();
+	if (m_pPath)
+		m_pPath->clear();
 }
 
 void CUnit::BeginMoveToAttack()
 {
 	m_bIsAtTileCenter = false;
-	// find the point halfway to the target
-	point targCoord = Globals::g_pMap->GetTarget()->GetCoord();
-	pointf dir = (pointf)Globals::g_pMap->IsoTilePlot(targCoord) - m_ptScreenPos;
-	float hl = dir.Length() * 0.5f;
-	dir.Normalize();
-	m_ptMoveToScreenPos = m_ptScreenPos + (dir * hl) + (pointf)m_ptOffset;
+	// set anim name before calling SetFacing
+	m_strCurrAnim = gAnimNames[AT_RUN];
+
+	// stand either to the left or right of the target, depending on where we're coming from
+	CUnit* target = ((CUnit*)Globals::g_pMap->GetTarget());
+	pointf targSPos = Globals::g_pMap->GetTarget()->GetSPos();
+	target->ChangeAnim(gAnimNames[AT_RUN]);
+	target->GetCurrAnim().Play();
+
+	m_ptMoveToScreenPos = targSPos;
+	if (target->GetSPos().x > m_ptScreenPos.x)	// they're on the right side
+	{
+		// move this unit to face the target on its tile
+		m_ptMoveToScreenPos.x -= BATTLE_OS;
+		SetFacing(DIR_E);
+
+		// move the target to the far side of the tile
+		targSPos.x += BATTLE_OS;
+		target->SetMoveToPt(targSPos);
+		target->SetFacing(DIR_W);
+	}
+	else if (target->GetSPos().x < m_ptScreenPos.x)	// they're on the left side
+	{
+		// move this unit to face the target on its tile
+		m_ptMoveToScreenPos.x += BATTLE_OS;
+		SetFacing(DIR_W);
+
+		// move the target to the far side of the tile
+		targSPos.x -= BATTLE_OS;
+		target->SetMoveToPt(targSPos);
+		target->SetFacing(DIR_E);
+	}
+	else	// they're above/below
+	{
+		if (target->GetSPos().y < m_ptScreenPos.y)	// target is "above"
+		{
+			// move this unit to face the target on its tile
+			m_ptMoveToScreenPos.x -= BATTLE_OS;
+			SetFacing(DIR_E);
+
+			// move the target to the far side of the tile
+			targSPos.x += BATTLE_OS;
+			target->SetMoveToPt(targSPos);
+			target->SetFacing(DIR_W);
+		} 
+		else	// target is "below"
+		{
+			// move this unit to face the target on its tile
+			m_ptMoveToScreenPos.x += BATTLE_OS;
+			SetFacing(DIR_W);
+
+			// move the target to the far side of the tile
+			targSPos.x -= BATTLE_OS;
+			target->SetMoveToPt(targSPos);
+			target->SetFacing(DIR_E);
+		}
+	}
 
 	TargetDirPair pair;
 	pair.first	= m_ptCoord.x - (*m_iCurrPath)->DestXID();
 	pair.second	= m_ptCoord.y - (*m_iCurrPath)->DestYID();
 
-	// set anim name before calling SetFacing
-	m_strCurrAnim = gAnimNames[AT_RUN];
-	SetFacing(Globals::g_CoordToDir[m_ptCoord.y & 1][pair]);
 	m_mAnimations[m_strCurrAnim]->Play(1, true);
-	SetCoord(targCoord);	// set grid coord
+	SetCoord(Globals::g_pMap->GetTarget()->GetCoord());	// set grid coord
 	DecrementStamina((*m_iCurrPath)->TerrainCost());
 	m_bMovingToAttack = true;
 	m_pPath->clear();

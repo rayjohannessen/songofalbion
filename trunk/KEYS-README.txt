@@ -40,6 +40,7 @@ numpad - all keys except for 5 move units in 8 directions
 left-click (on object) - selects it, displays info on GUI, attacks selected enemy on second click
 left-click (on empty terrain) - deselects any current enemy first click, your units next click
 right-click (on terrain) - moves to selected tile
+right-click (on enemy)   - selects, if already selected it will attack if enough stamina remains (includes movement to 				the target's position)
 
 --------------------------------------------------------------------------------------------------------------
 MAP VIEW---------------------------------------------------------------------------------------------------------
