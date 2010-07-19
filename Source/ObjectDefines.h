@@ -8,6 +8,7 @@
 namespace UnitDefines
 {
 	#define MOVE_SPEED 150.0f;	// TODO:: this will change for each unit
+	#define BATTLE_OS 25.0f;	// how much units offset when facing one another on a single tile in battle
 	enum eUnitType {UT_GROUND, UT_AIR, UT_SEA, };
 	
 	// units

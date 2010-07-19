@@ -830,35 +830,38 @@ void CMap::HandleMouseInput()
 		// moving with mouse
 		if (m_pCurrPlayerSelectedObj && m_pCurrPlayerSelectedObj->GetType() == OBJ_UNIT) // a unit has already been selected (of the current player)
 		{
-			if (m_pCurrHoverObject)	// some object is being right-clicked now
+			if (m_ptCurrMouseTile != m_pCurrPlayerSelectedObj->GetCoord() || m_pCurrHoverObject)	// make sure nothing happens if right-clicking the object that's selected
 			{
-					// right-clicking on current player's object, show extra info
-				if (m_pCurrHoverObject->GetFactionID() == Globals::g_pCurrPlayer->GetProfile()->nFactionID)
-				{	// TODO:: display stats or something extra
-
-				} 
-				else// an enemy object is being right-clicked
+				if (m_pCurrHoverObject)	// some object is being right-clicked now
 				{
-					if (m_pEnemyObj)	
+						// right-clicking on current player's object, show extra info
+					if (m_pCurrHoverObject->GetFactionID() == Globals::g_pCurrPlayer->GetProfile()->nFactionID)
+					{	// TODO:: display stats or something extra
+	
+					} 
+					else// an enemy object is being right-clicked
 					{
-						if (m_pCurrHoverObject == m_pEnemyObj) // right-clicking to attack an already-selected enemy object
+						if (m_pEnemyObj)	
 						{
-							DetermineMoveSpecifics(m_ptCurrMouseTile);
+							if (m_pCurrHoverObject == m_pEnemyObj) // right-clicking to attack an already-selected enemy object
+							{
+								DetermineMoveSpecifics(m_ptCurrMouseTile);
+							} 
+							else
+							{
+								Select(m_pCurrHoverObject);
+							}
 						} 
-						else
+						else	// right-clicking enemy object
 						{
 							Select(m_pCurrHoverObject);
 						}
-					} 
-					else	// right-clicking enemy object
-					{
-						Select(m_pCurrHoverObject);
 					}
+				} 
+				else	// then we're just moving to open terrain
+				{
+					DetermineMoveSpecifics(m_ptCurrMouseTile);
 				}
-			} 
-			else	// then we're just moving to open terrain
-			{
-				DetermineMoveSpecifics(m_ptCurrMouseTile);
 			}
 		}
 	}
