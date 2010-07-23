@@ -117,3 +117,9 @@ Battle tweaks
 	- bug fixed where you could right-click on the currently selected unit and stamina would be used as if moving, 		but nothing would happen
 
 
+7/20/2010
+---------
+Added End Turn Button
+Fixed crash if you "wait" after "skip"ping a unit then selecting it
+Moved object info to left side of bottom bar and buttons to the left a bit (to make room for a third row of buttons)
+

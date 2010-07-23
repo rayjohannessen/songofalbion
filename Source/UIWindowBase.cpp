@@ -18,7 +18,7 @@ void COption::Render(float zPos, float scale, DWORD color, bool IsCurrentlyTrans
 	{
 		// TODO:: add alpha to color
 	}
-	point strPos = Globals::g_pBitMapFont->DrawStringAutoCenterBox(Name.c_str(), m_Rect.right - m_Rect.left, m_Rect.left, m_Rect.top, zPos, scale, color);
+	point strPos = Globals::g_pBitMapFont->DrawStringAutoCenter(Name.c_str(), m_Rect, zPos, scale, color);
 	// draw the ability's icon to the left of the string
 	if (m_pQBObj)
 		Globals::g_pTM->DrawWithZSort(m_pQBObj->ImageID, strPos.x - 42, strPos.y - 10, zPos, 1.0f, 1.0f, &m_pQBObj->SrcRect);
@@ -50,7 +50,7 @@ m_dwTitleColor(titleColor)
 	pointf size;
 	int numCols = 1;
 	unsigned numOptions = options.size();
-	int optionHeight = Globals::g_pBitMapFont->GetSize().y;
+	int optionHeight = Globals::g_pBitMapFont->GetSize();
 
 	// determine how many columns are needed
 	// TODO:: make sure return is really needed...
@@ -110,9 +110,9 @@ int CWindowVariablesBase::SetRect( unsigned numOptions, const OptionProps &optio
 	}
 
 	if (m_fTitleScale > scale.x)
-		maxWidth *= int((float)Globals::g_pBitMapFont->GetSize().x * m_fTitleScale);
+		maxWidth *= int((float)Globals::g_pBitMapFont->GetSize() * m_fTitleScale);
 	else
-		maxWidth *= int((float)Globals::g_pBitMapFont->GetSize().x * scale.x);
+		maxWidth *= int((float)Globals::g_pBitMapFont->GetSize() * scale.x);
 
 	// get width
 	if (numOptions > optionProps.MaxRows) // need more columns to fit all the options

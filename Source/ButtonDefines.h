@@ -5,6 +5,7 @@ const float TEXT_SCALE = 0.9f;
 enum eButtonSlot	// for the locations of all available buttons
 {
 	BL_MENU, 
+	BL_END_TURN,
 	BL_SLOT_1_1,
 	BL_SLOT_1_2,
 	BL_SLOT_1_3,
@@ -21,6 +22,7 @@ enum eButtonSlot	// for the locations of all available buttons
 enum eButtonName		// the actual buttons
 {
 	BN_MENU,
+	BN_END_TURN,
 	BN_COMBAT_SKILLS,
 	BN_SKILLS,
 	BN_NONCOMBAT_SKILLS,
@@ -35,7 +37,7 @@ enum eButtonName		// the actual buttons
 // there are a few buttons that are constant, such as the "menu" button,
 // but most buttons correspond to specific objects, e.g., a unit has "gear"
 // "attacks" or "skills", etc. even these buttons may vary depending on the type of unit.
-// likewise, other objects, such as cities has its own unique set of buttons.
+// likewise, other objects, such as cities have their own unique set of buttons.
 // each non-constant object(e.g. unit)-related button displayed to the screen will correspond to the currently selected
 // player object. To allow for changes between buttons needing to be displayed and what they do when clicked,
 // 	a map of what buttons are needed for the given object will be queried, what each button type does will then be 
@@ -61,6 +63,7 @@ CUIWindowBase* BtnAction_OptionBox(CObject*, CButton&);
 CUIWindowBase* BtnAction_Skip(CObject*, CButton&);
 CUIWindowBase* BtnAction_Disband(CObject*, CButton&);
 CUIWindowBase* BtnAction_Wait(CObject*, CButton&);
+CUIWindowBase* BtnAction_EndTurn(CObject*, CButton&);
 
 //////////////////////////////////////////////////////////////////////////
 

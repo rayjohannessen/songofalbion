@@ -29,6 +29,7 @@ CUIWindowBase* BtnAction_OptionBox(CObject* obj, CButton& btn)
 
 			point btmRight = Globals::g_ptQBPos;
 			btmRight.x += 256; // size of the quick bar texture
+			btmRight.y -= 10;
 			CWindowVariablesBase* pVariables = new CWindowVariablesBase(btmRight, "Combat Skills", options, OptionProps());
 			pWindow = new CUIOptionsWindow(Globals::g_pAssets->GetGUIasts()->BlackPixel(), pVariables);
 			
@@ -79,6 +80,12 @@ CUIWindowBase* BtnAction_Wait(CObject* obj, CButton& btn)
 {
 	Globals::g_pObjManager->NextObjectNoRemove();
 
+	return NULL;
+}
+
+CUIWindowBase* BtnAction_EndTurn(CObject*, CButton&)
+{
+	Globals::g_pObjManager->EndTurn();
 	return NULL;
 }
 

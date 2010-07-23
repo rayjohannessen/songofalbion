@@ -1,27 +1,43 @@
 ////////////////////////////////////////////////////////
 //   File Name	:	"BitmapFont.h"
 //
-//   Author		:	Matthew Di Matteo (MD)
+//   Author		:	Ray Johannessen
 //
 //   Purpose	:	To provide a way for the user to draw text
 //					using bitmap fonts
 ////////////////////////////////////////////////////////
 
 #ifndef BITMAPFONT_H
-#define BITMAPFONt_H
+#define BITMAPFONT_H
 
 #include "Structs.h"
 
+struct BFProfile 
+{
+	char	StartChar;		// ascii start character value
+	bool	HasLowerCase;	// does the bitmap font support lower case characters
+	int		ID;				// image id
+	int		NumCols;
+	int		Size;
+
+	BFProfile(char _startChar, bool _lcase, int _id, int _numCols, int _size) : 
+		StartChar(_startChar), 
+		HasLowerCase(_lcase), 
+		ID(_id),
+		NumCols(_numCols),
+		Size(_size)
+	{}
+};
+
+enum eBMProf { BFP_DEFAULT, BFP_MEDIEVAL, NUM_BFPROFILES};
+
+
 class CBitmapFont
 {
-private:
-	int m_nImageID;
-	int m_nCharWidth;
-	int m_nCharHeight;
-	int m_nNumCols;
-	char m_cStartChar;
+	BFProfile* m_arrProfiles[NUM_BFPROFILES];
+	BFProfile* m_pCurrBMProf;
 
-	rect CellAlgorithm(int ID);
+	inline rect CellAlgorithm(int ID);
 
 	///////////////////////////////////////////////////////////////////
 	//	Function:	"CBitmapFont(Constructor)"
@@ -47,51 +63,40 @@ public:
 	// Function: "Load"
 	//
 	//  Purpose: Loads the sprite sheet and sets its members from passed in data
-	//
 	///////////////////////////////////////////////////////////////////
-	void Load();
+	void LoadProfiles();
 
 	///////////////////////////////////////////////////////////////////
 	// Function: “drawstring”
+	//
+	//	NOTE: does not support newline
 	//
 	// Purpose: Draws the string passed in to the screen at the specified location.
 	////////////////////////////////////////////////////////////////////
 	void DrawString( const char* szstring, int posX, int posY, float posZ = 0.05f, float scale = 1.0f, DWORD color = -1); 
 
-	///////////////////////////////////////////////////////////////////
-	// Function: “DrawChar”
-	//
-	// Purpose: Draws the character passed in to the screen at the specified location.
-	////////////////////////////////////////////////////////////////////
-	void DrawChar(char c, int posX, int posY, float scale = 1, DWORD dwcolor = NULL);
-
 	//////////////////////////////////////////////////////////////////////////
 	// Function		:		DrawStringAutoCenter
 	//
-	// Purpose		:		Same as DrawString, except it auto centers horizontally(good for scrolling)
-	//////////////////////////////////////////////////////////////////////////
-	void DrawStringAutoCenter (const char* szString, int ScreenWidth, int yPos, float zPos = 0.09f, float fScale = 1.0f, DWORD dwColor = D3DCOLOR_XRGB(255,255,255));
-
-	//////////////////////////////////////////////////////////////////////////
-	// Function		:		DrawStringAutoCenterBox
+	//	NOTE: specify w/h to zero if no centering is needed for that orientation.
+	//			does not support newline and does not wrap
 	//
-	// Purpose		:		Same as DrawString, except it auto centers horizontally(good for scrolling)
+	// Purpose		:		Auto centers within the confies of the given rect
+	//
+	// RETURN(point):		The start point of the string after being centered
 	//////////////////////////////////////////////////////////////////////////
-	point DrawStringAutoCenterBox (const char* szString, int boxWidth, int startX, int yPos, float zPos = 0.09f, float fScale = 1.0f, DWORD dwColor = D3DCOLOR_XRGB(255,255,255));
+	point DrawStringAutoCenter (const char* szString, const rect& r, float zPos = 0.09f, float fScale = 1.0f, DWORD dwColor = D3DCOLOR_XRGB(255,255,255));
+
 
 	//////////////////////////////////////////////////////////////////////////
 	//	Mutators
 	//////////////////////////////////////////////////////////////////////////
-	void SetNewID(int imageID) {m_nImageID = imageID;}
-	void SetCharWidth(int width) {m_nCharWidth = width;}
-	void SetCharHeight(int height) {m_nCharHeight = height;}
-	void SetNumCols(int cols) {m_nNumCols = cols;}
-	void ChangeBMFont(int imageID, int width, int height, int cols);
-	void Reset();
+	inline void SetBMProfile(eBMProf prof)	{ m_pCurrBMProf = m_arrProfiles[prof];	}		
+
 	//////////////////////////////////////////////////////////////////////////
 	//	Accessors
 	//////////////////////////////////////////////////////////////////////////
-	inline point GetSize() const	{ return point(m_nCharWidth, m_nCharHeight); }
+	inline const int GetSize() const	{ return m_pCurrBMProf->Size; }
 };
 
 #endif

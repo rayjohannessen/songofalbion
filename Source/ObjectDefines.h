@@ -59,8 +59,8 @@ namespace ObjectDefines
 		g_pObjButtonsMap = new ObjectButtonsMap;
 
 		eUnits currUnit = UNIT_UMKNIGHT;	// knight has all buttons (so far)
-		eButtonName i = (eButtonName)1;
-		eButtonSlot s = (eButtonSlot)1;
+		eButtonName i = BN_COMBAT_SKILLS;	// NOT including menu and end turn buttons
+		eButtonSlot s = BL_SLOT_1_1;
 		for ( ; i < BN_NUM_BUTTONS; i = eButtonName(i + 1), s = eButtonSlot(s + 1))
 		{
 			if (i == BN_SKILLS)

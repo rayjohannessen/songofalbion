@@ -18,7 +18,7 @@ bool					Globals::g_bWindowOpen		= false;
 short					Globals::g_nNumPlayers		= 0;
 short					Globals::g_nPlayerFactionID	= 0;
 unsigned				Globals::m_nCurrPlayerInd	= 0;
-point					Globals::g_ptQBPos		= point(645, 603);
+point					Globals::g_ptQBPos		= point(575, 603);
 CSGD_Direct3D*			Globals::g_pD3D			= NULL;
 CSGD_TextureManager*	Globals::g_pTM			= NULL;
 CSGD_DirectInput*		Globals::g_pDI			= NULL;
@@ -52,6 +52,8 @@ bool Globals::InitGlobals(HWND hWnd, HINSTANCE hInstance, int nScreenWidth, int 
 	g_pAssets->Init();
 
 	g_pBitMapFont	= CBitmapFont::GetInstance();
+	g_pBitMapFont->LoadProfiles();
+
 	if(!g_pFMOD->InitFModManager(hWnd))
 		return false;
 

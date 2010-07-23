@@ -70,24 +70,21 @@ public:
 	// as well as setting any button selects
 	// and calling the appropriate functionality
 	void Update(double fElapsedTime);
-
-	// RETURN:	int - as a button index, an enum for all buttons
-	int Input(POINT& mousePt);
+	void Input(POINT& mousePt);
 
 	void CloseCurrWindow();
+	void ToggleAddingQBObjects(CQuickBarObject* const qbObj);
+	void ClearQBSlots();
+	void AddWindow(CUIWindowBase* window);
 
 	//////////////////////////////////////////////////////////////////////////
 	// mutators
 	void SetButtonSlot(eButtonSlot slotEnum, CButton* button = NULL);
 	void SetInitialQBSlots(CObject* const owner, CQuickBarObject** qbObjects);
 	void SetQBSlot(int slot, CQuickBarObject* qbObj);
-	void ToggleAddingQBObjects(CQuickBarObject* const qbObj);
-	void ClearQBSlots();
-	void AddWindow(CUIWindowBase* window);
 
 	//////////////////////////////////////////////////////////////////////////
 	// accessors
-//	CButton* const GetCurrSelBtn() const	{ return m_arrBtnSlots[m_nCurrSelectedIndex].pButton; }
 	CButton* const GetButtonArray()				{ return m_arrButtons;					}
 	inline CButton* GetButton(eButtonSlot slot)	{ return m_arrBtnSlots[slot].pButton;	}
 };

@@ -66,9 +66,10 @@ void CUIOptionsWindow::Render()
 
 	// the title
 	if (title().size())
-		Globals::g_pBitMapFont->DrawStringAutoCenterBox(title().c_str(), windowRect().right - windowRect().left, windowRect().left, 
-													windowRect().top + optionProperties().EdgePadding, zPos(), titleScale(), titleClr());
-
+	{
+		rect r(windowRect()); r.top += optionProperties().EdgePadding; r.bottom = 0; // don't center on the height
+		Globals::g_pBitMapFont->DrawStringAutoCenter(title().c_str(), windowRect(), zPos(), titleScale(), titleClr());
+	}
 	// the options
 	OptionsListIter iter = optionsList().begin();
 	OptionsListIter end = optionsList().end();
@@ -84,7 +85,7 @@ void CUIOptionsWindow::AddCloseButton()
 {
 	point pos;
 
-	int buttonSize = Globals::g_pBitMapFont->GetSize().x;
+	int buttonSize = Globals::g_pBitMapFont->GetSize();
 	switch (closePos())
 	{
 	case CP_TOP_LEFT:

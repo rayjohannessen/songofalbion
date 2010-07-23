@@ -34,9 +34,8 @@ void CButton::Input(POINT& mouse, CUIWindowBase*& window)
 
 CUIWindowBase* CButton::SimulatePressed()
 {
-	CUIWindowBase* window = NULL;
+	CUIWindowBase* window = m_ActionFunc(Globals::g_pMap->GetSelectedObject(), *this);
 	m_nState = m_nImageIDdown;
-	window = m_ActionFunc(Globals::g_pMap->GetSelectedObject(), *this);
 	m_Timer.StartTimer(0.3);
 
 	return (CUIWindowBase*)window;
@@ -45,16 +44,11 @@ CUIWindowBase* CButton::SimulatePressed()
 void CButton::Render()
 {
 	Globals::g_pTM->DrawWithZSort(m_nState, m_Rect.left, m_Rect.top, DEPTH_BUTTON);
+
 	if (m_nState == m_nImageIDdown)
-		Globals::g_pBitMapFont->DrawStringAutoCenterBox(m_strText.c_str(), 
-														m_Rect.right - m_Rect.left , m_Rect.left, m_Rect.top + 5, DEPTH_BUTTONTXT, 
-														TEXT_SCALE, GREY);
+		Globals::g_pBitMapFont->DrawStringAutoCenter(m_strText.c_str(), m_Rect, DEPTH_BUTTONTXT, TEXT_SCALE, GREY);
 	else if (m_nState == m_nImageIDhover)
-		Globals::g_pBitMapFont->DrawStringAutoCenterBox(m_strText.c_str(), 
-														m_Rect.right - m_Rect.left , m_Rect.left, m_Rect.top + 5, DEPTH_BUTTONTXT,
-														TEXT_SCALE, WHITE);
+		Globals::g_pBitMapFont->DrawStringAutoCenter(m_strText.c_str(), m_Rect, DEPTH_BUTTONTXT, TEXT_SCALE, WHITE);
 	else
-		Globals::g_pBitMapFont->DrawStringAutoCenterBox(m_strText.c_str(), 
-														m_Rect.right - m_Rect.left , m_Rect.left, m_Rect.top + 5, DEPTH_BUTTONTXT,
-														TEXT_SCALE, WHITE);
+		Globals::g_pBitMapFont->DrawStringAutoCenter(m_strText.c_str(), m_Rect, DEPTH_BUTTONTXT, TEXT_SCALE, YELLOW_WHITE);
 }

@@ -11,7 +11,7 @@ class ObjectManager
 	typedef list<CObject*>::iterator ObjectsIter;
 
 	PlayersIter m_iPlayersIter, m_iPlayersIterEnd;
-	ObjectsIter m_iCurrObjIter, m_iCurrObjEnd;
+	ObjectsIter m_iCurrObjIter;
 
 	Objects m_lCurrPlayerObjects;
 

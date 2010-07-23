@@ -87,12 +87,14 @@ CGamePlayState* CGamePlayState::GetInstance(void)
 
 bool CGamePlayState::Input(double fElapsedTime, POINT mousePt)
 {
+	// map input
 	eMapInputRet mapRet = Globals::g_pMap->Input(fElapsedTime, mousePt);
 	if(mapRet == MIR_EXIT)
 		return false;
 	else if (mapRet == MIR_NEXTPLAYER)
 		Globals::GotoNextPlayer();
 
+	// HUD input
 	Globals::g_pHUD->Input(mousePt);
 	
 	return true;
