@@ -31,16 +31,16 @@
 #define RAND_U32COLOR() (rand() % 0x01000000 + 0xFF000000)
 
 // colors (DWORDs)
-#define DARKRED		0xffff3333
-#define DARKGREEN	0xff33ff33
-#define DARKBLUE	0xff3333ff
-#define WHITE		0xffffffff
-#define GREY		0xff555555
-#define BLUE		0xff0000ff
-#define RED			0xffff0000
-#define LIGHT_RED	0xffff5555
-#define YELLOW		0xffffff00
-#define YELLOW_WHITE 0xfff2e5aa
+#define DARKRED			0xffff3333
+#define DARKGREEN		0xff33ff33
+#define DARKBLUE		0xff3333ff
+#define WHITE			0xffffffff
+#define GREY			0xff555555
+#define BLUE			0xff0000ff
+#define RED				0xffff0000
+#define LIGHT_RED		0xffff5555
+#define YELLOW			0xffffff00
+#define YELLOW_WHITE	0xfff2e5aa
 
 // depths -- closest to farthest (into screen)
 #define DEPTH_MOUSE			0.0f

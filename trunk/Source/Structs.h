@@ -4,8 +4,16 @@
 struct pointf;
 struct point 
 {
-	int x;
-	int y;
+	union
+	{
+		int x;
+		int width;
+	};
+	union
+	{
+		int y;
+		int height;
+	};
 	point() {x=0;y=0;}
 	point(const point& pt)
 	{ x = (int)pt.x; y = (int)pt.y; }
@@ -22,13 +30,23 @@ struct point
 	bool operator!= (const point& pt)
 	{ return (pt.x != x || pt.y != y);}
 	operator pointf() const;
-	void Offset(int osx, int osy) {x += osx; y += osy;}
-	void Offset(point os) {x += os.x; y += os.y;}
+	point Offset(int osx, int osy)	{ return point(x += osx,  y += osy);  }
+	point Offset(point os)			{ return point(x += os.x, y += os.y); }
 };
+typedef point size;
+
 struct pointf
 {
-	float x;
-	float y;
+	union
+	{
+		float x;
+		float width;
+	};
+	union
+	{
+		float y;
+		float height;
+	};
 	pointf() {x=0.0f;y=0.0f;}
 	pointf(float X, float Y)
 	{ x = X; y = Y; }
@@ -79,51 +97,24 @@ struct pointf
 		y = y / mag;
 	}
 };
-#define PTF_DEF_ONE (pointf(1.0f, 1.0f))
+typedef pointf sizef;
+
+#define PTF_DEF_ONE (pointf(1.0f, 1.0f))	// a default pointf value of (1.0f, 1.0f) macro
 struct rect 
 {
 	int top;
-	int bottom;
 	int left;
+	int bottom;
 	int right;
-	rect() {top = -1; bottom = -1; left = -1; right = -1;}
-	rect(int t, int b, int l, int r)
-	{
-		top		= t;
-		bottom	= b;
-		left	= l;
-		right	= r;
-	}
-	rect(const pointf&pos, int size)
-	{
-		top		= (int)pos.y;
-		bottom	= (int)pos.y + size;
-		left	= (int)pos.x;
-		right	= (int)pos.x + size;
-	}
-	rect(const pointf& pos, const point& size)
-	{
-		top		= (int)pos.y;
-		bottom	= (int)pos.y + size.y;
-		left	= (int)pos.x;
-		right	= (int)pos.x + size.x;
-	}
-	rect(const point& pos, const point& size)
-	{
-		top		= pos.y;
-		bottom	= pos.y + size.y;
-		left	= pos.x;
-		right	= pos.x + size.x;
-	}
-	rect(const point& pos, const point& size, const point& offset)
-	{
-		top		= pos.y;
-		bottom	= pos.y + size.y;
-		left	= pos.x;
-		right	= pos.x + size.x;
-		Offset(offset);
-	}
-	inline rect& operator= (const rect& r)
+
+	rect() : top(-1), bottom(-1), left(-1), right(-1) {}
+	rect(const rect& r) : top(r.top), bottom(r.bottom), left(r.left), right(r.right) { }
+	rect(int t, int b, int l, int r)			: top(t), bottom(b), left(l), right(r) { }
+	rect(const pointf& pos, int size)			: top((int)pos.y), bottom((int)pos.y + size), left((int)pos.x), right((int)pos.x + size) { }
+	rect(const pointf& pos, const point& size)	: top((int)pos.y), bottom((int)pos.y + size.y), left((int)pos.x), right((int)pos.x + size.x) { }
+	rect(const point& pos, const point& size)	: top(pos.y), bottom(pos.y + size.y), left(pos.x), right(pos.x + size.x) { }
+	rect(const point& pos, const point& size, const point& offset) : top(pos.y), bottom(pos.y + size.y), left(pos.x), right(pos.x + size.x) { Offset(offset); }
+	inline const rect& operator= (const rect& r)
 	{
 		top		= r.top;
 		bottom	= r.bottom;
@@ -131,25 +122,24 @@ struct rect
 		right	= r.right;
 		return *this;
 	}
-	rect& operator+= (const pointf& change)
+	const rect& operator+= (const pointf& change)
 	{ top += (int)change.y; bottom += (int)change.y; left += (int)change.x; right += (int)change.x; return *this; }
 	inline bool IsPointInRect(const point& pt) const
-	{
-		return (pt.x >= left && pt.x <= right
-			&& pt.y >= top && pt.y <= bottom);
-	}
+	{ return (pt.x >= left && pt.x <= right && pt.y >= top && pt.y <= bottom); }
 	bool IsRectIntersecting(const rect& r) const
 	{
 		return ( IsPointInRect(point(r.left, r.top)) || IsPointInRect(point(r.right, r.top)) || 
 				 IsPointInRect(point(r.right, r.bottom)) || IsPointInRect(point(r.left, r.bottom)) );
 	}
-	void Offset(const point& offset)
+	inline void Offset(const point& offset)
 	{
 		top += offset.y;
 		bottom += offset.y;
 		left += offset.x;
 		right += offset.x;
 	}
+	inline int width() const { return right-left; }
+	inline int height() const{ return bottom-top; }
 };
 
 struct rectf

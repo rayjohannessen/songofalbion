@@ -261,6 +261,8 @@ bool CMap::DetermineMoveSpecifics(const point& pt)
 						{
 							m_vPath.clear();
 							InitiateAttack(false);
+							unit->SetNeighbor(((CUnit*)m_pEnemyObj));
+							((CUnit*)m_pEnemyObj)->SetNeighbor(unit);
 						}
 					}
 				}
@@ -836,7 +838,7 @@ void CMap::HandleMouseInput()
 				{
 						// right-clicking on current player's object, show extra info
 					if (m_pCurrHoverObject->GetFactionID() == Globals::g_pCurrPlayer->GetProfile()->nFactionID)
-					{	// TODO:: display stats or something extra
+					{	// TODO:: display stats or something extra (equipment panel maybe)
 	
 					} 
 					else// an enemy object is being right-clicked
@@ -1034,13 +1036,7 @@ bool CMap::HandleKBInput()
 	}
 	// end turn
 	else if (Globals::g_pDI->KeyPressed(DIK_Q))
-	{
-		if (m_pCurrPlayerSelectedObj)
-			Deselect(m_pCurrPlayerSelectedObj);
-		if (m_pEnemyObj)
-			Deselect(m_pEnemyObj);
-		return false;
-	}
+		Globals::g_pHUD->GetButton(BL_END_TURN)->SimulatePressed();
 
 	return true;
 }
@@ -1127,7 +1123,8 @@ void CMap::ActionIfSelected(CObject* obj)
 	if (obj == m_pCurrPlayerSelectedObj)	// if the attacking unit is killed
 	{
 		Deselect(m_pCurrPlayerSelectedObj);
-		Deselect(m_pEnemyObj);
+		if (m_pEnemyObj)
+			Deselect(m_pEnemyObj);
 	}
 	else if (obj == m_pEnemyObj)		// if the target unit is killed
 		Deselect(m_pEnemyObj);

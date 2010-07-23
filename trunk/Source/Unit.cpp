@@ -25,7 +25,6 @@ CUnit::~CUnit()
 CUnit::CUnit() : 
 CObject(),
 m_bMovingToAttack(false),
-m_bIsAtTileCenter(true),
 m_nUnitType(-1),
 m_nMaxVitality(0),
 m_nVitality(0),
@@ -39,7 +38,8 @@ m_nRange(1),
 m_nNumAnims(0),
 m_strCurrAnim("NONE"),
 m_ptOriginalScrnOS(0.0f, 0.0f),
-m_pPath(NULL)
+m_pPath(NULL),
+m_pNeighborEnemy(NULL)
 {
 }
 
@@ -52,7 +52,7 @@ CUnit::CUnit(CUnit& unit)
 
 CUnit::CUnit( int nUnitType, int type, point& coord, point& sPos, 
 			 string name, const char* faction, int factionID)
-			 : CObject(type, coord, sPos, name, faction, factionID), m_pPath(NULL)
+			 : CObject(type, coord, sPos, name, faction, factionID), m_pPath(NULL), m_pNeighborEnemy(NULL)
 {
 	// most units' source rects should be the same size, use default size for now (w=128, h=128)
 	m_nUnitType = nUnitType;
@@ -111,8 +111,8 @@ void CUnit::DeepCopyAll( CUnit &unit )
 	m_strCurrAnim	  	= unit.GetCurrAnimString();
 	m_ptOriginalScrnOS	= unit.GetOrigScOS();
 	m_Timer				= unit.m_Timer;
-	m_bIsAtTileCenter	= true;
 	m_bMovingToAttack	= false;
+	SetNeighbor(unit.GetNeighbor());
 
 	UnitAnims::iterator iter, end;
 	for (iter = unit.GetAnims().begin(), end = unit.GetAnims().end(); iter != end; ++iter)
@@ -128,8 +128,8 @@ void CUnit::Update(double fTimeStep, const pointf* moveAmt)
 	{
 		// tell the unit that killed this one to move to the center of the tile now:
 		CUnit* vic = ((CUnit*)Globals::g_pMap->GetVictor());
-		if (!vic->IsAtCenter())
-			vic->NextMove(m_ptCoord, 0, NUM_DIRECTIONS);
+		vic->CenterUnit();
+		vic->SetNeighbor(NULL);
 		Globals::g_pObjManager->RemoveObj(Globals::GetPlayerByFactionID(GetFactionID()), this);
 	}
 
@@ -171,7 +171,6 @@ void CUnit::Update(double fTimeStep, const pointf* moveAmt)
 				else if (Globals::g_pMap->GetTarget()->GetCoord() == (*m_iCurrPath)->DestID() &&
 						(*m_iCurrPath) == (*m_pPath)[m_pPath->size()-1])	// this last tile contains the target
 				{
-					// TODO:: determine how far the unit will move into the enemy's tile when attacking, and how that will all work
 					// begin moving to target's tile (halfway)
 					Globals::g_pMap->ToggleMapFlagOff(MF_MOVING);
 					BeginMoveToAttack();
@@ -188,7 +187,6 @@ void CUnit::Update(double fTimeStep, const pointf* moveAmt)
 			else
 			{
 				StopMoving();
-				m_bIsAtTileCenter = true;
 			}
 		}
 	}
@@ -285,6 +283,15 @@ void CUnit::ClearAnims()
 
 void CUnit::SetNewPath(Path* const p)	
 { 
+	// if you currently have a neighbor enemy, make him center on the tile and set his and this one's to NULL.
+	// since this function is only called when the unit actually moves to a new tile,
+	// any current neighbor will be left behind. If a new one is found, it will be set then
+	if (m_pNeighborEnemy)
+	{
+		m_pNeighborEnemy->CenterUnit();
+		m_pNeighborEnemy->SetNeighbor(NULL);
+		SetNeighbor(NULL);
+	}
 	m_pPath = p;
 	m_iCurrPath = p->begin();
 	// see if the first tile contains the target
@@ -309,6 +316,10 @@ void CUnit::Reset()
 { 
 	m_nStamina = m_nMaxStamina; 
 	m_pCurrDefenseAbility->ResetFreeCounter();	
+}
+void CUnit::CenterUnit()
+{
+	NextMove(m_ptCoord, 0, NUM_DIRECTIONS);
 }
 //////////////////////////////////////////////////////////////////////////
 //	PRIVATE FUNCTIONS
@@ -342,7 +353,6 @@ void CUnit::StopMoving()
 
 void CUnit::BeginMoveToAttack()
 {
-	m_bIsAtTileCenter = false;
 	// set anim name before calling SetFacing
 	m_strCurrAnim = gAnimNames[AT_RUN];
 
@@ -351,6 +361,8 @@ void CUnit::BeginMoveToAttack()
 	pointf targSPos = Globals::g_pMap->GetTarget()->GetSPos();
 	target->ChangeAnim(gAnimNames[AT_RUN]);
 	target->GetCurrAnim().Play();
+	target->SetNeighbor(this);
+	SetNeighbor(target);
 
 	m_ptMoveToScreenPos = targSPos;
 	if (target->GetSPos().x > m_ptScreenPos.x)	// they're on the right side

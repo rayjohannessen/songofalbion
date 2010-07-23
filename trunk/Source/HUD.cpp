@@ -14,13 +14,40 @@
 #include "AbilityObjectBase.h"
 using namespace ObjectDefines;
 
-const int   POS_SLOT_Y_SPACE = 5;
-const int	POS_SLOT_X_SPACE = 15;
-const point	BTN_SIZE		 = point(117, 27);
+// BUTTON POS/SIZE VALUES
+const int	POS_X			 = 585;
+const int	POS_Y			 = 656;
+const point	BTN_SIZE		 = point(127, 30);
 
-const point POS_SLOT_1_1 = point(765, 655);
-const point POS_SLOT_2_1 = point(765 + BTN_SIZE.x + 5, 655);
-const point POS_SLOT_3_1 = point(765 + (BTN_SIZE.x + 5) * 2, 655);
+const point POS_SLOT_1_1 = point(POS_X, POS_Y);
+const point POS_SLOT_2_1 = point(POS_X + BTN_SIZE.x, POS_Y);
+const point POS_SLOT_3_1 = point(POS_X + BTN_SIZE.x * 2, POS_Y);
+const point POS_END_TURN = point(885, 610);
+
+// UNIT INFO POS/SIZE VALUES
+const float FACTION_SCALE	 = 0.75f;
+const float INFO_TEXT_SCALE	 = 0.8f;
+const int	TEXT_Y_SPACING	 = 20;
+const point TEXT_OS_FROM_BG	 = point(10, 34);
+const point FACTION_OS		 = point(7, 6);
+const point NAME_OS			 = point(45, 9);
+// SELECTED (FRIENDLY OBJ)
+const point	POS_SEL_OBJ_BG	 = point(255, 651);
+const point POS_NAME		 = point(POS_SEL_OBJ_BG).Offset(NAME_OS);
+const point	POS_TEXT_BEGIN	 = point(POS_SEL_OBJ_BG).Offset(TEXT_OS_FROM_BG);
+const point POS_VIT			 = point(POS_TEXT_BEGIN);
+const point POS_STA			 = point(POS_TEXT_BEGIN.x, POS_TEXT_BEGIN.y + TEXT_Y_SPACING);
+const point POS_MAG			 = point(POS_TEXT_BEGIN.x, POS_TEXT_BEGIN.y + TEXT_Y_SPACING * 2);
+const point POS_FACTION		 = point(POS_SEL_OBJ_BG).Offset(FACTION_OS);
+// SELECTED (TARGET OBJ)
+const point POS_TARGET_BG	 = point(55, 651);
+const point POS_NAME_T		 = point(POS_TARGET_BG).Offset(NAME_OS);
+const point	POS_TEXT_BEGIN_T = point(POS_TARGET_BG).Offset(TEXT_OS_FROM_BG);
+const point POS_VIT_T		 = point(POS_TEXT_BEGIN_T);
+const point POS_STA_T		 = point(POS_TEXT_BEGIN_T.x, POS_TEXT_BEGIN_T.y + TEXT_Y_SPACING);
+const point POS_MAG_T		 = point(POS_TEXT_BEGIN_T.x, POS_TEXT_BEGIN_T.y + TEXT_Y_SPACING * 2);
+const point POS_FACTION_T	 = point(POS_TARGET_BG).Offset(FACTION_OS);
+
 
 CHUD* CHUD::GetInstance()
 {
@@ -92,7 +119,7 @@ void CHUD::Update(double fElapsedTime)
 	}
 }
 
-int CHUD::Input(POINT& mouse)
+void CHUD::Input(POINT& mouse)
 {
 	point mousePt = mouse;
 
@@ -144,8 +171,6 @@ int CHUD::Input(POINT& mouse)
 			}
 		}
 	}
-
-	return 0;
 }
 
 void CHUD::DrawResources(  )
@@ -164,22 +189,21 @@ void CHUD::DrawResources(  )
 
 void CHUD::DrawSelectedObjInfo( )
 {
-	// TODO:: have each object draw it's own info
 	char buff[32];
 	if (m_pSelectedPlayerObj)
 	{
-		Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->PlayerInfoBG(), 575, 651, DEPTH_PLAYERINFOBG);
+		Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->PlayerInfoBG(), POS_SEL_OBJ_BG.x, POS_SEL_OBJ_BG.y, DEPTH_PLAYERINFOBG);
 		switch(m_pSelectedPlayerObj->GetType())
 		{
 		case OBJ_UNIT:
 			{
 				CUnit* unit = (CUnit*)m_pSelectedPlayerObj;
 				sprintf_s(buff, "Vit:%i/%i", unit->GetVitality(), unit->GetMaxVit());
-				Globals::g_pBitMapFont->DrawString(buff, 585, 685, DEPTH_PLAYERINFO, 0.8f);
+				Globals::g_pBitMapFont->DrawString(buff, POS_VIT.x, POS_VIT.y, DEPTH_PLAYERINFO, INFO_TEXT_SCALE);
 				sprintf_s(buff, "Sta:%i/%i", unit->GetStamina(), unit->GetMaxStamina());
-				Globals::g_pBitMapFont->DrawString(buff, 585, 705, DEPTH_PLAYERINFO, 0.8f);
+				Globals::g_pBitMapFont->DrawString(buff, POS_STA.x, POS_STA.y, DEPTH_PLAYERINFO, INFO_TEXT_SCALE);
 				sprintf_s(buff, "Mag:%i/%i", unit->GetMP(), unit->GetMaxMagPts());
-				Globals::g_pBitMapFont->DrawString(buff, 585, 725, DEPTH_PLAYERINFO, 0.8f);
+				Globals::g_pBitMapFont->DrawString(buff, POS_MAG.x, POS_MAG.y, DEPTH_PLAYERINFO, INFO_TEXT_SCALE);
 			}
 			break;
 		case OBJ_CITY:
@@ -192,30 +216,28 @@ void CHUD::DrawSelectedObjInfo( )
 			break;
 		}
 
-		Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->FactionImages()[m_pSelectedPlayerObj->GetFactionID()], 582, 657, DEPTH_PLAYERINFO, 0.75f, 0.75f);
-		Globals::g_pBitMapFont->DrawString(m_pSelectedPlayerObj->GetName().c_str(), 620, 660, DEPTH_PLAYERINFO, 0.8f);
+		Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->FactionImages()[m_pSelectedPlayerObj->GetFactionID()], POS_FACTION.x, POS_FACTION.y, DEPTH_PLAYERINFO, FACTION_SCALE, FACTION_SCALE);
+		Globals::g_pBitMapFont->DrawString(m_pSelectedPlayerObj->GetName().c_str(), POS_NAME.x, POS_NAME.y, DEPTH_PLAYERINFO, INFO_TEXT_SCALE);
 	}
 }
 
 void CHUD::DrawTargetInfo( )
 {
-	// TODO:: have each object draw it's own info
 	char buff[32];
 	if (m_pSelectedTarget)
 	{
-		Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->EnemyInfoBG(), 265, 651, DEPTH_PLAYERINFOBG);
+		Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->EnemyInfoBG(), POS_TARGET_BG.x, POS_TARGET_BG.y, DEPTH_PLAYERINFOBG);
 		switch(m_pSelectedTarget->GetType())
 		{
 		case OBJ_UNIT:
 			{
 				CUnit* unit = (CUnit*)m_pSelectedTarget;
 				sprintf_s(buff, "Vit:%i/%i", unit->GetVitality(), unit->GetMaxVit());
-				Globals::g_pBitMapFont->DrawString(buff, 275, 685, DEPTH_PLAYERINFO, 0.8f);
+				Globals::g_pBitMapFont->DrawString(buff, POS_VIT_T.x, POS_VIT_T.y, DEPTH_PLAYERINFO, INFO_TEXT_SCALE);
 				sprintf_s(buff, "Sta:%i/%i", unit->GetStamina(), unit->GetMaxStamina());
-				Globals::g_pBitMapFont->DrawString(buff, 275, 705, DEPTH_PLAYERINFO, 0.8f);
+				Globals::g_pBitMapFont->DrawString(buff, POS_STA_T.x, POS_STA_T.y, DEPTH_PLAYERINFO, INFO_TEXT_SCALE);
 				sprintf_s(buff, "Mag:%i/%i", unit->GetMP(), unit->GetMaxMagPts());
-				Globals::g_pBitMapFont->DrawString(buff, 275, 725, DEPTH_PLAYERINFO, 0.8f);
-
+				Globals::g_pBitMapFont->DrawString(buff, POS_MAG_T.x, POS_MAG_T.y, DEPTH_PLAYERINFO, INFO_TEXT_SCALE);
 			}
 			break;
 		case OBJ_CITY:
@@ -230,37 +252,40 @@ void CHUD::DrawTargetInfo( )
 			break;
 		}
 
-		Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->FactionImages()[m_pSelectedTarget->GetFactionID()], 272, 658, DEPTH_PLAYERINFO, 0.75f, 0.75f);
-		Globals::g_pBitMapFont->DrawString(m_pSelectedTarget->GetName().c_str(), 310, 660, DEPTH_PLAYERINFO, 0.8f);
+		Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->FactionImages()[m_pSelectedTarget->GetFactionID()], POS_FACTION_T.x, POS_FACTION_T.y, DEPTH_PLAYERINFO, FACTION_SCALE, FACTION_SCALE);
+		Globals::g_pBitMapFont->DrawString(m_pSelectedTarget->GetName().c_str(), POS_NAME_T.x, POS_NAME_T.y, DEPTH_PLAYERINFO, INFO_TEXT_SCALE);
 	}
 }
 
 void CHUD::InitBtnSlots()
 {
 	m_arrBtnSlots[BL_MENU].Rect		= rect(point(75, 20), BTN_SIZE);
+	m_arrBtnSlots[BL_END_TURN].Rect	= rect(POS_END_TURN, BTN_SIZE);
 	m_arrBtnSlots[BL_SLOT_1_1].Rect	= rect(POS_SLOT_1_1, BTN_SIZE);
-	m_arrBtnSlots[BL_SLOT_1_2].Rect	= rect(POS_SLOT_1_1, BTN_SIZE, point(0,BTN_SIZE.y+5));
-	m_arrBtnSlots[BL_SLOT_1_3].Rect	= rect(POS_SLOT_1_1, BTN_SIZE, point(0,(BTN_SIZE.y+5)*2));
+	m_arrBtnSlots[BL_SLOT_1_2].Rect	= rect(POS_SLOT_1_1, BTN_SIZE, point(0, BTN_SIZE.y) );
+	m_arrBtnSlots[BL_SLOT_1_3].Rect	= rect(POS_SLOT_1_1, BTN_SIZE, point(0, BTN_SIZE.y * 2));
 	m_arrBtnSlots[BL_SLOT_2_1].Rect = rect(POS_SLOT_2_1, BTN_SIZE);
-	m_arrBtnSlots[BL_SLOT_2_2].Rect = rect(POS_SLOT_2_1, BTN_SIZE, point(0,BTN_SIZE.y+5));
-	m_arrBtnSlots[BL_SLOT_2_3].Rect = rect(POS_SLOT_2_1, BTN_SIZE, point(0,(BTN_SIZE.y+5)*2));
+	m_arrBtnSlots[BL_SLOT_2_2].Rect = rect(POS_SLOT_2_1, BTN_SIZE, point(0, BTN_SIZE.y) );
+	m_arrBtnSlots[BL_SLOT_2_3].Rect = rect(POS_SLOT_2_1, BTN_SIZE, point(0, BTN_SIZE.y * 2));
 	m_arrBtnSlots[BL_SLOT_3_1].Rect = rect(POS_SLOT_3_1, BTN_SIZE);
-	m_arrBtnSlots[BL_SLOT_3_2].Rect = rect(POS_SLOT_3_1, BTN_SIZE, point(0,BTN_SIZE.y+5));
-	m_arrBtnSlots[BL_SLOT_3_3].Rect = rect(POS_SLOT_3_1, BTN_SIZE, point(0,(BTN_SIZE.y+5)*2));
+	m_arrBtnSlots[BL_SLOT_3_2].Rect = rect(POS_SLOT_3_1, BTN_SIZE, point(0, BTN_SIZE.y) );
+	m_arrBtnSlots[BL_SLOT_3_3].Rect = rect(POS_SLOT_3_1, BTN_SIZE, point(0, BTN_SIZE.y * 2));
 	SetButtonSlot(BL_MENU, &m_arrButtons[BN_MENU]);
+	SetButtonSlot(BL_END_TURN, &m_arrButtons[BN_END_TURN]);
 }
 
 void CHUD::InitButtons()
 {
-	m_arrButtons[BN_MENU].SetVariables(BN_MENU, BtnAction_OptionBox, "Menu");
-	m_arrButtons[BN_GEAR].SetVariables(BN_GEAR, BtnAction_OptionBox, "Gear");
-	m_arrButtons[BN_SKILLS].SetVariables(BN_SKILLS, BtnAction_OptionBox, "Skills");
-	m_arrButtons[BN_COMBAT_SKILLS].SetVariables(BN_COMBAT_SKILLS, BtnAction_OptionBox, "CSkills");
+	m_arrButtons[BN_MENU].SetVariables			  (BN_MENU,			    BtnAction_OptionBox, "Menu");
+	m_arrButtons[BN_END_TURN].SetVariables		  (BN_END_TURN,		    BtnAction_EndTurn,   "End");
+	m_arrButtons[BN_GEAR].SetVariables			  (BN_GEAR,			    BtnAction_OptionBox, "Gear");
+	m_arrButtons[BN_SKILLS].SetVariables		  (BN_SKILLS,			BtnAction_OptionBox, "Skills");
+	m_arrButtons[BN_COMBAT_SKILLS].SetVariables	  (BN_COMBAT_SKILLS,	BtnAction_OptionBox, "CSkills");
 	m_arrButtons[BN_NONCOMBAT_SKILLS].SetVariables(BN_NONCOMBAT_SKILLS, BtnAction_OptionBox, "Skills");
 
 	m_arrButtons[BN_DISBAND].SetVariables( BN_DISBAND, BtnAction_Disband, "Disband" );
-	m_arrButtons[BN_WAIT].SetVariables   ( BN_WAIT,    BtnAction_Wait, "Wait" );
-	m_arrButtons[BN_SKIP].SetVariables   ( BN_SKIP,    BtnAction_Skip, "Skip" );
+	m_arrButtons[BN_WAIT].SetVariables   ( BN_WAIT,    BtnAction_Wait,	  "Wait" );
+	m_arrButtons[BN_SKIP].SetVariables   ( BN_SKIP,    BtnAction_Skip,	  "Skip" );
 }
 
 void CHUD::DrawButtons()
@@ -285,11 +310,9 @@ void CHUD::SetButtons()
 
 void CHUD::ClearButtons()
 {
-	for (unsigned i = 0; i < BL_NUM_LOCATIONS; ++i)
-	{
-		if ((eButtonSlot)i != BL_MENU)	// never clear the menu button
-			SetButtonSlot((eButtonSlot)i, NULL);
-	}
+	// never clear the menu or the end turn button
+	for (unsigned i = BL_SLOT_1_1; i < BL_NUM_LOCATIONS; ++i)
+		SetButtonSlot((eButtonSlot)i, NULL);
 }
 
 inline

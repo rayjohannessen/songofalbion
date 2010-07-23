@@ -27,7 +27,7 @@ CObject* ObjectManager::NextObjectRemove()
 		// one has been erased, see if there's any left now
 		if (m_lCurrPlayerObjects.size())
 		{
-			if (m_iCurrObjIter == m_iCurrObjEnd)	// if we're at the end, go back to beginning
+			if (m_iCurrObjIter == m_lCurrPlayerObjects.end())	// if we're at the end, go back to beginning
 				m_iCurrObjIter = m_lCurrPlayerObjects.begin();
 			nextObj = (*m_iCurrObjIter);
 		}
@@ -38,17 +38,25 @@ CObject* ObjectManager::NextObjectRemove()
 
 CObject* ObjectManager::NextObjectNoRemove()
 {
-	++m_iCurrObjIter;
-	if (m_iCurrObjIter == m_iCurrObjEnd)	// if we're at the end, go back to beginning
-		m_iCurrObjIter = m_lCurrPlayerObjects.begin();
-	Globals::g_pMap->SelectObj((*m_iCurrObjIter), true);
+	if (m_lCurrPlayerObjects.size())	// if we're at the end, go back to beginning
+	{	
+		++m_iCurrObjIter;
+		if (m_iCurrObjIter == m_lCurrPlayerObjects.end())
+		{
+			m_iCurrObjIter = m_lCurrPlayerObjects.begin();
+			Globals::g_pMap->SelectObj((*m_iCurrObjIter), true);
+		}
+	}
+	else
+		return NULL;
+
 	return (*m_iCurrObjIter);
 }
 
 void ObjectManager::ChangeCurrObj(CObject *currObj)
 {
 	m_iCurrObjIter = m_lCurrPlayerObjects.begin();
-	for ( ; m_iCurrObjIter != m_iCurrObjEnd; ++m_iCurrObjIter)
+	for ( ; m_iCurrObjIter != m_lCurrPlayerObjects.end(); ++m_iCurrObjIter)
 		if (currObj == (*m_iCurrObjIter))
 			break;	// found the unit, if this doesn't get hit...something's wrong
 }
@@ -65,7 +73,6 @@ CObject* ObjectManager::StartTurn(CPlayer* currPlayer)
 			m_lCurrPlayerObjects.push_back(&currPlayer->GetUnits()[i]);
 		}
 		m_iCurrObjIter = m_lCurrPlayerObjects.begin();
-		m_iCurrObjEnd  = m_lCurrPlayerObjects.end();
 		Globals::g_pMap->SelectObj((*m_iCurrObjIter));
 		return (*m_iCurrObjIter);
 	}
@@ -74,7 +81,9 @@ CObject* ObjectManager::StartTurn(CPlayer* currPlayer)
 }
 void ObjectManager::EndTurn()
 {
-
+	if ( m_lCurrPlayerObjects.size() && (*m_iCurrObjIter) )
+		Globals::g_pMap->ActionIfSelected(*m_iCurrObjIter);
+	Globals::GotoNextPlayer();
 }
 
 void ObjectManager::Update(double fTimeStep, const pointf* moveAmt)
@@ -210,6 +219,9 @@ void ObjectManager::RemoveObj(CPlayer* player, CObject* pObj)
 			{
 				if (pObj == &player->GetUnits()[i])
 				{
+					CUnit* unit = (CUnit*)pObj;
+					if (unit->GetNeighbor())
+						unit->GetNeighbor()->CenterUnit();
 					player->RemoveUnit(i);
 				}break;
 			}
