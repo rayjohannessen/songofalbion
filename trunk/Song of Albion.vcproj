@@ -306,22 +306,26 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="MenuStates"
+			Name="Menus"
 			>
 			<File
-				RelativePath=".\Source\BaseMenuState.cpp"
+				RelativePath=".\Source\Menu.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\BaseMenuState.h"
+				RelativePath=".\Source\Menu.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\HelpMenu.cpp"
+				RelativePath=".\Source\MenuDefines.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\HelpMenu.h"
+				RelativePath=".\Source\MenuFunctions.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\MenuFunctions.h"
 				>
 			</File>
 		</Filter>
@@ -390,10 +394,6 @@
 			</File>
 			<File
 				RelativePath=".\Source\Defines.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\DLList.h"
 				>
 			</File>
 			<File

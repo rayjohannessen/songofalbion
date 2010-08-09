@@ -23,6 +23,9 @@ const point POS_SLOT_1_1 = point(POS_X, POS_Y);
 const point POS_SLOT_2_1 = point(POS_X + BTN_SIZE.x, POS_Y);
 const point POS_SLOT_3_1 = point(POS_X + BTN_SIZE.x * 2, POS_Y);
 const point POS_END_TURN = point(885, 610);
+const point POS_MENU	 = point(75, 19);
+
+const int	POS_RES_Y	 = 25;
 
 // UNIT INFO POS/SIZE VALUES
 const float FACTION_SCALE	 = 0.75f;
@@ -76,7 +79,7 @@ void CHUD::Render()
 {
 	Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->HUD(), 0, 0, DEPTH_HUDFRAME);	// the main HUD's frame bg
 	Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->Frame(), 0, 0, DEPTH_HUDBORDER);	// the border
-	Globals::g_pBitMapFont->DrawString(Globals::g_pCurrPlayer->GetProfile()->name.c_str(), 230, 25, DEPTH_PLAYERINFO);
+	Globals::g_pBitMapFont->DrawString(Globals::g_pCurrPlayer->GetProfile()->name.c_str(), 230, 22, DEPTH_PLAYERINFO, 1.0f, YELLOW_WHITE);
 
 	m_pQuickBar->Render();
 
@@ -101,11 +104,11 @@ void CHUD::Render()
 	}
 }
 
-void CHUD::Update(double fElapsedTime)
+void CHUD::Update(double dTimeStep)
 {
 	for (int i = 0; !Globals::g_bWindowOpen && i < BL_NUM_LOCATIONS; ++i)
 		if (m_arrBtnSlots[i].pButton)
-			m_arrBtnSlots[i].pButton->Update(fElapsedTime);
+			m_arrBtnSlots[i].pButton->Update(dTimeStep);
 
 	m_pPrevSelectedPlayerObjState = m_pSelectedPlayerObj;
 	m_pSelectedPlayerObj = Globals::g_pMap->GetSelectedObject();
@@ -119,13 +122,13 @@ void CHUD::Update(double fElapsedTime)
 	}
 }
 
-void CHUD::Input(POINT& mouse)
+bool CHUD::Input(const POINT& mouse)
 {
 	point mousePt = mouse;
 
 	m_pQuickBar->Input(mouse);
 
-	// handle button input
+	// handle button input - don't handle if there is a window open
 	for (int i = 0; !Globals::g_bWindowOpen && i < BL_NUM_LOCATIONS; ++i)
 	{
 		if (m_arrBtnSlots[i].pButton)
@@ -158,7 +161,7 @@ void CHUD::Input(POINT& mouse)
 				}
 				if (code == RC_SELECTION)	// a selection was made from the options
 				{
-					break;	// no need to do anything here?
+					return false;	// no need to do anything here?
 				}
 				else if (code == RC_CLOSE)	// user pushed close button
 				{
@@ -166,11 +169,21 @@ void CHUD::Input(POINT& mouse)
 					m_vWindows.erase(m_iWindowsIter);
 					if (!m_vWindows.size())
 						Globals::g_bWindowOpen = false;
-					break;
+					return false;
+				}
+				else if (code == RC_TO_MENU)
+				{
+					delete (*m_iWindowsIter);
+					m_vWindows.erase(m_iWindowsIter);
+					if (!m_vWindows.size())
+						Globals::g_bWindowOpen = false;
+
+					return true;
 				}
 			}
 		}
 	}
+	return false;
 }
 
 void CHUD::DrawResources(  )
@@ -178,13 +191,13 @@ void CHUD::DrawResources(  )
 	char buff[32];
 	// resources	([0] is always human player)
 	sprintf_s(buff, " %i", Globals::GetPlayers()[0]->GetCrystalRes());
-	Globals::g_pBitMapFont->DrawString(buff, 600, 27, DEPTH_RESOURCES, 0.75f);
+	Globals::g_pBitMapFont->DrawString(buff, 600, POS_RES_Y, DEPTH_RESOURCES, 0.75f);
 	sprintf_s(buff, " %i", Globals::GetPlayers()[0]->GetWoodRes());
-	Globals::g_pBitMapFont->DrawString(buff, 699, 27, DEPTH_RESOURCES, 0.75f);
+	Globals::g_pBitMapFont->DrawString(buff, 699, POS_RES_Y, DEPTH_RESOURCES, 0.75f);
 	sprintf_s(buff, " %i", Globals::GetPlayers()[0]->GetOreRes());
-	Globals::g_pBitMapFont->DrawString(buff, 802, 27, DEPTH_RESOURCES, 0.75f);
+	Globals::g_pBitMapFont->DrawString(buff, 802, POS_RES_Y, DEPTH_RESOURCES, 0.75f);
 	sprintf_s(buff, " %i", Globals::GetPlayers()[0]->GetGoldRes());
-	Globals::g_pBitMapFont->DrawString(buff, 899, 27, DEPTH_RESOURCES, 0.75f);
+	Globals::g_pBitMapFont->DrawString(buff, 899, POS_RES_Y, DEPTH_RESOURCES, 0.75f);
 }
 
 void CHUD::DrawSelectedObjInfo( )
@@ -259,7 +272,7 @@ void CHUD::DrawTargetInfo( )
 
 void CHUD::InitBtnSlots()
 {
-	m_arrBtnSlots[BL_MENU].Rect		= rect(point(75, 20), BTN_SIZE);
+	m_arrBtnSlots[BL_MENU].Rect		= rect(POS_MENU, BTN_SIZE);
 	m_arrBtnSlots[BL_END_TURN].Rect	= rect(POS_END_TURN, BTN_SIZE);
 	m_arrBtnSlots[BL_SLOT_1_1].Rect	= rect(POS_SLOT_1_1, BTN_SIZE);
 	m_arrBtnSlots[BL_SLOT_1_2].Rect	= rect(POS_SLOT_1_1, BTN_SIZE, point(0, BTN_SIZE.y) );
@@ -335,7 +348,7 @@ void CHUD::CloseCurrWindow()
 	}
 }
 
-void CHUD::AddWindow(CUIWindowBase* window)		
+void CHUD::AddWindow(CUIWindowBase* const window)		
 { 
 	m_vWindows.push_back(window); 
 	Globals::g_bWindowOpen = true; 

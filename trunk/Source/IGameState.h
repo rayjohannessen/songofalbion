@@ -11,6 +11,8 @@
 
 #include "windows.h"
 
+enum eInputReturnType {IRT_EXIT, IRT_CONTINUE, IRT_CHANGE_STATE, };
+
 class IGameState
 {
 private:
@@ -27,7 +29,7 @@ public:
 	//
 	//	Purpose		:	Any update code goes here, pure virtual, must be overwritten
 	//////////////////////////////////////////////////////////////////////////
-	virtual void Update(double fElapsedTime) = 0;
+	virtual void Update(double dTimeStep) = 0;
 	//////////////////////////////////////////////////////////////////////////
 	//	Function	:	Render
 	//
@@ -41,7 +43,7 @@ public:
 	//
 	//	Return		:	true/false, false if we are exiting the game
 	//////////////////////////////////////////////////////////////////////////
-	virtual bool Input(double elapsedTime, POINT mousePt) = 0;
+	virtual eInputReturnType Input(double elapsedTime, const POINT& mousePt) = 0;
 	//////////////////////////////////////////////////////////////////////////
 	//	Function	:	Enter
 	//

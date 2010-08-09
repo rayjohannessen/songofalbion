@@ -78,6 +78,7 @@ void CAssetsGUI::LoadInGameHUD()
 	m_nHUDFrame				= Globals::g_pTM->LoadTexture((GetPath() + "HUD_Frame.png").c_str(),	white);
 	m_nPlayerInfoBG			= Globals::g_pTM->LoadTexture((GetPath() + "playerInfoBG.png").c_str(), white);
 	m_nEnemyInfoBG			= Globals::g_pTM->LoadTexture((GetPath() + "enemyInfoBG.png").c_str(),	white);
+	m_nWindowFrame			= Globals::g_pTM->LoadTexture((GetPath() + "Window.png").c_str(), white);
 
 	m_nFactions[FAC_LOGRESS] = Globals::g_pTM->LoadTexture((GetPath() + "faction-1.png").c_str(), white);
 	m_nFactions[FAC_PRYDAIN] = Globals::g_pTM->LoadTexture((GetPath() + "faction-2.png").c_str(), white);

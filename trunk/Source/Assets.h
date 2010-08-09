@@ -63,6 +63,7 @@ class CAssetsGUI : BaseAsset
 	int m_nAbilityImages;
 	int m_nPlayerInfoBG;
 	int m_nEnemyInfoBG;
+	int m_nWindowFrame;
 	int m_nFactions[NUM_FACTIONS];
 
 	CAssetsGUI();
@@ -85,6 +86,7 @@ public:
 	inline int BlackPixel()	const	{ return m_nBlackPixel;		}
 	inline int QuickBar() const		{ return m_nQBFrame;		}
 	inline int AbilityImages() const{ return m_nAbilityImages;	}
+	inline int WindowFrame() const  { return m_nWindowFrame;	}
 };
 
 //////////////////////////////////////////////////////////////////////////

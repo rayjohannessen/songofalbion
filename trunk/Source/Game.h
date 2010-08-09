@@ -3,19 +3,18 @@
 
 
 #include "IGameState.h"
+#include "MenuDefines.h"
 
 class CPlayer;
 class CTimer;
-
-#include <string>
-using std::string;
+class CMenu;
 
 class CGame
 {
 private:
 	//pointers to other classes
 	IGameState*			m_pCurrentState;
-
+	CMenu*				m_pCurrMenu;
 	string				m_sCurrProfName;
 
 	// variables
@@ -40,6 +39,7 @@ private:
 
 
 public:
+	void ChangeMenu(eMenuType mt);
 	///////////////////////////////////////////////
 	//	Function:	ChangeState
 	//
@@ -51,7 +51,7 @@ public:
 	//
 	//	Purpose:	To run while the game runs from start to finish
 	////////////////////////////////////////////////////////////////
-	bool Main(POINT mouse);
+	bool Main(const POINT& mouse);
 	////////////////////////////////////////////////////////////////
 	//	Function:	Shutdown
 	//
@@ -88,13 +88,14 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	// Accessors
 	//////////////////////////////////////////////////////////////////////////
-	//RECT GetBackGroundSize(void){ return m_rectBackGroundSize; }
- 	inline int			GetScreenWidth ()	const	{return m_nScreenWidth;}
+	inline bool			GetIsRunning()		const	{return m_bIsRunning;	}
+	inline int			GetScreenWidth ()	const	{return m_nScreenWidth;	}
  	inline int			GetScreenHeight ()	const	{return m_nScreenHeight;}
-	inline bool			GetIsRunning()		const	{return m_bIsRunning;}
-	inline float		GetSFXVolume()		const	{return m_fSFXVolume;}
-	inline float		GetMusicVolume()	const	{return m_fMusicVolume;}
+	inline float		GetSFXVolume()		const	{return m_fSFXVolume;	}
+	inline float		GetMusicVolume()	const	{return m_fMusicVolume;	}
 	inline string		GetProfName()		const	{return m_sCurrProfName;}
+	inline CMenu* const GetCurrMenu()		const	{return m_pCurrMenu;	}
+	inline const IGameState* const GetCurrState()	const	{return m_pCurrentState;}
 	// 	bool GetIsPaused()			{return m_bIsPaused;}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -104,6 +105,7 @@ public:
 	inline void SetMusicVolume	(float _nMusicVolume);
 	inline void SetIsRunning	(bool _bIsRunning)		{m_bIsRunning = _bIsRunning;}
 	inline void SetProfName		(string& profName)		{m_sCurrProfName = profName;}
+	inline void SetCurrMenu		(CMenu* const menu)		{m_pCurrMenu = menu;		}
 	//	void SetIsPaused	()					{m_bIsPaused = !m_bIsPaused;}
 	// 	void SetLastScore	(int _nLastScore)		{m_nLastScore = _nLastScore;}
 };

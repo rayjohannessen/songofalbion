@@ -14,7 +14,7 @@ CNonCombatSkill::~CNonCombatSkill()
 
 }
 
-void CNonCombatSkill::Update(double fTimeStep, AbilityReturn& abilRet)
+void CNonCombatSkill::Update(double dTimeStep, AbilityReturn& abilRet)
 {
 	m_fpAbilityFunc(m_pTarget, m_pOwner, abilRet);
 }

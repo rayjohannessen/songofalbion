@@ -69,13 +69,20 @@ public:
 	// handles updating any mouse-overs,
 	// as well as setting any button selects
 	// and calling the appropriate functionality
-	void Update(double fElapsedTime);
-	void Input(POINT& mousePt);
+	void Update(double dTimeStep);
+	//////////////////////////////////////////////////////////////////////////
+	//	FUNCTION	:	Input
+	//
+	//	RETURNS (bool):	true if exiting from gameplay state, false otherwise
+	//					(does not return true if any other menu options pressed)
+	//
+	//////////////////////////////////////////////////////////////////////////
+	bool Input(const POINT& mousePt);
 
 	void CloseCurrWindow();
 	void ToggleAddingQBObjects(CQuickBarObject* const qbObj);
 	void ClearQBSlots();
-	void AddWindow(CUIWindowBase* window);
+	void AddWindow(CUIWindowBase* const window);
 
 	//////////////////////////////////////////////////////////////////////////
 	// mutators

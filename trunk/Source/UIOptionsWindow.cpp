@@ -3,15 +3,26 @@
 #include "UIOptionsWindow.h"
 #include "Globals.h"
 #include "BitmapFont.h"
+#include "Assets.h"
+
+const rect CUIOptionsWindow::cornerSrcTL	= rect(0, 71, 0, 76);
+const rect CUIOptionsWindow::cornerSrcTR	= rect(0, 71, 76, 152);
+const rect CUIOptionsWindow::cornerSrcBL	= rect(90, 161, 0, 76);
+const rect CUIOptionsWindow::cornerSrcBR	= rect(90, 161, 76, 152);
+const rect CUIOptionsWindow::sideSrc		= rect(71, 90, 0, 256);
 
 CUIOptionsWindow::CUIOptionsWindow( int imageID, CWindowVariablesBase* variables, bool hasCloseBtn /*= true*/ ) : 
 	CUIWindowBase(imageID, variables),
+	m_bHasCloseBtn(hasCloseBtn),
 	m_pAbility(NULL)
 {
 	// the close button will always be the last option in the list
-	m_bHasCloseBtn = hasCloseBtn;
 	if(hasCloseBtn)
 		AddCloseButton();
+
+	// determine the width modifier for frame purposes:
+	m_fFrameWMultiplier = (windowRect().width() / 256.0f);
+	m_fFrameHMultiplier = (windowRect().height()/ 256.0f);
 }
 
 CUIOptionsWindow::~CUIOptionsWindow()
@@ -34,14 +45,9 @@ eReturnCode  CUIOptionsWindow::Input(POINT mouse, CUIWindowBase* window /*= NULL
 		{
 			if ( (*iter).IsMouseOverOption(point(mouse)) && Globals::g_pDI->MouseButtonPressed(MOUSE_LEFT)  )
 			{							// simply determines if the current option == close button (last element in optionsList)
-				if ( m_bHasCloseBtn && (&(*iter) == &(*(optionsList().end()-1))) )
-					index = RC_CLOSE;
-				else	// no close button or the mouse is on a different option, call the option's function
-				{
-					window = (*iter).ExecuteOptionAction(); // returns null if no window is created
-					index = RC_SELECTION;
-				}
-				return index;	// we're done
+				index = (*iter).GetRetCode();
+				window = (*iter).ExecuteOptionAction(); // returns null if no window is created
+				return index; // we're done
 			}
 		}
 		index = RC_NO_SELECTION;
@@ -54,7 +60,7 @@ eReturnCode  CUIOptionsWindow::Input(POINT mouse, CUIWindowBase* window /*= NULL
 	return index;
 }
 
-void CUIOptionsWindow::Update(float fTimeStep)
+void CUIOptionsWindow::Update(float dTimeStep)
 {
 
 }
@@ -62,21 +68,23 @@ void CUIOptionsWindow::Update(float fTimeStep)
 void CUIOptionsWindow::Render()
 {
 	// the window bg
-	Globals::g_pTM->DrawWithZSort(m_nImageID, windowRect().left, windowRect().top, m_fBGZPos, scale().x, scale().y, NULL, 0.0f, 0.0f, 0.0f /*, color()*/);
+	Globals::g_pTM->DrawWithZSort(m_nImageID, windowRect().left, windowRect().top, zPos(), scale().x, scale().y, NULL, 0.0f, 0.0f, 0.0f /*, color()*/);
 
 	// the title
 	if (title().size())
 	{
 		rect r(windowRect()); r.top += optionProperties().EdgePadding; r.bottom = 0; // don't center on the height
-		Globals::g_pBitMapFont->DrawStringAutoCenter(title().c_str(), windowRect(), zPos(), titleScale(), titleClr());
+		Globals::g_pBitMapFont->DrawStringAutoCenter(title().c_str(), r, zPosTxtFrame(), titleScale(), titleClr());
 	}
 	// the options
 	OptionsListIter iter = optionsList().begin();
 	OptionsListIter end = optionsList().end();
 	for ( ; iter != end; ++iter )
 	{
-		(*iter).Render(zPos(), 1.0f, color(), transparent());
+		(*iter).Render(zPosTxtFrame(), 1.0f, color(), transparent());
 	}
+	// the frame
+	DrawFrame();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -110,7 +118,42 @@ void CUIOptionsWindow::AddCloseButton()
 		}break;
 	}
 	rect r = rect(pos, point(buttonSize, buttonSize));
-	COption opt = COption("X", NULL, NULL, &r);
+	COption opt = COption("X", RC_CLOSE, NULL, NULL, &r);
 	opt.m_nTopBtmOffset = 0;
 	optionsList().push_back(opt);
+}
+
+void CUIOptionsWindow::DrawFrame()
+{
+	//////////////////////////////////////////////////////////////////////////
+	// sides
+	//////////////////////////////////////////////////////////////////////////
+	// top
+	Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->WindowFrame(), windowRect().left, windowRect().top-12, zPosTxtFrame(), 
+		m_fFrameWMultiplier, 1.0f, &(rect)sideSrc);	
+	// btm
+	Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->WindowFrame(), windowRect().left, windowRect().bottom-5, zPosTxtFrame(), 
+		m_fFrameWMultiplier, 0.95f, &(rect)sideSrc);	
+	// left
+	Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->WindowFrame(), windowRect().left+5, windowRect().top, zPosTxtFrame(), 
+		0.95f, m_fFrameHMultiplier, &(rect)sideSrc, 0.0f, 0.0f, 1.57f);
+	// right
+	Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->WindowFrame(), windowRect().right+12, windowRect().top, zPosTxtFrame(), 
+		0.95f, m_fFrameHMultiplier, &(rect)sideSrc, 0.0f, 0.0f, 1.57f);
+
+	//////////////////////////////////////////////////////////////////////////
+	// corners
+	//////////////////////////////////////////////////////////////////////////
+	// top-left
+	Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->WindowFrame(), windowRect().left-cornerOS, windowRect().top-cornerOS, zPosTxtFrame(), 
+		1.0, 1.0f, &(rect)cornerSrcTL);
+	// top-right
+	Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->WindowFrame(), windowRect().right-cornerSrcTL.width()+cornerOS, windowRect().top-cornerOS, zPosTxtFrame(), 
+		1.0, 1.0f, &(rect)cornerSrcTR);
+	// btm-left
+	Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->WindowFrame(), windowRect().left-cornerOS, windowRect().bottom-cornerSrcBL.height()+cornerOS+1, zPosTxtFrame(), 
+		1.0, 1.0f, &(rect)cornerSrcBL);
+	// btm-right
+	Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->WindowFrame(), windowRect().right-cornerSrcBR.width()+cornerOS, windowRect().bottom-cornerSrcBR.height()+cornerOS+1, zPosTxtFrame(), 
+		1.0, 1.0f, &(rect)cornerSrcBR);
 }

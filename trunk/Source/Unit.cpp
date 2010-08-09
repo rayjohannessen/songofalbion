@@ -50,9 +50,10 @@ CUnit::CUnit(CUnit& unit)
 	DeepCopyAll(unit);
 }
 
-CUnit::CUnit( int nUnitType, int type, point& coord, point& sPos, 
-			 string name, const char* faction, int factionID)
-			 : CObject(type, coord, sPos, name, faction, factionID), m_pPath(NULL), m_pNeighborEnemy(NULL)
+CUnit::CUnit( int nUnitType, int type, point& coord, point& sPos, string name, const char* faction, int factionID) : 
+	CObject(type, coord, sPos, name, faction, factionID), 
+	m_pPath(NULL), 
+	m_pNeighborEnemy(NULL)
 {
 	// most units' source rects should be the same size, use default size for now (w=128, h=128)
 	m_nUnitType = nUnitType;
@@ -119,10 +120,10 @@ void CUnit::DeepCopyAll( CUnit &unit )
 		m_mAnimations[(*iter).second->GetName()] = new CAnimation(*((*iter).second));
 }
 
-void CUnit::Update(double fTimeStep, const pointf* moveAmt)
+void CUnit::Update(double dTimeStep, const pointf* moveAmt)
 {
 	if (moveAmt) // account for scrolling of the map
-		CObject::Update(fTimeStep, moveAmt);
+		CObject::Update(dTimeStep, moveAmt);
 
 	if (m_Timer.Update())	// death timer...need to change if a timer is needed for another trigger as well
 	{
@@ -144,7 +145,7 @@ void CUnit::Update(double fTimeStep, const pointf* moveAmt)
 			newPos	= m_ptScreenPos;
 			dir		= (m_ptMoveToScreenPos - newPos);
 			dir.Normalize();
-			newAmt = dir * (float)fTimeStep * MOVE_SPEED;
+			newAmt = dir * (float)dTimeStep * MOVE_SPEED;
 			newPos  = newPos + newAmt;
 			m_rSelectionRect += newAmt;
 	
@@ -171,7 +172,7 @@ void CUnit::Update(double fTimeStep, const pointf* moveAmt)
 				else if (Globals::g_pMap->GetTarget()->GetCoord() == (*m_iCurrPath)->DestID() &&
 						(*m_iCurrPath) == (*m_pPath)[m_pPath->size()-1])	// this last tile contains the target
 				{
-					// begin moving to target's tile (halfway)
+					// begin moving to target's tile
 					Globals::g_pMap->ToggleMapFlagOff(MF_MOVING);
 					BeginMoveToAttack();
 				}
@@ -187,11 +188,12 @@ void CUnit::Update(double fTimeStep, const pointf* moveAmt)
 			else
 			{
 				StopMoving();
+				Globals::g_pMap->CheckMapScroll(this);
 			}
 		}
 	}
 	// update current animation
-	if(m_mAnimations[m_strCurrAnim]->Update(fTimeStep))
+	if(m_mAnimations[m_strCurrAnim]->Update(dTimeStep))
 	{
 		// an anim has finished playing...maybe do something now...
 		if (IsAnimAttack(m_strCurrAnim))
@@ -219,9 +221,6 @@ void CUnit::Render( const rect& viewPort )
 			m_mAnimations[m_strCurrAnim]->GetImageID(), 
 			(int)m_ptScreenPos.x, (int)m_ptScreenPos.y, m_fZDepth,
 			m_fScaleX, m_fScaleY, &m_mAnimations[m_strCurrAnim]->GetSourceRect(), 0.0f, 0.0f, 0.0f, m_dwColor);
-
-// 		if (m_pCurrAbility && m_pCurrAbility->IsUpdating())
-// 			m_pCurrAbility->Render();
 	}
 }
 
@@ -280,7 +279,6 @@ void CUnit::ClearAnims()
 	}
 }
 
-
 void CUnit::SetNewPath(Path* const p)	
 { 
 	// if you currently have a neighbor enemy, make him center on the tile and set his and this one's to NULL.
@@ -314,8 +312,8 @@ void CUnit::SetNewPath(Path* const p)
 
 void CUnit::Reset()							
 { 
-	m_nStamina = m_nMaxStamina; 
-	m_pCurrDefenseAbility->ResetFreeCounter();	
+	m_nStamina = m_nMaxStamina;
+	GetCurrDefenseAbility()->ResetFreeCounter();	
 }
 void CUnit::CenterUnit()
 {
@@ -347,14 +345,14 @@ void CUnit::StopMoving()
 	ChangeAnim(gAnimNames[AT_ATTACK]);
 	m_ptScreenPos = m_ptMoveToScreenPos;
 	Globals::g_pMap->ToggleMapFlagOff(MF_MOVING);
-	if (m_pPath)
-		m_pPath->clear();
+	ResetPath();
 }
 
 void CUnit::BeginMoveToAttack()
 {
 	// set anim name before calling SetFacing
 	m_strCurrAnim = gAnimNames[AT_RUN];
+	Globals::g_pMap->ToggleMapFlagOn(MF_ATTACKING);
 
 	// stand either to the left or right of the target, depending on where we're coming from
 	CUnit* target = ((CUnit*)Globals::g_pMap->GetTarget());
@@ -421,6 +419,15 @@ void CUnit::BeginMoveToAttack()
 	SetCoord(Globals::g_pMap->GetTarget()->GetCoord());	// set grid coord
 	DecrementStamina((*m_iCurrPath)->TerrainCost());
 	m_bMovingToAttack = true;
-	m_pPath->clear();
+	ResetPath();
+}
+
+void CUnit::ResetPath()
+{
+	if (m_pPath)
+	{
+		m_pPath->clear();
+		m_pPath = NULL;
+	}
 }
 //////////////////////////////////////////////////////////////////////////

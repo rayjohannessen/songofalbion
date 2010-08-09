@@ -203,5 +203,5 @@ public:
 		rect* pSection = NULL, /*float fRotCenterX = 0.0f, float fRotCenterY = 0.0f, float fRotation = 0.0f,*/ DWORD dwColor = 0xFFFFFFFF);
 
 	bool DrawWithZSort(int nID, int nX, int nY, float nZ, float fScaleX = 1.0f, float fScaleY = 1.0f,
-		rect* pSection = NULL, float fRotCenterX = 0.0f, float fRotCenterY = 0.0f, float fRotation = 0.0f, DWORD dwColor = 0xFFFFFFFF);
+		rect* const pSection = NULL, float fRotCenterX = 0.0f, float fRotCenterY = 0.0f, float fRotation = 0.0f, DWORD dwColor = 0xFFFFFFFF);
 };

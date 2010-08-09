@@ -123,3 +123,32 @@ Added End Turn Button
 Fixed crash if you "wait" after "skip"ping a unit then selecting it
 Moved object info to left side of bottom bar and buttons to the left a bit (to make room for a third row of buttons)
 
+
+7/24/2010
+---------
+Fixed being able to move while beginning to attack
+Bitmap fonts
+	- Added automatic loading
+	- Added profiles and ability to use multiple fonts by changing the currently used profile
+	- Tweaked Auto-centering of font display to allow for centering in an arbitrary rect
+
+
+7/27/2010
+---------
+Option Windows
+	- Added frame textures to window edges and corners
+	- Frame textures dynamically size to fit window
+
+
+7/31/2010
+---------
+Added centering of first unit at start of turn
+Tweaked (and fixed) centering of units that move off the screen
+Properly renamed many time step variables
+Cleaned up unused code
+Added const and pass-by-reference as needed in many places
+
+
+
+
+

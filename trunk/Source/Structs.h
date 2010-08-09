@@ -138,8 +138,8 @@ struct rect
 		left += offset.x;
 		right += offset.x;
 	}
-	inline int width() const { return right-left; }
-	inline int height() const{ return bottom-top; }
+	inline int width()  const { if(right)return right-left; return 0;	}
+	inline int height() const { if(bottom)return bottom-top; return 0;	}
 };
 
 struct rectf

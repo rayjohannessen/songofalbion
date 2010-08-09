@@ -50,6 +50,8 @@ class CUnit : public CObject
 	void NextMove(const point& coord, int cost, eAnimationDirections facing);
 		
 	void StopMoving();
+
+	void ResetPath();
 	void BeginMoveToAttack();
 
 public:
@@ -64,7 +66,7 @@ public:
 
 	// draws the unit at its current frame
 	void Render(const rect& viewPort);
-	void Update(double fTimeStep, const pointf* moveAmt = NULL);
+	void Update(double dTimeStep, const pointf* moveAmt = NULL);
 
 	//////////////////////////////////////////////////////////////////////////
 	//	For simply facing the target when attacking, movement is not covered,

@@ -21,11 +21,11 @@ CCity::CCity(int type, int cityType, int size, point coord, point sPos, string n
 	m_ptSize = point(CITY_WIDTH, CITY_HEIGHT);
 }
 
-void CCity::Update(double fTimeStep, const pointf* moveAmt)
+void CCity::Update(double dTimeStep, const pointf* moveAmt)
 {
 	if (moveAmt)	// for scrolling
 	{
-		CObject::Update(fTimeStep, moveAmt);
+		CObject::Update(dTimeStep, moveAmt);
 	}
 }
 

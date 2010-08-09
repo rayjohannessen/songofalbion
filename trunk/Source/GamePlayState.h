@@ -11,7 +11,7 @@
 
 #include "IGameState.h"
 
-class CBaseMenuState;
+class CMenu;
 class CMap;
 class CPlayer;
 
@@ -20,7 +20,7 @@ class CGamePlayState : public IGameState
 {
 private:
 	bool m_bIsPaused;
-	CBaseMenuState* m_pCurrentMenuState;
+	CMenu* m_pCurrentMenuState;
 
 	int		m_nNumPlayers;
 
@@ -68,14 +68,16 @@ public:
 	//	Function: Input
 	//
 	//	Purpose: Read the input from the user
+	//  RETURN(eInputReturnType)	: whether or not we need to exit
+	//									or return early (changing from current state)
 	/////////////////////////////////////////////////////////////////
-	bool Input(double, POINT);
+	eInputReturnType Input(double, const POINT&);
 	/////////////////////////////////////////////////////////////////
 	//	Function:	Update
 	//
 	//	Purpose:	Update the state objects
 	////////////////////////////////////////////////////////////////
-	void Update(double fElapsedTime);
+	void Update(double dTimeStep);
 	////////////////////////////////////////////////////////////////
 	//	Function:	Render
 	//

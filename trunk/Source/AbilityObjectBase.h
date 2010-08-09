@@ -136,7 +136,7 @@ public:
 	virtual ~CAbilityObjectBase() {SAFE_DELETE(m_pQBObj);}
 
 	// return true when this ability is complete
-	virtual void Update(double fTimeStep, AbilityReturn& abilRet) = 0;
+	virtual void Update(double dTimeStep, AbilityReturn& abilRet) = 0;
 	virtual void Render() = 0;
 
 	//////////////////////////////////////////////////////////////////////////

@@ -17,7 +17,7 @@ public:
 	CCity(int type, int cityType, int size, point coord, point sPos, 
 			string name, const char* faction = "Llwyddi", int factionID = 0);
 
-	void Update(double fTimeStep, const pointf* moveAmt = NULL);
+	void Update(double dTimeStep, const pointf* moveAmt = NULL);
 	void Render(const rect& viewPort);
 
 	//////////////////////////////////////////////////////////////////////////

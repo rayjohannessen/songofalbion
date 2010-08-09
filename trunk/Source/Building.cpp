@@ -33,11 +33,11 @@ CBuilding::CBuilding(int buildingType, int type, point coord, point sPos,
 	}
 }
 
-void CBuilding::Update(double fTimeStep, const pointf* moveAmt/*double xOS, double yOS*/)
+void CBuilding::Update(double dTimeStep, const pointf* moveAmt/*double xOS, double yOS*/)
 {
 	if (moveAmt)
 	{
-		CObject::Update(fTimeStep, moveAmt);
+		CObject::Update(dTimeStep, moveAmt);
 	}
 }
 

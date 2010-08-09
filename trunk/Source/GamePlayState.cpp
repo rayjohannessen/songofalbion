@@ -9,7 +9,7 @@
 #include "stdafx.h"
 
 #include "GamePlayState.h"
-#include "BaseMenuState.h"
+#include "Menu.h"
 #include "Game.h"
 #include "Map.h"
 #include "HUD.h"
@@ -53,13 +53,14 @@ void CGamePlayState::Enter(void)
 	CPlayer* player = Globals::GetPlayerByFactionID(0);
 	CUnit* unit = new CUnit(UnitDefines::UNIT_UMKNIGHT, OBJ_UNIT, point(4, 5), Globals::g_pMap->IsoTilePlot(point(4, 5)), "UMKnight",
 					player->GetProfile()->name.c_str(), player->GetProfile()->nFactionID);
-	Globals::g_pObjManager->AddObject(player, (CObject*&)(unit), Globals::g_pMap->IsoTilePlot(point(4, 5) ));
+	Globals::g_pObjManager->AddObject((CObject*&)(unit), (point)unit->GetSPos() );
 	Globals::g_pObjManager->StartTurn(player);
+
 	// comp
 	player = Globals::GetPlayerByFactionID(1);
 	unit = new CUnit(UnitDefines::UNIT_UMKNIGHT, OBJ_UNIT, point(5, 5), Globals::g_pMap->IsoTilePlot(point(5, 5)), "UMKnight",
 					player->GetProfile()->name.c_str(), player->GetProfile()->nFactionID);
-	Globals::g_pObjManager->AddObject(player, (CObject*&)(unit), Globals::g_pMap->IsoTilePlot(point(5, 5) ));
+	Globals::g_pObjManager->AddObject((CObject*&)(unit), (point)unit->GetSPos() );
 }
 
 void CGamePlayState::Exit(void)
@@ -67,7 +68,7 @@ void CGamePlayState::Exit(void)
 	if (Globals::g_pMap)
 	{
 		Globals::g_pMap->Shutdown();
-		Globals::g_pMap = NULL;
+//		Globals::g_pMap = NULL;
 	}
 	if(m_pCurrentMenuState)
 	{
@@ -85,31 +86,32 @@ CGamePlayState* CGamePlayState::GetInstance(void)
 	return &instance;
 }
 
-bool CGamePlayState::Input(double fElapsedTime, POINT mousePt)
+eInputReturnType CGamePlayState::Input(double dTimeStep, const POINT& mousePt)
 {
 	// map input
-	eMapInputRet mapRet = Globals::g_pMap->Input(fElapsedTime, mousePt);
+	eMapInputRet mapRet = Globals::g_pMap->Input(dTimeStep, mousePt);
 	if(mapRet == MIR_EXIT)
-		return false;
+		return IRT_EXIT;
 	else if (mapRet == MIR_NEXTPLAYER)
 		Globals::GotoNextPlayer();
 
 	// HUD input
-	Globals::g_pHUD->Input(mousePt);
+	if (Globals::g_pHUD->Input(mousePt))
+		return IRT_CHANGE_STATE;
 	
-	return true;
+	return IRT_CONTINUE;
 }
 
-void CGamePlayState::Update(double fElapsedTime)
+void CGamePlayState::Update(double dTimeStep)
 {
 	if(!m_bIsPaused)
 	{
 		// Update map
-		Globals::g_pMap->Update(fElapsedTime);
+		Globals::g_pMap->Update(dTimeStep);
 		// update objects
-		Globals::g_pObjManager->Update(fElapsedTime, Globals::g_pMap->GetTotalFrameScroll());
+		Globals::g_pObjManager->Update(dTimeStep, Globals::g_pMap->GetTotalFrameScroll());
 		// update HUD
-		Globals::g_pHUD->Update(fElapsedTime);
+		Globals::g_pHUD->Update(dTimeStep);
 	}
 }
 
@@ -131,7 +133,6 @@ void CGamePlayState::LoadGame(const char* fileName)
 	ifs.open(pathFileName.c_str(), ios_base::binary | ios_base::in);
 	if (ifs.is_open())
 	{
-
 		ifs.close();
 	}
 }

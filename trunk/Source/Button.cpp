@@ -6,16 +6,16 @@
 #include "Map.h"
 #include "UIWindowBase.h"
 
-void CButton::Update(double fElapsedTime)
+void CButton::Update(double dTimeStep)
 {
-	if(m_Timer.Update(fElapsedTime))
+	if(m_Timer.Update(dTimeStep))
 	{
 		m_nState = m_nImageIDup;
 		m_Timer.ResetTimer(true);
 	}
 }
 
-void CButton::Input(POINT& mouse, CUIWindowBase*& window)
+void CButton::Input(const POINT& mouse, CUIWindowBase*& window)
 {
 	if (m_Rect.IsPointInRect(mouse))
 	{

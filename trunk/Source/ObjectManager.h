@@ -24,7 +24,7 @@ public:
 
 	//////////////////////////////////////////////////////////////////////////
 	// add/remove object(s)
-	void AddObject(CPlayer* player, CObject*& obj, point& sPos);
+	void AddObject(CObject*& obj, point& sPos);
 	void RemoveAll();
 	void RemoveObj(CPlayer* player, CObject* obj);
 	//////////////////////////////////////////////////////////////////////////

@@ -35,7 +35,7 @@ public:
 
 	void Update(double dElapsed);
 
-	void Input(POINT& mouse);
+	void Input(const POINT& mouse);
 	void HandleInputRemoveObj();
 	void HandleInputAddNew( unsigned i );
 	bool HandleInputObjectsOnQB( unsigned i, bool bCanDrag, MouseButtons mb, short& currSelectionType );
