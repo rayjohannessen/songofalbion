@@ -64,3 +64,4 @@
 #define DEPTH_TILES			1.0f
 
 #define DEPTH_OS_FACTION	-0.01f
+#define DEPTH_OS_WNDFRAME	-0.001f

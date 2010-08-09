@@ -17,7 +17,6 @@
 
 #if _DEBUG
 	static bool debug = true;	// draw debug info in debug mode only
-	static point lastCoordClicked;
 #else
 	static bool debug = false;
 #endif
@@ -154,7 +153,7 @@ void CMap::Update(double dElapsedTime)
 		CenterMap(dElapsedTime);
 }
 
-eMapInputRet CMap::Input(double fElapsedTime, POINT& mouse)
+eMapInputRet CMap::Input(double dTimeStep, const POINT& mouse)
 {
 	m_ptTotalMapScroll = pointf(0.0f, 0.0f);
 	m_ptMouseScrn = m_ptMouseWrld = mouse;
@@ -177,10 +176,10 @@ eMapInputRet CMap::Input(double fElapsedTime, POINT& mouse)
 	}
 	else
 		// scrolling - keyboard & mouse
-		HandleViewScroll(mouse, fElapsedTime);
+		HandleViewScroll(mouse, dTimeStep);
 
 	// unit movement
-	HandleMovement(fElapsedTime, mouse);
+	HandleMovement(dTimeStep, mouse);
 
 	if (!HandleKBInput())
 		return MIR_NEXTPLAYER;
@@ -199,10 +198,10 @@ eMapInputRet CMap::Input(double fElapsedTime, POINT& mouse)
 	return MIR_CONTINUE;
 }
 
-void CMap::HandleMovement( double fElapsedTime, POINT& mouse )
+void CMap::HandleMovement( double dTimeStep, const POINT& mouse )
 {
 	// handle movement, only if there is a selected object (and it's a unit)
-	if ( m_pCurrPlayerSelectedObj && m_pCurrPlayerSelectedObj->GetType() == OBJ_UNIT )
+	if ( m_pCurrPlayerSelectedObj && m_pCurrPlayerSelectedObj->GetType() == OBJ_UNIT)
 	{
 		// if we have a valid direction input key that is pressed, start to make the move
 		if ((m_InputMapIter = gInputToDirection.find(Globals::g_pDI->GetBufferedDIKCodeEx())) != m_InputMapEndIter)
@@ -277,7 +276,7 @@ bool CMap::DetermineMoveSpecifics(const point& pt)
 		{
 			// TODO:: find and display path(s) available when unit is first clicked
 			CUnit* unit = ((CUnit*)m_pCurrPlayerSelectedObj);
-			if (DetermineTotalMoveCost(false) <= unit->GetStamina())
+			if ( DetermineTotalMoveCost(false) <= unit->GetStamina() )
 			{
 				unit->SetNewPath(&m_vPath);
 				return true;
@@ -342,7 +341,7 @@ void CMap::Shutdown()
 	SAFE_DELETE(m_pTimer);
 }
 
-point CMap::GetMouseTile(point mouse)
+point CMap::GetMouseTile(point& mouse)
 {
 	mouse.Offset(-m_nOSx, -m_nOSy);
 	point ptCurrMouseTileID;
@@ -412,45 +411,61 @@ point CMap::GetMouseTile(point mouse)
 		ptCurrMouseTileID.y = m_nNumCols - 1;
 	return ptCurrMouseTileID;
 }
-void CMap::ScrollMapUp(double fTimeStep)
-{
-	m_ptTotalMapScroll.y = (DEFAULT_CENTER_SPEED * (float)fTimeStep);
+void CMap::ScrollMapUp(double dTimeStep)
+{// (camera moves up/map moves down)
+	m_ptTotalMapScroll.y = (DEFAULT_CENTER_SPEED * (float)dTimeStep);
 	m_fScrollY -= m_ptTotalMapScroll.y;
 	if (m_fScrollY < 0.0f)
 	{
+		m_ptTotalMapScroll.y += (float)m_fScrollY;		// apply the difference back to the total map scroll
 		m_fScrollY = 0.0f;
 		m_ptTotalMapScroll.y = 0.0f;
+		BIT_ON(m_nMapFlags, MF_AT_EDGE_N);		// we're at the north edge
+		BIT_OFF(m_nMapFlags, MF_CENTER_DIR_N);	// stop scrolling north
 	}
+	BIT_OFF(m_nMapFlags, MF_AT_EDGE_S);
 }
-void CMap::ScrollMapDown(double fTimeStep)
-{
-	m_ptTotalMapScroll.y = -(DEFAULT_CENTER_SPEED * (float)fTimeStep);
+void CMap::ScrollMapDown(double dTimeStep)
+{// (camera moves down/map moves up)
+	m_ptTotalMapScroll.y = -(DEFAULT_CENTER_SPEED * (float)dTimeStep);
 	m_fScrollY -= m_ptTotalMapScroll.y;
 	if (m_fScrollY > m_nMaxScrollY)
 	{
+		m_ptTotalMapScroll.y += float(m_fScrollY - (double)m_nMaxScrollY); // apply the difference back to the total map scroll
 		m_fScrollY = (float)m_nMaxScrollY;
 		m_ptTotalMapScroll.y = 0.0f;
+		BIT_ON(m_nMapFlags, MF_AT_EDGE_S);		// we're at the south edge
+		BIT_OFF(m_nMapFlags, MF_CENTER_DIR_S);	// stop scrolling south
 	}
+	BIT_OFF(m_nMapFlags, MF_AT_EDGE_N);
 }
-void CMap::ScrollMapLeft(double fTimeStep)
-{
-	m_ptTotalMapScroll.x = (DEFAULT_CENTER_SPEED * (float)fTimeStep);
+void CMap::ScrollMapLeft(double dTimeStep)
+{	// (camera moves left/map moves right)
+	m_ptTotalMapScroll.x = (DEFAULT_CENTER_SPEED * (float)dTimeStep);
 	m_fScrollX -= m_ptTotalMapScroll.x;
 	if (m_fScrollX < 0.0f)
 	{
+		m_ptTotalMapScroll.x += (float)m_fScrollX;		// apply the difference back to the total map scroll
 		m_fScrollX = 0.0f;
 		m_ptTotalMapScroll.x = 0.0f;
+		BIT_ON(m_nMapFlags, MF_AT_EDGE_W);		// we're at the west edge
+		BIT_OFF(m_nMapFlags, MF_CENTER_DIR_W);	// stop scrolling west
 	}
+	BIT_OFF(m_nMapFlags, MF_AT_EDGE_E);
 }
-void CMap::ScrollMapRight(double fTimeStep)
-{
-	m_ptTotalMapScroll.x = -(DEFAULT_CENTER_SPEED * (float)fTimeStep);
+void CMap::ScrollMapRight(double dTimeStep)
+{// (camera moves right/map moves left)
+	m_ptTotalMapScroll.x = -(DEFAULT_CENTER_SPEED * (float)dTimeStep);
  	m_fScrollX -= m_ptTotalMapScroll.x;
 	if (m_fScrollX > m_nMaxScrollX)
 	{
+		m_ptTotalMapScroll.x += float(m_fScrollX - (double)m_nMaxScrollX);
 		m_fScrollX = (float)m_nMaxScrollX;
 		m_ptTotalMapScroll.x = 0.0f;
+		BIT_ON(m_nMapFlags, MF_AT_EDGE_E);		// we're at the east edge
+		BIT_OFF(m_nMapFlags, MF_CENTER_DIR_E);	// stop scrolling east
 	}
+	BIT_OFF(m_nMapFlags, MF_AT_EDGE_W);
 }
 void CMap::LoadMap(string fileName)
 {
@@ -468,18 +483,23 @@ void CMap::LoadMap(string fileName)
 			char szBuffer[128];
 			sprintf_s(szBuffer, "Failed to open file: %s", fileName );
 			MessageBox(0, szBuffer, "Incorrect file name.", MB_OK);
-//			m_pGame->ChangeState(CMainMenuState::GetInstance());
 		}
 		if (ifs.eof())
 		{ifs.close();return;}		
 	}
+
+	// "camera" starts at the top/left edge of the map by default
+	// any movement from that must be done after this by normal means (CenterMap or ScrollMap___)
+	BIT_ON(m_nMapFlags, MF_AT_EDGE_N);
+	BIT_ON(m_nMapFlags, MF_AT_EDGE_W);
+
 	//read input from the given binary file
 	string version, eat, name, tilesetName, fName;
 	char file[256];
 	char buff[256];
 	ZeroMemory(buff, 256);
 	byte size;
-	ifs.read(reinterpret_cast<char*>(&size), 1);
+	ifs.read((char*)(&size), 1);
 	ifs.read(buff, size);
 
 	version = buff;
@@ -491,9 +511,9 @@ void CMap::LoadMap(string fileName)
 			// Total number of tiles on map
 			// number of columns
 			// number of rows
-			ifs.read(reinterpret_cast<char*>(&m_nTotalNumTiles), 4);
-			ifs.read(reinterpret_cast<char*>(&m_nNumCols), 4);
-			ifs.read(reinterpret_cast<char*>(&m_nNumRows), 4);
+			ifs.read((char*)(&m_nTotalNumTiles), 4);
+			ifs.read((char*)(&m_nNumCols), 4);
+			ifs.read((char*)(&m_nNumRows), 4);
 
 			//////////////////////////////////////////////////////////////////////////
 			//	set up the map so that it centers at the beginning
@@ -542,7 +562,7 @@ void CMap::LoadMap(string fileName)
 	try 
 	{
 		ZeroMemory(buff, 256);
-		ifs.read(reinterpret_cast<char*>(&size), 1);
+		ifs.read((char*)(&size), 1);
 		ifs.read(buff, size);
 		name = buff;
 		//////////////////////////////////////////////////////////////////////////
@@ -551,25 +571,25 @@ void CMap::LoadMap(string fileName)
 		while (name == "Tileset")
 		{
 			ZeroMemory(buff, size);
-			ifs.read(reinterpret_cast<char*>(&size), 1);
+			ifs.read((char*)(&size), 1);
 			ifs.read(buff, size);
 			fName = buff;
 			strcpy_s(file, fName.c_str());
 
 			ZeroMemory(buff, 256);
-			ifs.read(reinterpret_cast<char*>(&size), 1);
+			ifs.read((char*)(&size), 1);
 			ifs.read(buff, size);
 			name = buff;
 
-			ifs.read(reinterpret_cast<char*>(&red), 1);
-			ifs.read(reinterpret_cast<char*>(&green), 1);
-			ifs.read(reinterpret_cast<char*>(&blue), 1);
+			ifs.read((char*)(&red), 1);
+			ifs.read((char*)(&green), 1);
+			ifs.read((char*)(&blue), 1);
 			// store the tileset information so we can determine where each tile comes from
 			m_pTilesets[tilesetCount].id = Globals::g_pTM->LoadTexture(file, D3DCOLOR_ARGB(255,red, green, blue));
 			m_pTilesets[tilesetCount++].name = name;
 
 			ZeroMemory(buff, 256);
-			ifs.read(reinterpret_cast<char*>(&size), 1);
+			ifs.read((char*)(&size), 1);
 			ifs.read(buff, size);
 			name = buff;
 		}
@@ -592,7 +612,7 @@ void CMap::LoadMap(string fileName)
 		{
 			// read in tile's tileset name (which tileset it came from)
 			ZeroMemory(buff, 256);
-			ifs.read(reinterpret_cast<char*>(&size), 1);
+			ifs.read((char*)(&size), 1);
 			ifs.read(buff, size);
 			tilesetName = buff;
 			// determine which image id this tile should have
@@ -605,17 +625,17 @@ void CMap::LoadMap(string fileName)
 					break;
 				}
 			}
-			ifs.read(reinterpret_cast<char*>(&sourceID), 4);
-			ifs.read(reinterpret_cast<char*>(&xID), 4);
-			ifs.read(reinterpret_cast<char*>(&yID), 4);
-			ifs.read(reinterpret_cast<char*>(&flag), 4);
-			ifs.read(reinterpret_cast<char*>(&width), 4);
-			ifs.read(reinterpret_cast<char*>(&height), 4);
+			ifs.read((char*)(&sourceID), 4);
+			ifs.read((char*)(&xID), 4);
+			ifs.read((char*)(&yID), 4);
+			ifs.read((char*)(&flag), 4);
+			ifs.read((char*)(&width), 4);
+			ifs.read((char*)(&height), 4);
 			ZeroMemory(buff, 256);
-			ifs.read(reinterpret_cast<char*>(&size), 1);
+			ifs.read((char*)(&size), 1);
 			ifs.read(buff, size);
 			trigger = buff;
-			ifs.read(reinterpret_cast<char*>(&cost), 4);
+			ifs.read((char*)(&cost), 4);
 			// TODO:: temp
 			cost = 1;
 
@@ -653,7 +673,7 @@ void CMap::LoadMap(string fileName)
 		//////////////////////////////////////////////////////////////////////////
 		// Layer TWO
 		ZeroMemory(buff, 256);
-		ifs.read(reinterpret_cast<char*>(&size), 1);
+		ifs.read((char*)(&size), 1);
 		ifs.read(buff, size);
 		name = buff;
 		//}
@@ -661,7 +681,7 @@ void CMap::LoadMap(string fileName)
 		{
 			// read in tile's tileset name (which tileset it came from)
 			ZeroMemory(buff, 256);
-			ifs.read(reinterpret_cast<char*>(&size), 1);
+			ifs.read((char*)(&size), 1);
 			ifs.read(buff, size);
 			tilesetName = buff;
 			if (tilesetName == "FreePlace")
@@ -676,17 +696,17 @@ void CMap::LoadMap(string fileName)
 					break;
 				}
 			}
-			ifs.read(reinterpret_cast<char*>(&sourceID), 4);
-			ifs.read(reinterpret_cast<char*>(&xID), 4);
-			ifs.read(reinterpret_cast<char*>(&yID), 4);
-			ifs.read(reinterpret_cast<char*>(&flag), 4);
-			ifs.read(reinterpret_cast<char*>(&width), 4);
-			ifs.read(reinterpret_cast<char*>(&height), 4);
+			ifs.read((char*)(&sourceID), 4);
+			ifs.read((char*)(&xID), 4);
+			ifs.read((char*)(&yID), 4);
+			ifs.read((char*)(&flag), 4);
+			ifs.read((char*)(&width), 4);
+			ifs.read((char*)(&height), 4);
 			ZeroMemory(buff, 256);
-			ifs.read(reinterpret_cast<char*>(&size), 1);
+			ifs.read((char*)(&size), 1);
 			ifs.read(buff, size);
 			trigger = buff;
-			ifs.read(reinterpret_cast<char*>(&cost), 4);
+			ifs.read((char*)(&cost), 4);
 
 			// setting up each tile of the first layer
 			destID = yID * m_nNumCols + xID;
@@ -715,7 +735,7 @@ void CMap::LoadMap(string fileName)
 		{
 			ifs.seekg(sPos);
 			ZeroMemory(buff, 256);
-			ifs.read(reinterpret_cast<char*>(&size), 1);
+			ifs.read((char*)(&size), 1);
 			ifs.read(buff, size);
 			name = buff;
 		}
@@ -727,7 +747,7 @@ void CMap::LoadMap(string fileName)
 		{
 			// read in tile's tileset name (which tileset it came from)
 			ZeroMemory(buff, 256);
-			ifs.read(reinterpret_cast<char*>(&size), 1);
+			ifs.read((char*)(&size), 1);
 			ifs.read(buff, size);
 			tilesetName = buff;
 
@@ -741,19 +761,19 @@ void CMap::LoadMap(string fileName)
 				}
 			}
 
-			ifs.read(reinterpret_cast<char*>(&srcPosX), sizeof(int));
-			ifs.read(reinterpret_cast<char*>(&srcPosY), sizeof(int));
-			ifs.read(reinterpret_cast<char*>(&flag), sizeof(int));
-			ifs.read(reinterpret_cast<char*>(&destX), sizeof(int));
-			ifs.read(reinterpret_cast<char*>(&destY), sizeof(int));
-			ifs.read(reinterpret_cast<char*>(&width), sizeof(int));
-			ifs.read(reinterpret_cast<char*>(&height), sizeof(int));
+			ifs.read((char*)(&srcPosX), sizeof(int));
+			ifs.read((char*)(&srcPosY), sizeof(int));
+			ifs.read((char*)(&flag), sizeof(int));
+			ifs.read((char*)(&destX), sizeof(int));
+			ifs.read((char*)(&destY), sizeof(int));
+			ifs.read((char*)(&width), sizeof(int));
+			ifs.read((char*)(&height), sizeof(int));
 			ZeroMemory(buff, 256);
-			ifs.read(reinterpret_cast<char*>(&size), 1);
+			ifs.read((char*)(&size), 1);
 			ifs.read(buff, size);
 			trigger = buff;
 			int rot = 0;
-			ifs.read(reinterpret_cast<char*>(&rot), sizeof(int));
+			ifs.read((char*)(&rot), sizeof(int));
 			rotation = (float)rot / 10.0f;
 
 			m_pFreeTiles[count++] = CFreeTile(srcPosX, srcPosY, imageID, destX, destY, width, height, flag, trigger, rotation);
@@ -805,7 +825,6 @@ void CMap::HandleMouseInput()
 	{
 #if _DEBUG
 		DebugWnd->DebugPoint(m_ptCurrMouseTile, &string("Tile Coord"));
-		lastCoordClicked = m_ptCurrMouseTile;	// TODO:: TEMP
 #endif
 	
 		if (m_nCurrPlaceType == MSA_SELECT)
@@ -816,7 +835,7 @@ void CMap::HandleMouseInput()
 		else if (m_nCurrPlaceType < MSA_ADDING && m_pPlaceObj)
 		{
 			m_pPlaceObj->SetCoord(m_ptCurrMouseTile);
-			Globals::g_pObjManager->AddObject(Globals::GetCurrPlayer(), m_pPlaceObj, IsoTilePlot(m_ptCurrMouseTile));
+			Globals::g_pObjManager->AddObject(m_pPlaceObj, IsoTilePlot(m_ptCurrMouseTile));
 		}
 		// removing an object
 		else if (m_nCurrPlaceType == MSA_REMOVE)
@@ -869,55 +888,56 @@ void CMap::HandleMouseInput()
 	}
 }
 
-void CMap::CenterMap( double fElapsedTime )
+void CMap::CenterMap( double dTimeStep )
 {
 	pointf sPos = m_pCurrPlayerSelectedObj->GetSPos();
 	point size = m_pCurrPlayerSelectedObj->GetSize();
-	bool bDone = false;
 	if (BIT_TEST_ON(m_nMapFlags, MF_CENTERING))
 	{
-		if (BIT_TEST_ON(m_nMapFlags, MF_CENTER_DIR_S))
+		bool bDone = true;
+		if (BIT_TEST_ON(m_nMapFlags, MF_CENTER_DIR_S) && BIT_TEST_OFF(m_nMapFlags, MF_AT_EDGE_S))
 		{
 			if ((int)(sPos.y+(size.y>>1)) > (m_nScreenHeight>>1) && (int)m_fScrollY < m_nMaxScrollY)
-				ScrollMapDown(fElapsedTime); 
+				ScrollMapDown(dTimeStep);	// (camera moves down/map moves up)
 			else
 				BIT_OFF(m_nMapFlags, MF_CENTER_DIR_S);
 		}
-		else if (BIT_TEST_ON(m_nMapFlags, MF_CENTER_DIR_N))
+		else if (BIT_TEST_ON(m_nMapFlags, MF_CENTER_DIR_N) && BIT_TEST_OFF(m_nMapFlags, MF_AT_EDGE_N))
 		{
 			if ((int)(sPos.y+(size.y>>1)) < (m_nScreenHeight>>1) && (int)m_fScrollY > 0)
-				ScrollMapUp(fElapsedTime);  
+				ScrollMapUp(dTimeStep);		// (camera moves up/map moves down)
 			else
 				BIT_OFF(m_nMapFlags, MF_CENTER_DIR_N);
 		}
-		if (BIT_TEST_ON(m_nMapFlags, MF_CENTER_DIR_W))
+		if (BIT_TEST_ON(m_nMapFlags, MF_CENTER_DIR_W) && BIT_TEST_OFF(m_nMapFlags, MF_AT_EDGE_W))
 		{
 			if ((int)(sPos.x+(size.x>>1)) < (m_nScreenWidth>>1)+1 && (int)m_fScrollX > 0)
-				ScrollMapLeft(fElapsedTime); 
+				ScrollMapLeft(dTimeStep);	// (camera moves left/map moves right)
 			else
 				BIT_OFF(m_nMapFlags, MF_CENTER_DIR_W);
 		}
-		else if (BIT_TEST_ON(m_nMapFlags, MF_CENTER_DIR_E))
+		else if (BIT_TEST_ON(m_nMapFlags, MF_CENTER_DIR_E) && BIT_TEST_OFF(m_nMapFlags, MF_AT_EDGE_E))
 		{
 			if ((int)(sPos.x+(size.x>>1)) > (m_nScreenWidth>>1)+1 && (int)m_fScrollX < m_nMaxScrollX)
-				ScrollMapRight(fElapsedTime);  
+				ScrollMapRight(dTimeStep);	// (camera moves right/map moves left)
 			else
 				BIT_OFF(m_nMapFlags, MF_CENTER_DIR_E);
 		}
-		bDone = true;
 		for (int i = MF_CENTER_DIR_N; i < MF_CENTER_DIR_END; ++i)
 			if (BIT_TEST_ON(m_nMapFlags, i))
 				bDone = false;
 		if (bDone)
-		{BIT_OFF(m_nMapFlags, MF_CENTER_MAP); BIT_OFF(m_nMapFlags, MF_CENTERING); }
+		{
+			BIT_OFF(m_nMapFlags, MF_CENTER_MAP); BIT_OFF(m_nMapFlags, MF_CENTERING); 
+		}
 	}
 	else
 	{
-		if ((int)(sPos.x+(size.x>>1)) > (m_nScreenWidth>>1) && (int)m_fScrollX < m_nMaxScrollX)
+		if ((int)(sPos.x+(size.x>>1)) > (m_nScreenWidth>>1)		  && (int)m_fScrollX < m_nMaxScrollX)
 		{BIT_ON(m_nMapFlags, MF_CENTER_DIR_E);}
-		else if ((int)(sPos.x+(size.x>>1)) < (m_nScreenWidth>>1) && (int)m_fScrollX > 0)
+		else if ((int)(sPos.x+(size.x>>1)) < (m_nScreenWidth>>1)  && (int)m_fScrollX > 0)
 		{BIT_ON(m_nMapFlags, MF_CENTER_DIR_W);}
-		if ((int)(sPos.y+(size.y>>1)) > (m_nScreenHeight>>1) && (int)m_fScrollY < m_nMaxScrollY)
+		if ((int)(sPos.y+(size.y>>1)) > (m_nScreenHeight>>1)	  && (int)m_fScrollY < m_nMaxScrollY)
 		{BIT_ON(m_nMapFlags, MF_CENTER_DIR_S);}
 		else if ((int)(sPos.y+(size.y>>1)) < (m_nScreenHeight>>1) && (int)m_fScrollY > 0)
 		{BIT_ON(m_nMapFlags, MF_CENTER_DIR_N);}
@@ -925,12 +945,12 @@ void CMap::CenterMap( double fElapsedTime )
 	}
 }
 
-void CMap::HandleViewScroll( POINT &mouse, double fElapsedTime )
+void CMap::HandleViewScroll( const POINT &mouse, double dTimeStep )
 {
 	if (Globals::g_pDI->KeyDown(DIK_DOWNARROW) || mouse.y >= m_nScreenHeight/*m_rViewport.bottom*/ - SCROLL_AREA)
 	{
 		if ( BIT_TEST_ON(m_nMapFlags, MF_DO_SCROLL_S) || Globals::g_pDI->KeyDown(DIK_DOWNARROW))
-			ScrollMapDown(fElapsedTime);
+			ScrollMapDown(dTimeStep);
 		else
 			BIT_ON(m_nMapFlags, MF_IN_SCROLL_AREA_S);
 	}
@@ -939,7 +959,7 @@ void CMap::HandleViewScroll( POINT &mouse, double fElapsedTime )
 	if (Globals::g_pDI->KeyDown(DIK_UPARROW) || mouse.y <= /*m_rViewport.top +*/ SCROLL_AREA)
 	{
 		if (BIT_TEST_ON(m_nMapFlags, MF_DO_SCROLL_N) || Globals::g_pDI->KeyDown(DIK_UPARROW))
-			ScrollMapUp(fElapsedTime);
+			ScrollMapUp(dTimeStep);
 		else
 			BIT_ON(m_nMapFlags, MF_IN_SCROLL_AREA_N);
 	}
@@ -948,7 +968,7 @@ void CMap::HandleViewScroll( POINT &mouse, double fElapsedTime )
 	if (Globals::g_pDI->KeyDown(DIK_RIGHTARROW) || mouse.x >= m_nScreenWidth/*m_rViewport.right*/ - SCROLL_AREA)
 	{
 		if (BIT_TEST_ON(m_nMapFlags, MF_DO_SCROLL_E) || Globals::g_pDI->KeyDown(DIK_RIGHTARROW))
-			ScrollMapRight(fElapsedTime);
+			ScrollMapRight(dTimeStep);
 		else
 			BIT_ON(m_nMapFlags, MF_IN_SCROLL_AREA_E);
 	}
@@ -957,7 +977,7 @@ void CMap::HandleViewScroll( POINT &mouse, double fElapsedTime )
 	if (Globals::g_pDI->KeyDown(DIK_LEFTARROW) || mouse.x <= /*m_rViewport.left +*/ SCROLL_AREA)
 	{
 		if (BIT_TEST_ON(m_nMapFlags, MF_DO_SCROLL_W) || Globals::g_pDI->KeyDown(DIK_LEFTARROW))
-			ScrollMapLeft(fElapsedTime);
+			ScrollMapLeft(dTimeStep);
 		else
 			BIT_ON(m_nMapFlags, MF_IN_SCROLL_AREA_W);
 	}
@@ -1093,8 +1113,6 @@ void CMap::Select(CObject* const obj)
 				((CUnit*)m_pCurrPlayerSelectedObj)->FaceTarget(m_pEnemyObj->GetCoord());
 		}
 	}
-
-	//BIT_ON(m_nMapFlags, MF_CENTER_MAP);
 }
 void CMap::InitiateAttack(bool setfacing /*= true*/)
 {
@@ -1106,7 +1124,7 @@ void CMap::InitiateAttack(bool setfacing /*= true*/)
 	// also need to decrement stamina for the terrain cost
 
 	playerUnit->DecrementStamina(playerUnit->GetCurrAttackAbility()->GetCombatProps().AttackStam);
-	BIT_ON(m_nMapFlags, MF_ATTACKING);
+//	BIT_ON(m_nMapFlags, MF_ATTACKING);
 
 	// TODO:: units will not turn to face if a surprise attack is happening:
 	((CUnit*)m_pEnemyObj)->SetFacing(playerUnit->GetOppositeFacing());
@@ -1205,18 +1223,6 @@ void CMap::SelectObj(CObject*& obj, bool deselectAll /*= false*/)
 	Select(obj);
 }
 
-void CMap::DoMove( int newX, int newY, eAnimationDirections facing )
-{
-	if (point(newX, newY) != m_pCurrPlayerSelectedObj->GetCoord())
-	{
-		CUnit* currPlayerUnit = ((CUnit*)m_pCurrPlayerSelectedObj);
-		BIT_ON(m_nMapFlags, MF_MOVING);
-		if (currPlayerUnit->GetMoveToPos().x < 150 || currPlayerUnit->GetMoveToPos().x > m_nScreenWidth - 150
-			|| currPlayerUnit->GetMoveToPos().y < 150 || currPlayerUnit->GetMoveToPos().y > m_rViewport.bottom - 150)
-			BIT_ON(m_nMapFlags, MF_CENTER_MAP);
-	}
-}
-
 int  CMap::DetermineTotalMoveCost(bool attacking)
 {
 	PathIter iter = m_vPath.begin();
@@ -1228,6 +1234,25 @@ int  CMap::DetermineTotalMoveCost(bool attacking)
 		cost += (*iter)->TerrainCost();
 	}
 	if (attacking)
+	{
 		cost += m_pCurrPlayerSelectedObj->GetCurrAttackAbility()->GetCombatProps().AttackStam;
+	}
 	return cost;
+}
+void CMap::CheckMapScroll(const CObject *const movingObj)
+{
+	switch (movingObj->GetType())
+	{
+	case OBJ_UNIT:
+		{
+			CUnit* currPlayerUnit = ((CUnit*)movingObj);
+			if ((currPlayerUnit->GetSPos().x < 150 && BIT_TEST_OFF(m_nMapFlags, MF_AT_EDGE_W) || 
+				(currPlayerUnit->GetSPos().x > m_nScreenWidth - 150 && BIT_TEST_OFF(m_nMapFlags, MF_AT_EDGE_E) ||
+				(currPlayerUnit->GetSPos().y < 150) && BIT_TEST_OFF(m_nMapFlags, MF_AT_EDGE_N) || 
+				(currPlayerUnit->GetSPos().y > m_rViewport.bottom - 150) && BIT_TEST_OFF(m_nMapFlags, MF_AT_EDGE_S))))
+			{
+				BIT_ON(m_nMapFlags, MF_CENTER_MAP);
+			}
+		}break;
+	}
 }

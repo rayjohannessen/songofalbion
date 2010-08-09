@@ -70,7 +70,7 @@ public:
 	//
 	// moveAmt is the final amount to move by (already modified by timeStep)
 	//////////////////////////////////////////////////////////////////////////
-	virtual void Update(double fTimeStep, const pointf* moveAmt = NULL);
+	virtual void Update(double dTimeStep, const pointf* moveAmt = NULL);
 
 	// uses the map's viewport to determine if the object needs to be rendered
 	bool TestOnScreen(const rect& viewPort);
@@ -96,8 +96,9 @@ public:
 	inline DWORD GetColor()			const	{ return m_dwColor;		}
 	inline float GetZDepth()		const	{ return m_fZDepth;		}
 	inline eButtonName GetDefAbilityType()	{ return m_eDefaultAbilityType;	}
-	inline CCombatSkill* GetCurrAttackAbility()		const   { return m_pCurrAttackAbility;	}
-	inline CCombatSkill* GetCurrDefenseAbility()	const	{ return m_pCurrDefenseAbility;	}
+	inline CCombatSkill* GetDefCombatAbility()		{ return (CCombatSkill*)m_mAbilities[BN_COMBAT_SKILLS][0]; }
+	inline CCombatSkill* GetCurrAttackAbility()		{ if (m_pCurrAttackAbility) return m_pCurrAttackAbility; else return (m_pCurrAttackAbility = GetDefCombatAbility());	}
+	inline CCombatSkill* GetCurrDefenseAbility()	{ if (m_pCurrDefenseAbility) return m_pCurrDefenseAbility; else return (m_pCurrDefenseAbility = GetDefCombatAbility()); }
 	inline CCombatSkill* GetCurrAbilOfType(eAbSelType type) { if (type == AST_ATTACK) return m_pCurrAttackAbility; else return m_pCurrDefenseAbility; }
 	CCombatSkill* GetCurrDefaultAbility(eButtonName& defType);
 	inline CQuickBarObject** GetQBSlots()						{ return &m_arrQBSlots[0];	}

@@ -10,11 +10,24 @@
 class CAbilityObjectBase;
 class CUIOptionsWindow : public CUIWindowBase
 {
+	const static int cornerOS = 22;
+	const static rect cornerSrcTL;
+	const static rect cornerSrcTR;
+	const static rect cornerSrcBL;
+	const static rect cornerSrcBR;
+	const static rect sideSrc;
+
 	CTimer m_Timer;	// delay for escape key
 	CAbilityObjectBase* m_pAbility;
-	bool m_bHasCloseBtn;
+	bool	m_bHasCloseBtn;
+	float	m_fFrameWMultiplier;
+	float	m_fFrameHMultiplier;
+	
 	CUIOptionsWindow() {}
+
 	void AddCloseButton();
+	void DrawFrame();
+
 public:
 
 	CUIOptionsWindow( int imageID, CWindowVariablesBase* variables, bool hasCloseBtn = true );
@@ -32,6 +45,6 @@ public:
 	//
 	//////////////////////////////////////////////////////////////////////////
 	eReturnCode  Input(POINT mouse, CUIWindowBase* window = NULL);
-	void Update(float fTimeStep);
+	void Update(float dTimeStep);
 	void Render();
 };

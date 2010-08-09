@@ -8,23 +8,22 @@
 #include "BitmapFont.h"
 #include "Globals.h"
 #include "Timer.h"
+#include "Menu.h"
 #include <ctime>
 
 //#include "MessageSystem.h"
 //#include "Factory.h"
 
-CGame::CGame()
+CGame::CGame() : 
+m_pCurrentState(NULL), 
+m_pCurrMenu(NULL),
+m_bIsRunning(false),
+m_fSFXVolume(0.5f),
+m_fMusicVolume(0.5f),
+m_sCurrProfName("NONE"),
+m_dTimeStep(0.0)
 {
-	m_pCurrentState = NULL;
-
-	// variables
-	m_bIsRunning = false;
-	m_fSFXVolume = 0.5f;
-	m_fMusicVolume = 0.5f;
-	m_sCurrProfName = "NONE";
-
 	srand((unsigned int)(time(0)));
-	m_dTimeStep = 0.0;
 }
 
 CGame::~CGame()
@@ -49,8 +48,8 @@ void CGame::Initialize(HWND hWnd, HINSTANCE hInstance, int nScreenWidth, int nSc
 
 	SetIsRunning(true);
 
-	//ChangeState(CMainMenuState::GetInstance());
-	ChangeState(CGamePlayState::GetInstance());
+	m_pCurrMenu = Globals::g_pMenus[MT_MAIN];
+	//ChangeState(CGamePlayState::GetInstance());
 }
 
 void CGame::Shutdown()
@@ -61,7 +60,7 @@ void CGame::Shutdown()
 	Globals::ShutdownGlobals();
 }
 
-bool CGame::Main(POINT mouse)
+bool CGame::Main(const POINT& mouse)
 {
 	m_dTimeStep = m_pTimer->Update();
 	
@@ -74,35 +73,51 @@ bool CGame::Main(POINT mouse)
 		Globals::g_pDI->ReadDevices();
 	}
 
-	if( !m_pCurrentState->Input(m_dTimeStep, mouse) )
-		return false;
+	Globals::g_pD3D->Clear(0,0,0);
+	Globals::g_pD3D->DeviceBegin();
+	Globals::g_pD3D->SpriteBegin();
 
-	m_pCurrentState->Update(m_dTimeStep);
+	// if we're in a menu
+	if (m_pCurrMenu)
+	{
+		if (m_pCurrMenu->Input(m_dTimeStep, mouse))
+			return true;	// the menu was changed, return
+		m_pCurrMenu->Update(m_dTimeStep);
+		m_pCurrMenu->Render();
+	}
+	else	// not in a menu
+	{
+		eInputReturnType ret = m_pCurrentState->Input(m_dTimeStep, mouse);
+		if (ret == IRT_EXIT)
+			return false;
+		else if (ret == IRT_CHANGE_STATE)// this state is now NULL, get out
+			return true;
+		m_pCurrentState->Update(m_dTimeStep);
+		m_pCurrentState->Render();
+	}
+
 	Globals::g_pFMOD->Update();
 
 	//m_pMS->ProcessMsgs();
 
-	Globals::g_pD3D->Clear(0,0,0);
-	Globals::g_pD3D->DeviceBegin();
-	Globals::g_pD3D->SpriteBegin();
-	m_pCurrentState->Render();
 	Globals::g_pD3D->SpriteEnd();
 	Globals::g_pD3D->DeviceEnd();
-
-	//CMap* Globals::g_pMap = CMap::GetInstance();
-	//Globals::g_pMap->DrawDebug();
-
 	Globals::g_pD3D->Present();
 
 	return true;
 }
 
+void CGame::ChangeMenu(eMenuType mt)
+{
+	CMenu* prevMenu = m_pCurrMenu;
+	m_pCurrMenu->Exit();
+	m_pCurrMenu = Globals::g_pMenus[mt];
+	m_pCurrMenu->Enter(prevMenu);
+}
 void CGame::ChangeState(IGameState *pGameState)
 {
 	if(m_pCurrentState) { m_pCurrentState->Exit(); }
-
 	m_pCurrentState = pGameState;
-
 	if(m_pCurrentState) { m_pCurrentState->Enter(); }
 }
 

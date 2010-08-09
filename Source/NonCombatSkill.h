@@ -21,7 +21,7 @@ public:
 	CNonCombatSkill() : CAbilityObjectBase() {}
 	CNonCombatSkill(eAbilityTypes type, point pos, string name, AbilityFunction abilityFunc, CQuickBarObject* qbObj, CAbilityProperties& props);
 	~CNonCombatSkill();
-	void Update(double fTimeStep, AbilityReturn& abilRetu);
+	void Update(double dTimeStep, AbilityReturn& abilRetu);
 	void Render();
 };
 

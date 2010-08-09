@@ -80,7 +80,7 @@ CObject::~CObject()
 {
 }
 
-void CObject::Update(double fTimeStep, const pointf* moveAmt)
+void CObject::Update(double dTimeStep, const pointf* moveAmt)
 {
 	m_ptScreenPos += (*moveAmt);
 	m_rSelectionRect.top	+= moveAmt->y;

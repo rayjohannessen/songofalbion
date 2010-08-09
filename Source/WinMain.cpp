@@ -190,8 +190,8 @@ BOOL RegisterWindowClass(HINSTANCE hInstance)
 
 	//ShowCursor(FALSE);
 
-	mouse.x = 0;
-	mouse.y = 0;
+	mouse.x = g_nWINDOW_WIDTH >> 1;
+	mouse.y = g_nWINDOW_HEIGHT >> 1;
 	//	Register the window class
 	return RegisterClassEx(&winClassEx);
 }

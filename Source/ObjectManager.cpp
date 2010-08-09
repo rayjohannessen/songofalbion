@@ -74,6 +74,7 @@ CObject* ObjectManager::StartTurn(CPlayer* currPlayer)
 		}
 		m_iCurrObjIter = m_lCurrPlayerObjects.begin();
 		Globals::g_pMap->SelectObj((*m_iCurrObjIter));
+		Globals::g_pMap->ToggleMapFlagOn(MF_CENTER_MAP);
 		return (*m_iCurrObjIter);
 	}
 	else
@@ -86,7 +87,7 @@ void ObjectManager::EndTurn()
 	Globals::GotoNextPlayer();
 }
 
-void ObjectManager::Update(double fTimeStep, const pointf* moveAmt)
+void ObjectManager::Update(double dTimeStep, const pointf* moveAmt)
 {
 	m_iPlayersIter = Globals::GetPlayers().begin();
 	m_iPlayersIterEnd = Globals::GetPlayers().end();
@@ -100,7 +101,7 @@ void ObjectManager::Update(double fTimeStep, const pointf* moveAmt)
 		{
 			if (bldng[i].GetImageID() == -1)
 				continue;
-			bldng[i].Update(fTimeStep, moveAmt);
+			bldng[i].Update(dTimeStep, moveAmt);
 		}
 		// Draw cities
 		CCity* city = player->GetCities(); int numCities = player->GetNumCities();
@@ -108,7 +109,7 @@ void ObjectManager::Update(double fTimeStep, const pointf* moveAmt)
 		{
 			if (city[i].GetImageID() == -1)
 				continue;
-			city[i].Update(fTimeStep, moveAmt);
+			city[i].Update(dTimeStep, moveAmt);
 		}
 		// Draw units
 		CUnit* unit = player->GetUnits(); int numUnits = player->GetNumUnits();	
@@ -116,7 +117,7 @@ void ObjectManager::Update(double fTimeStep, const pointf* moveAmt)
 		{
 			if (unit[i].GetImageID() == -1)
 				continue;
-			unit[i].Update(fTimeStep, moveAmt);
+			unit[i].Update(dTimeStep, moveAmt);
 		}
 	}
 }
@@ -161,8 +162,9 @@ void ObjectManager::Init()
 
 }
 
-void ObjectManager::AddObject(CPlayer* player, CObject*& obj, point& sPos)
+void ObjectManager::AddObject(CObject*& obj, point& sPos)
 {
+	CPlayer* player = Globals::GetPlayerByFactionID(obj->GetFactionID());
 	switch (obj->GetType())
 	{
 	case OBJ_CITY:

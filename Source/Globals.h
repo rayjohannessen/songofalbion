@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Menu.h"
 class CBitmapFont;
 class CAssets;
 class CSGD_DirectInput;
@@ -15,7 +16,7 @@ class CPlayer;
 class CAnimationsManager;
 class CUnit; 
 class CAbilitiesManager;
-class CBaseMenuState;
+class CMenu;
 class DebugWindow;
 enum eAnimationDirections;
 
@@ -35,8 +36,6 @@ typedef map<pair<int, int>, eAnimationDirections> CoordToDirMap;
 typedef map<eAnimationDirections, point> DirToCoordMap;
 typedef vector<CPlayer*> Players;
 
-enum eMenus { M_MAIN, M_HELP, M_OPTIONS, NUM_MENUS };
-
 class Globals
 {
 	typedef vector<CPlayer*>::iterator	PlayersIter;
@@ -45,13 +44,6 @@ class Globals
 	static void SetCoordDirMaps();
 public:
 
-// 	typedef string ObjName;
-// 	typedef vector<pair<eButtonSlot, eButtonName>> ButtonNamesVec;
-// 	typedef pair<eButtonSlot, eButtonName> ButtonPair;
-// 	typedef map<ObjName, vector<pair<eButtonSlot, eButtonName>>> ObjectButtonsMap;
-// 	typedef map<ObjName, vector<pair<eButtonSlot, eButtonName>>>::iterator ObjButtonsIter;
-
-//	static ObjectButtonsMap*		g_pObjButtonsMap = NULL;
 	static CoordToDirMap			g_CoordToDir[2];
 	static DirToCoordMap			g_AdjTileOffsets[2];
 	static CSGD_Direct3D*			g_pD3D;
@@ -69,14 +61,16 @@ public:
 	static UnitNamesTypes*			g_vUnitNames;
 	static CAnimationsManager*		g_pAnimManager; 	// initialized in CAssets
 	static CAbilitiesManager*		g_pAbilitiesManager;
-	static CBaseMenuState*			g_pMenus[NUM_MENUS];
+	static CMenu*					g_pMenus[NUM_MENU_TYPES];
 	static short					g_nNumPlayers;
 	static short					g_nPlayerFactionID;
 	static bool						g_bWindowOpen;
 	static point					g_ptQBPos;
+	static point					g_ptScreenSize;
 	
 	static bool InitGlobals(HWND hWnd, HINSTANCE hInstance, int nScreenWidth, int nScreenHeight, bool bIsWindowed);
 
+	static void InitMenus();
 	static bool InitHUD();
 	static bool InitObjManager();
 	static bool InitPlayers(short numPlayers);

@@ -36,7 +36,8 @@ public:
 	void DebugVec3(const D3DXVECTOR3& _vec, const string* _vecName = NULL);
 	void DebugFloat(float _float, const string* _floatName = NULL);
 	void DebugInt(int _int, const string* _intName = NULL);
-	void DebugPoint(point& _pt, const string* _pointName = NULL);
+	void DebugPoint(const point& _pt, const string* _pointName = NULL);
+	void DebugPointf(const pointf& _pt, const string* _pointName = NULL);
 };
 
 static DebugWindow* DebugWnd = DebugWindow::GetInstance();

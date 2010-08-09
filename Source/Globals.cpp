@@ -10,8 +10,8 @@
 #include "AnimationsManager.h"
 #include "AbilitiesManager.h"
 #include "Unit.h"
-#include "HelpMenu.h"
 #include "DebugWindow.h"
+#include "MenuFunctions.h"
 CoordToDirMap			Globals::g_CoordToDir[2]	= {};
 DirToCoordMap			Globals::g_AdjTileOffsets[2]= {};
 bool					Globals::g_bWindowOpen		= false;
@@ -19,6 +19,7 @@ short					Globals::g_nNumPlayers		= 0;
 short					Globals::g_nPlayerFactionID	= 0;
 unsigned				Globals::m_nCurrPlayerInd	= 0;
 point					Globals::g_ptQBPos		= point(575, 603);
+point					Globals::g_ptScreenSize = point(1024, 768);
 CSGD_Direct3D*			Globals::g_pD3D			= NULL;
 CSGD_TextureManager*	Globals::g_pTM			= NULL;
 CSGD_DirectInput*		Globals::g_pDI			= NULL;
@@ -34,7 +35,7 @@ CPlayer*				Globals::g_pCurrPlayer	= NULL;
 UnitNamesTypes*			Globals::g_vUnitNames	= NULL;	// initialized in CAssets
 CAnimationsManager*		Globals::g_pAnimManager	= NULL;	// initialized in CAssets
 CAbilitiesManager*		Globals::g_pAbilitiesManager = NULL;
-CBaseMenuState*			Globals::g_pMenus[NUM_MENUS] = {};
+CMenu*					Globals::g_pMenus[NUM_MENU_TYPES] = {};
 
 bool Globals::InitGlobals(HWND hWnd, HINSTANCE hInstance, int nScreenWidth, int nScreenHeight, bool bIsWindowed)
 {
@@ -47,6 +48,7 @@ bool Globals::InitGlobals(HWND hWnd, HINSTANCE hInstance, int nScreenWidth, int 
 	g_pAnimManager  = CAnimationsManager::GetInstance();
 	g_pAbilitiesManager = CAbilitiesManager::GetInstance();
 
+	g_ptScreenSize = point(nScreenWidth, nScreenHeight);
 	g_pD3D->InitDirect3D(hWnd, nScreenWidth, nScreenHeight, bIsWindowed, bIsWindowed);
 	g_pTM->InitTextureManager(g_pD3D->GetDirect3DDevice(), g_pD3D->GetSprite());
 	g_pAssets->Init();
@@ -69,8 +71,7 @@ bool Globals::InitGlobals(HWND hWnd, HINSTANCE hInstance, int nScreenWidth, int 
 	SetCoordDirMaps();
 
 	// init menus 
-	// TODO:: init menus only before they are needed.
-	g_pMenus[M_HELP] = new CHelpMenu();
+	InitMenus();
 
 	return true;
 }
@@ -113,7 +114,7 @@ void Globals::ShutdownGlobals()
 		g_pAbilitiesManager = NULL;
 	}
 	SAFE_DELETE(g_vUnitNames);
-	for (unsigned i = 0; i < NUM_MENUS; ++i)
+	for (unsigned i = 0; i < NUM_MENU_TYPES; ++i)
 		SAFE_DELETE(g_pMenus[i]);
 }
 
@@ -235,6 +236,26 @@ void Globals::SetCoordDirMaps()
 	g_AdjTileOffsets[ODD] [DIR_S]  = point(0, 2);
 	g_AdjTileOffsets[ODD] [DIR_SW] = point(0, 1);
 	g_AdjTileOffsets[ODD] [DIR_W]  = point(-1, 0);
+}
+
+void Globals::InitMenus()
+{
+	// some options are not menus (play, back)
+	MenuOptions options;
+	options.push_back(MenuOption(MT_PLAY,	string("Play"),			OptionAction_Play));
+	options.push_back(MenuOption(MT_MAIN,	string("Main Menu"),	OptionAction_MainMenu));
+	options.push_back(MenuOption(MT_HELP,	string("Help Menu"),	OptionAction_Help));
+	options.push_back(MenuOption(MT_OPTIONS,string("Option Menu"),	OptionAction_Options));
+	options.push_back(MenuOption(MT_EXIT,	string("Exit"), OptionAction_Exit));
+
+	point pos((g_ptScreenSize.width >> 1) - (11*g_pBitMapFont->GetSize() >> 1), 350 );
+	g_pMenus[MT_MAIN]	= new CMenu(-1, pos, MT_MAIN, options, MainMenu::Render, MainMenu::Update, MainMenu::Input);
+
+	options.erase(options.end()-1);
+	options.push_back(MenuOption(MT_BACK,	string("Back"),			OptionAction_Back));
+
+	g_pMenus[MT_HELP]	= new CMenu(-1, pos, MT_HELP, options, HelpMenu::Render, HelpMenu::Update, HelpMenu::Input);
+	g_pMenus[MT_OPTIONS]= new CMenu(-1, pos, MT_OPTIONS, options, OptionMenu::Render, OptionMenu::Update, OptionMenu::Input);
 }
 //////////////////////////////////////////////////////////////////////////
 

@@ -23,11 +23,12 @@ enum Quadrants {TOP_LEFT, TOP_RIGHT, BTM_LEFT, BTM_RIGHT,};
 
 enum eMapInputRet {MIR_EXIT, MIR_NEXTPLAYER, MIR_CONTINUE, };
 enum eCardinalDirections {N, S, E, W,};
-enum {MSA_CITY, MSA_UNIT, MSA_BUILDING, MSA_ADDING, MSA_REMOVE, MSA_SELECT, };
+enum eDebugMapInteraction {MSA_CITY, MSA_UNIT, MSA_BUILDING, MSA_ADDING, MSA_REMOVE, MSA_SELECT, };
 enum eMapFlags { MF_CENTER_MAP, MF_CENTERING, 
 				 MF_CENTER_DIR_N, MF_CENTER_DIR_S, MF_CENTER_DIR_E, MF_CENTER_DIR_W,
-				 MF_MOUSE_BELOW_BTM, MF_CENTER_DIR_END = MF_MOUSE_BELOW_BTM, MF_MOUSE_IN_QUICK_BAR, 
+				 MF_MOUSE_BELOW_BTM, MF_CENTER_DIR_END = MF_MOUSE_BELOW_BTM, MF_MOUSE_IN_QUICK_BAR,
 				 MF_DO_SCROLL_N, MF_DO_SCROLL_S, MF_DO_SCROLL_E, MF_DO_SCROLL_W, MF_DO_SCROLL_END,
+				 MF_AT_EDGE_W, MF_AT_EDGE_E, MF_AT_EDGE_N, MF_AT_EDGE_S,
 				 MF_IN_SCROLL_AREA_N, MF_IN_SCROLL_AREA_S, MF_IN_SCROLL_AREA_E, MF_IN_SCROLL_AREA_W, MF_IN_SCROLL_AREA_END,
 				 MF_ATTACKING,
 				 MF_MOVING,};
@@ -43,11 +44,6 @@ class CMap
 		int id;
 	};
 	sTileset m_pTilesets[4];	// tilesets used for currently rendering map
-
-	// characters, by default, render behind the OBJECTS layer (CHARACTER_BEHIND)
-	//DEPTH depth;
-	
-	CGame*			m_pGame;
 
 	// TODO::temp
 	int m_nCurrPlaceType;	// used to place different objects with the mouse
@@ -106,16 +102,14 @@ class CMap
 
 //////////////////////////////////////////////////////////////////////////
 // Input
-	point GetMouseTile(point);
+	point GetMouseTile(point&);
 
 	//////////////////////////////////////////////////////////////////////////
 	// handling various input
 	bool HandleKBInput();
 	void HandleMouseInput();
-	void HandleViewScroll( POINT &mouse, double fElapsedTime );
-	void HandleMovement( double fElapsedTime, POINT& mouse );
-
-	void DoMove( int newX, int newY, eAnimationDirections facing );
+	void HandleViewScroll( const POINT &mouse, double dTimeStep );
+	void HandleMovement( double dTimeStep, const POINT& mouse );
 	void FindNewCoord( int facing, int &newY, int &newX );
 	CObject* HoverObject(point& coord);
 	void Deselect(CObject*& obj);
@@ -132,12 +126,12 @@ class CMap
 	void SetFTosY(int os)	{m_nFTosY = os;}
 
 	// scrolling
-	void ScrollMapUp(double fElapsedTime);
-	void ScrollMapDown(double fElapsedTime);
-	void ScrollMapLeft(double fElapsedTime);
-	void ScrollMapRight(double fElapsedTime);
+	void ScrollMapUp(double dTimeStep);
+	void ScrollMapDown(double dTimeStep);
+	void ScrollMapLeft(double dTimeStep);
+	void ScrollMapRight(double dTimeStep);
 
-	void CenterMap( double fElapsedTime );
+	void CenterMap( double dTimeStep );
 
 	void DrawTiles();
 //////////////////////////////////////////////////////////////////////////
@@ -201,7 +195,7 @@ public:
 	//
 	//	Purpose		:	Update the Map
 	//////////////////////////////////////////////////////////////////////////
-	void Update(double fElapsedTime);
+	void Update(double dTimeStep);
 
 	//////////////////////////////////////////////////////////////////////////
 	//	Function	:	Input
@@ -210,9 +204,13 @@ public:
 	//
 	//	Return		:	true/false, false if we are exiting the game
 	//////////////////////////////////////////////////////////////////////////
-	eMapInputRet Input(double, POINT&);
+	eMapInputRet Input(double, const POINT&);
 
 	//////////////////////////////////////////////////////////////////////////
+	void CheckMapScroll(const CObject* const movingObj);
+	// deselects the obj on the map if it is selected (e.g., if a unit is destroyed that is selected)
+	void ActionIfSelected(CObject* obj);
+	void InitiateAttack(bool setfacing = true);
 
 	//////////////////////////////////////////////////////////////////////////
 	// Mutators
@@ -220,19 +218,16 @@ public:
 	inline void ToggleMapFlagOff(eMapFlags flag)	{ BIT_OFF(m_nMapFlags, flag);	}
 	inline void ToggleMapFlagOn(eMapFlags flag)		{ BIT_ON(m_nMapFlags, flag);	}
 	void SelectObj(CObject*& obj, bool deselectAll = false);
-	// deselects the obj on the map if it is selected (e.g., if a unit is destroyed that is selected)
-	void ActionIfSelected(CObject* obj);
-	void InitiateAttack(bool setfacing = true);
 
 	//////////////////////////////////////////////////////////////////////////
 	// Accessors
 	//////////////////////////////////////////////////////////////////////////
-	inline CObject* GetSelectedObject()			{ return m_pCurrPlayerSelectedObj;  }
-	inline CObject* GetTarget()					{ return m_pEnemyObj;		 }
-	inline CObject* GetHoverObject()			{ return m_pCurrHoverObject; }
+	inline CObject* GetSelectedObject()	const	{ return m_pCurrPlayerSelectedObj;  }
+	inline CObject* GetTarget()			const 	{ return m_pEnemyObj;		 }
+	inline CObject* GetHoverObject()	const	{ return m_pCurrHoverObject; }
 	inline CObject* GetVictor()	const			{ return m_pVictor;		 }
-	inline const rect& GetViewport()   			{ return m_rViewport;		 }
-	inline const pointf* GetTotalFrameScroll()	{ if (m_ptTotalMapScroll.x != 0.0f || m_ptTotalMapScroll.y != 0.0f) return &m_ptTotalMapScroll; else return NULL;}
+	inline const rect& GetViewport()   	const	{ return m_rViewport;		 }
+	inline const pointf* GetTotalFrameScroll() const	{ if (m_ptTotalMapScroll.x != 0.0f || m_ptTotalMapScroll.y != 0.0f) return &m_ptTotalMapScroll; else return NULL;}
 	inline int GetScreenWidth()		const		{ return m_nScreenWidth;	 }
 	inline int GetScreenHeight()	const		{ return m_nScreenHeight;	 }
 	inline CTile* GetL1Tiles()		const		{ return m_pTilesL1;		 }

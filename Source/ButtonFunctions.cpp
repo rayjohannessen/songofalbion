@@ -29,7 +29,7 @@ CUIWindowBase* BtnAction_OptionBox(CObject* obj, CButton& btn)
 
 			point btmRight = Globals::g_ptQBPos;
 			btmRight.x += 256; // size of the quick bar texture
-			btmRight.y -= 10;
+			btmRight.y -= 20;
 			CWindowVariablesBase* pVariables = new CWindowVariablesBase(btmRight, "Combat Skills", options, OptionProps());
 			pWindow = new CUIOptionsWindow(Globals::g_pAssets->GetGUIasts()->BlackPixel(), pVariables);
 			
@@ -53,7 +53,7 @@ CUIWindowBase* BtnAction_OptionBox(CObject* obj, CButton& btn)
 			OptionsList options;
 			MenuOptionList(options);
 																				// no title
-			CWindowVariablesBase* pVariables = new CWindowVariablesBase(point(0, 0), "", options, OptionProps(), PTF_DEF_ONE, CP_TOP_RIGHT, BLUE, 0.01f, 1.0f, 0, true);	
+			CWindowVariablesBase* pVariables = new CWindowVariablesBase(point(0, 0), "", options, OptionProps(), PTF_DEF_ONE, CP_TOP_RIGHT, YELLOW_WHITE, 0.01f, 1.0f, 0, true);	
 			pWindow = new CUIOptionsWindow(Globals::g_pAssets->GetGUIasts()->BlackPixel(), pVariables, false);	// no close button for menu ( resume assumes this functionality )
 
 		}break;
@@ -95,16 +95,16 @@ void OptionListFromAbilities( const Abilities &skills, OptionsList& options )
 	AbilitiesIter iter = skills.begin();
 	AbilitiesIter end = skills.end();
 	for (; iter != end; ++iter)
-		options.push_back( COption((*iter)->GetName(), OptionAction_SetQBSlot, (*iter)->GetQBObj()) );
+		options.push_back( COption((*iter)->GetName(), RC_SELECTION, OptionAction_SetQBSlot, (*iter)->GetQBObj()) );
 }
 
 void MenuOptionList( OptionsList& options )
 {
-	options.push_back( COption("Resume", OptionAction_Resume) );
-	options.push_back( COption("Options", OptionAction_Options) );
-	options.push_back( COption("Help", OptionAction_Help) );
-	options.push_back( COption("Main Menu", OptionAction_MainMenu) );
-	options.push_back( COption("Exit", OptionAction_Exit) );
+	options.push_back( COption("Resume", RC_CLOSE, NULL) );
+	options.push_back( COption("Options", RC_CLOSE, OptionAction_Options) );
+	options.push_back( COption("Help", RC_CLOSE, OptionAction_Help) );
+	options.push_back( COption("Main Menu", RC_TO_MENU, OptionAction_MainMenu) );
+	options.push_back( COption("Exit", RC_CLOSE, OptionAction_Exit) );
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -113,43 +113,44 @@ void MenuOptionList( OptionsList& options )
 
 #include "HUD.h"
 #include "Map.h"
+#include "Menu.h"
+#include "GamePlayState.h"
 
-CUIWindowBase* OptionAction_Resume(COption*)
+void OptionAction_Options(COption* const)
 {
-	Globals::g_pHUD->CloseCurrWindow();
-	// TODO:: unpause game if necessary:
-
-	return NULL;
+	Globals::g_pGame->ChangeMenu(MT_OPTIONS);
 }
-
-CUIWindowBase* OptionAction_Options(COption*)
+void OptionAction_Help(COption* const)
 {
-
-	return NULL;
+	Globals::g_pGame->ChangeMenu(MT_HELP);
 }
-CUIWindowBase* OptionAction_Help(COption*)
+void OptionAction_MainMenu(COption* const)
 {
-
-	return NULL;
+	Globals::g_pGame->ChangeMenu(MT_MAIN);
+	if (Globals::g_pGame->GetCurrState())
+		Globals::g_pGame->ChangeState(NULL);
 }
-CUIWindowBase* OptionAction_MainMenu(COption*)
-{
-
-	return NULL;
-}
-CUIWindowBase* OptionAction_Exit(COption*)
+void OptionAction_Exit(COption* const)
 {
 	// TODO:: ask if they REALLY want to exit:
 
 	Globals::g_pGame->Shutdown();
 	exit(0);
-	return NULL;
 }
 
-CUIWindowBase* OptionAction_SetQBSlot(COption* option)
+void OptionAction_Play(COption* const)
+{
+	Globals::g_pGame->SetCurrMenu(NULL);
+	Globals::g_pGame->ChangeState(CGamePlayState::GetInstance());
+}
+void OptionAction_Back(COption* const)
+{
+	Globals::g_pGame->ChangeMenu(Globals::g_pGame->GetCurrMenu()->GetPrev()->GetType());
+}
+
+void OptionAction_SetQBSlot(COption* const option)
 {
 	// TODO:: if object is already on quick bar, show that somehow
 	if (!Globals::g_pMap->GetSelectedObject()->IsOnQuickBar(*option->GetQBObj()))
 		Globals::g_pHUD->ToggleAddingQBObjects(option->GetQBObj());
-	return NULL;
 }

@@ -17,10 +17,11 @@ CBitmapFont* CBitmapFont::GetInstance()
 	return &instance;
 }
 
-#define SPACING_MOD 2
+#define SPACING_MOD -3
 void CBitmapFont::DrawString(const char* szString, int posX, int posY, float posZ, float scale, DWORD dwcolor)
 {
 	char ch;
+	scale *= m_pCurrBMProf->Scale;
 	int len = (int)strlen(szString);
 
 	for(int i = 0; i < len; i++)
@@ -30,7 +31,7 @@ void CBitmapFont::DrawString(const char* szString, int posX, int posY, float pos
 			ch = toupper(szString[i]);
 		if(ch == ' ')
 		{
-			posX += int(m_pCurrBMProf->Size * scale);
+			posX += int((m_pCurrBMProf->Size + SPACING_MOD) * scale);
 			continue;
 		}
 		//convert ascii char to id off sheet
@@ -44,14 +45,19 @@ void CBitmapFont::DrawString(const char* szString, int posX, int posY, float pos
 
 point CBitmapFont::DrawStringAutoCenter (const char* szString, const rect& r, float zPos, float fScale, DWORD dwColor)
 {
+	fScale *= m_pCurrBMProf->Scale;
 	char ch;
+	float totalSize = (m_pCurrBMProf->Size + SPACING_MOD) * fScale;
 	size_t len = strlen(szString);
+
+	// if there's width/height, we're centering
 	int posX = r.left;
 	if (r.width())
-		posX -= (r.width() >> 1) - ((int)(len * (m_pCurrBMProf->Size) * fScale) >> 1);
+		posX += (r.width() >> 1) - ((int)(len * totalSize) >> 1);
 	int posY = r.top; 
 	if (r.height())
-		posY -= (r.height() >> 1) - ((int)(len * (m_pCurrBMProf->Size) * fScale) >> 1);
+		posY += (r.height() >> 1) - ((int)(m_pCurrBMProf->Size * fScale) >> 1);
+	
 	point start(posX, posY);
 
 	// 	loop through string	
@@ -64,16 +70,17 @@ point CBitmapFont::DrawStringAutoCenter (const char* szString, const rect& r, fl
 
 		if (ch == ' ')
 		{
-			posX += (int)(m_pCurrBMProf->Size * fScale);
+			posX += (int)totalSize;
 			continue;
 		}
 		//	convert ascii value into an id off the sheet
 		int nID = (int)(ch  - m_pCurrBMProf->StartChar);
 		rect rCell = CellAlgorithm(nID);
 
-		CSGD_TextureManager::GetInstance()->DrawWithZSort(m_pCurrBMProf->ID, posX, posY, zPos, fScale, fScale, &rCell, 0.f, 0.f, 0.f, dwColor);
+		CSGD_TextureManager::GetInstance()->DrawWithZSort(m_pCurrBMProf->ID, posX, posY, zPos, 
+															fScale, fScale, &rCell, 0.f, 0.f, 0.f, dwColor);
 
-		posX += (int)((m_pCurrBMProf->Size + SPACING_MOD) * fScale);
+		posX += (int)totalSize;
 	}
 	return start;
 }

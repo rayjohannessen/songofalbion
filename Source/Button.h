@@ -19,8 +19,8 @@ public:
 	~CButton() {}
 	CButton() : m_eName(BN_NUM_BUTTONS), m_nImageIDup(-1), m_ActionFunc(NULL), m_nState(-1) {}
 
-	void Update(double fElapsedTime);
-	void Input(POINT& mouse, CUIWindowBase*& window);
+	void Update(double dTimeStep);
+	void Input(const POINT& mouse, CUIWindowBase*& window);
 	void Render();
 
 	// ACCESSORS

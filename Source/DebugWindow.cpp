@@ -77,7 +77,7 @@ void DebugWindow::DebugInt(int _int, const string* _intName /*= NULL*/)
 	DebugString(buff);
 }
 
-void DebugWindow::DebugPoint(point& _pt, const string* _pointName /*= NULL*/)
+void DebugWindow::DebugPoint(const point& _pt, const string* _pointName /*= NULL*/)
 {
 	char buff[MAX_STRING];
 	if (_pointName)
@@ -88,6 +88,16 @@ void DebugWindow::DebugPoint(point& _pt, const string* _pointName /*= NULL*/)
 	DebugString(buff);
 }
 
+void DebugWindow::DebugPointf(const pointf& _pt, const string* _pointName /*= NULL*/)
+{
+	char buff[MAX_STRING];
+	if (_pointName)
+		sprintf_s(buff, "%s = %.2f, %.2f", _pointName->c_str(), _pt.x, _pt.y);
+	else
+		sprintf_s(buff, "point = %.2f, %.2f", _pt.x, _pt.y);
+
+	DebugString(buff);
+}
 //////////////////////////////////////////////////////////////////////////
 
 void DebugWindow::Init()

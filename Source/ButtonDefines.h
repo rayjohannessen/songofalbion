@@ -46,7 +46,7 @@ class CUIWindowBase;
 class CObject;
 class CButton;
 class COption;
-class CBaseMenuState;
+class CMenu;
 
 typedef CUIWindowBase* (*ButtonActionFP)(CObject*, CButton&);
 
@@ -67,12 +67,13 @@ CUIWindowBase* BtnAction_EndTurn(CObject*, CButton&);
 
 //////////////////////////////////////////////////////////////////////////
 
-typedef CUIWindowBase* (*OptionBtnActionFP)(COption*);
+typedef void (*OptionBtnActionFP)(COption* const);
 
-CUIWindowBase* OptionAction_Resume(COption*);
-CUIWindowBase* OptionAction_Options(COption*);
-CUIWindowBase* OptionAction_Help(COption*);
-CUIWindowBase* OptionAction_MainMenu(COption*);
-CUIWindowBase* OptionAction_Exit(COption*);
+void OptionAction_Options(COption* const);
+void OptionAction_Help(COption* const);
+void OptionAction_MainMenu(COption* const);
+void OptionAction_Exit(COption* const);
+void OptionAction_Play(COption* const);
+void OptionAction_Back(COption* const);
 
-CUIWindowBase* OptionAction_SetQBSlot(COption*);
+void OptionAction_SetQBSlot(COption* const);

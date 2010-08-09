@@ -30,13 +30,14 @@ void COption::Render(float zPos, float scale, DWORD color, bool IsCurrentlyTrans
 
 // CTOR
 CWindowVariablesBase::CWindowVariablesBase(const point& srcRectTopLeft, string title, OptionsList& options, 
-										   const OptionProps& optionProps, pointf scale /* = pointf(1.0f, 1.0f) */, 
+										   const OptionProps& optionProps, const pointf& scale /* = pointf(1.0f, 1.0f) */, 
 										   eClosePosition closePos /* = CP_TOP_RIGHT */, DWORD color /* = BLUE */, 
-										   float zPos /* = 0.0f */, float titleScale /*= 1.2f*/, DWORD titleColor /*= WHITE*/,
+										   float zPos /* = DEPTH_WNDOPTIONS */, float titleScale /*= 1.2f*/, DWORD titleColor /*= YELLOW_WHITE */,
 										   bool centerWindow /* = false */)
 	:	
 m_dwColor(color), 
 m_fZPos(zPos), 
+m_fFrameTextZPos(zPos+DEPTH_OS_WNDFRAME),
 m_ptImageScale(scale), 
 m_strTitle(title), 
 m_vOptions(options), 
@@ -67,7 +68,7 @@ void CWindowVariablesBase::SetOptionPositions( const OptionProps &optionProps, i
 {
 	point pos;
 	if (m_strTitle.size())
-		pos = point(m_rRect.left, m_nTitleY + (int)((float)(optionHeight << 1) * m_fTitleScale) + optionProps.Spacing);
+		pos = point(m_rRect.left, m_nTitleY + (int)((float)(optionHeight << 1) * m_fTitleScale * 0.65f) + optionProps.Spacing);
 	else // no title
 		pos = point(m_rRect.left, m_rRect.top + optionProps.EdgePadding);
 
@@ -99,7 +100,7 @@ void CWindowVariablesBase::SetOptionPositions( const OptionProps &optionProps, i
 }
 
 int CWindowVariablesBase::SetRect( unsigned numOptions, const OptionProps &optionProps, int numCols, 
-								   pointf &size, pointf &scale, int optionHeight, const point &srcRectTopLeft, int& maxWidth )
+								   pointf &size, const pointf &scale, int optionHeight, const point &srcRectTopLeft, int& maxWidth )
 {
 	// need to find the largest string, that will be used in determining the box width
 	maxWidth = m_strTitle.size();
@@ -169,6 +170,6 @@ int CWindowVariablesBase::SetRect( unsigned numOptions, const OptionProps &optio
 CUIWindowBase* COption::ExecuteOptionAction() 
 {
 	if(m_fpOptionAction) // some options do not execute a function
-		return m_fpOptionAction(this);
+		m_fpOptionAction(this);
 	return NULL;	
 }

@@ -88,7 +88,7 @@ void CUIQuickBar::Render()
 									DEPTH_QBOBJDRAG, 1.0f, 1.0f, &m_pDragQBObj->SrcRect);
 }
 
-void CUIQuickBar::Input(POINT& mouse)
+void CUIQuickBar::Input(const POINT& mouse)
 {
 	// determine if the mouse is over the quickbar, so we don't select anything underneath
 	if (m_rQuickBar.IsPointInRect(mouse))
@@ -128,7 +128,6 @@ void CUIQuickBar::Input(POINT& mouse)
 			break; // mouse is in a slot, no need to keep looping
 		}
 	}
-
 	//////////////////////////////////////////////////////////////////////////
 	// REMOVING QB Object being drug (mouse released anywhere outside of the QB)
 	if (!mouseIsInASlot)
@@ -255,7 +254,8 @@ bool CUIQuickBar::HandleInputObjectsOnQB( unsigned i, bool bCanDrag, MouseButton
 	else if (m_nLastIndex == i && Globals::g_pDI->MouseButtonDown(mb))
 	{
 		// start dragging currently selected ability, only if we're not already doing so
-		if (!m_pDragQBObj && bCanDrag)
+		// and the currently selected attack/defense ability is not the one being moved
+		if (!m_pDragQBObj && bCanDrag && m_nCurrSelectedAttack != m_nLastIndex && m_nCurrSelectedDefense != m_nLastIndex)
 		{
 			m_pDragQBObj = m_arrQBSlots[m_nLastIndex];
 			m_arrQBSlots[m_nLastIndex] = NULL;	// remove it from the array

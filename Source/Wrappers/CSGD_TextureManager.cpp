@@ -401,7 +401,7 @@ bool CSGD_TextureManager::Draw(int nID, int nX, int nY, float fScaleX, float fSc
 }
 
 bool CSGD_TextureManager::DrawWithZSort(int nID, int nX, int nY, float nZ, float fScaleX, float fScaleY,
-							   rect* rect, float fRotCenterX, float fRotCenterY, float fRotation, DWORD dwColor)
+							   rect* const rect, float fRotCenterX, float fRotCenterY, float fRotation, DWORD dwColor)
 {
 	RECT* pSection = NULL; //pSection->left = 0; pSection->bottom = 0; pSection->top = 0; pSection->right = 0;
 	if (rect)

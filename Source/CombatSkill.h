@@ -43,7 +43,7 @@ public:
 	CCombatSkill() : CAbilityObjectBase() {}
 	CCombatSkill(eAbilityTypes type, point pos, string name, AbilityFunction abilityFunc, CQuickBarObject* qbObj, CAbilityProperties& props, CCombatAbilProperties& combatProps);
 	~CCombatSkill();
-	void Update(double fTimeStep, AbilityReturn& abilRet);
+	void Update(double dTimeStep, AbilityReturn& abilRet);
 	void Render();
 
 	void ResetResultsApplied();

@@ -12,20 +12,23 @@
 
 #include "Structs.h"
 
+#define DEFAULT_SCALE 0.65f
 struct BFProfile 
 {
 	char	StartChar;		// ascii start character value
 	bool	HasLowerCase;	// does the bitmap font support lower case characters
 	int		ID;				// image id
 	int		NumCols;
-	int		Size;
+	int		Size;			// height/width of each cell
+	float	Scale;			// to offset the scale to begin with (different from the scale passed into the draw function)
 
-	BFProfile(char _startChar, bool _lcase, int _id, int _numCols, int _size) : 
+	BFProfile(char _startChar, bool _lcase, int _id, int _numCols, int _size, float _scale = DEFAULT_SCALE) : 
 		StartChar(_startChar), 
 		HasLowerCase(_lcase), 
 		ID(_id),
 		NumCols(_numCols),
-		Size(_size)
+		Size(_size),
+		Scale(_scale)
 	{}
 };
 
@@ -39,16 +42,9 @@ class CBitmapFont
 
 	inline rect CellAlgorithm(int ID);
 
-	///////////////////////////////////////////////////////////////////
-	//	Function:	"CBitmapFont(Constructor)"
-	///////////////////////////////////////////////////////////////////
 	CBitmapFont(void);
 	CBitmapFont(const CBitmapFont&);
 	CBitmapFont& operator=(const CBitmapFont&);
-
-	///////////////////////////////////////////////////////////////////
-	//	Function:	"~CBitmapFont(Destructor)"
-	///////////////////////////////////////////////////////////////////
 	~CBitmapFont(void);
 
 public:
@@ -87,7 +83,6 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	point DrawStringAutoCenter (const char* szString, const rect& r, float zPos = 0.09f, float fScale = 1.0f, DWORD dwColor = D3DCOLOR_XRGB(255,255,255));
 
-
 	//////////////////////////////////////////////////////////////////////////
 	//	Mutators
 	//////////////////////////////////////////////////////////////////////////
@@ -96,7 +91,7 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	//	Accessors
 	//////////////////////////////////////////////////////////////////////////
-	inline const int GetSize() const	{ return m_pCurrBMProf->Size; }
+	inline const int GetSize() const	{ return int(float(m_pCurrBMProf->Size) * m_pCurrBMProf->Scale); }
 };
 
 #endif
