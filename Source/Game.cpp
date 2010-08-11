@@ -17,6 +17,7 @@
 CGame::CGame() : 
 m_pCurrentState(NULL), 
 m_pCurrMenu(NULL),
+m_bInGameplay(false),
 m_bIsRunning(false),
 m_fSFXVolume(0.5f),
 m_fMusicVolume(0.5f),
@@ -48,8 +49,8 @@ void CGame::Initialize(HWND hWnd, HINSTANCE hInstance, int nScreenWidth, int nSc
 
 	SetIsRunning(true);
 
-	m_pCurrMenu = Globals::g_pMenus[MT_MAIN];
-	//ChangeState(CGamePlayState::GetInstance());
+	m_pCurrMenu = Globals::g_pMenus[MOT_MAIN];
+	m_bInGameplay = false;
 }
 
 void CGame::Shutdown()
@@ -107,10 +108,14 @@ bool CGame::Main(const POINT& mouse)
 	return true;
 }
 
-void CGame::ChangeMenu(eMenuType mt, bool exitingGameplay)
+void CGame::ChangeMenu(eMenuOptionType mt)
 {
-	m_pCurrMenu->Exit();
-	m_pCurrMenu = Globals::g_pMenus[mt];
+	if (m_pCurrMenu)
+		m_pCurrMenu->Exit();
+	if (m_bInGameplay && mt != MOT_MAIN)	// no main menu in the in-game menus
+		m_pCurrMenu = Globals::g_pMenusInGame[mt-1];	// offset for the fact that there's no main menu
+	else
+		m_pCurrMenu = Globals::g_pMenus[mt];
 	m_pCurrMenu->Enter();
 }
 void CGame::ChangeState(IGameState *pGameState)

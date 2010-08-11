@@ -35,7 +35,8 @@ CPlayer*				Globals::g_pCurrPlayer	= NULL;
 UnitNamesTypes*			Globals::g_vUnitNames	= NULL;	// initialized in CAssets
 CAnimationsManager*		Globals::g_pAnimManager	= NULL;	// initialized in CAssets
 CAbilitiesManager*		Globals::g_pAbilitiesManager = NULL;
-CMenu*					Globals::g_pMenus[NUM_MENU_TYPES] = {};
+CMenu*					Globals::g_pMenus[NUM_MENUOPTION_TYPES] = {};
+CMenu*					Globals::g_pMenusInGame[NUM_INGAME_MENU_TYPES] = {};
 
 bool Globals::InitGlobals(HWND hWnd, HINSTANCE hInstance, int nScreenWidth, int nScreenHeight, bool bIsWindowed)
 {
@@ -54,7 +55,6 @@ bool Globals::InitGlobals(HWND hWnd, HINSTANCE hInstance, int nScreenWidth, int 
 	g_pAssets->Init();
 
 	g_pBitMapFont	= CBitmapFont::GetInstance();
-	g_pBitMapFont->LoadProfiles();
 
 	if(!g_pFMOD->InitFModManager(hWnd))
 		return false;
@@ -114,8 +114,10 @@ void Globals::ShutdownGlobals()
 		g_pAbilitiesManager = NULL;
 	}
 	SAFE_DELETE(g_vUnitNames);
-	for (unsigned i = 0; i < NUM_MENU_TYPES; ++i)
+	for (unsigned i = 0; i < NUM_MENUOPTION_TYPES; ++i)
 		SAFE_DELETE(g_pMenus[i]);
+	for (unsigned i = 0; i < NUM_INGAME_MENU_TYPES; ++i)
+		SAFE_DELETE(g_pMenusInGame[i]);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -240,18 +242,33 @@ void Globals::SetCoordDirMaps()
 
 void Globals::InitMenus()
 {
-	// some options are not menus (play, back)
-	MenuOptions options;
-	options.push_back(MenuOption(MT_PLAY,	string("Play"),			OptionAction_Play));
-	options.push_back(MenuOption(MT_MAIN,	string("Main Menu"),	OptionAction_MainMenu));
-	options.push_back(MenuOption(MT_HELP,	string("Help Menu"),	OptionAction_Help));
-	options.push_back(MenuOption(MT_OPTIONS,string("Option Menu"),	OptionAction_Options));
-	options.push_back(MenuOption(MT_EXIT,	string("Exit"), OptionAction_Exit));
+	// play option is not a menu
 
-	point pos((g_ptScreenSize.width >> 1) - (11*g_pBitMapFont->GetSize() >> 1), 350 );
-	g_pMenus[MT_MAIN]	= new CMenu(-1, pos, MT_MAIN, options, MainMenu::Render, MainMenu::Update, MainMenu::Input);
-	g_pMenus[MT_HELP]	= new CMenu(-1, pos, MT_HELP, options, HelpMenu::Render, HelpMenu::Update, HelpMenu::Input);
-	g_pMenus[MT_OPTIONS]= new CMenu(-1, pos, MT_OPTIONS, options, OptionMenu::Render, OptionMenu::Update, OptionMenu::Input);
+	//////////////////////////////////////////////////////////////////////////
+	// menus out-of-game
+	MenuOptions options;
+	options.push_back(MenuOption(MOT_PLAY,	string("Play"),				OptionAction_Play));
+	options.push_back(MenuOption(MOT_MAIN,	string("Main Menu"),		OptionAction_MainMenu));
+	options.push_back(MenuOption(MOT_HELP,	string("Help Menu"),		OptionAction_Help));
+	options.push_back(MenuOption(MOT_OPTIONS,string("Option Menu"),		OptionAction_Options));
+	options.push_back(MenuOption(MOT_EXIT,	string("Exit"),				OptionAction_Exit));
+
+	point pos((g_ptScreenSize.width >> 1) - (11*g_pBitMapFont->GetSize() >> 1), 350 );	// 11 is the size of the longest menu name string
+	g_pMenus[MOT_MAIN]	= new CMenu(-1, pos, MOT_MAIN, options, MainMenu::Render, MainMenu::Update, MainMenu::Input);
+	g_pMenus[MOT_HELP]	= new CMenu(-1, pos, MOT_HELP, options, HelpMenu::Render, HelpMenu::Update, HelpMenu::Input);
+	g_pMenus[MOT_OPTIONS]= new CMenu(-1, pos, MOT_OPTIONS, options, OptionMenu::Render, OptionMenu::Update, OptionMenu::Input);
+
+	//////////////////////////////////////////////////////////////////////////
+	// menus in-game (gameplay state)
+	MenuOptions optionsInGame;
+	optionsInGame.push_back(MenuOption(MOT_PLAY,	string("Resume"),			OptionAction_Resume));
+	optionsInGame.push_back(MenuOption(MOT_HELP,	string("Help Menu"),		OptionAction_Help));
+	optionsInGame.push_back(MenuOption(MOT_OPTIONS,string("Option Menu"),	OptionAction_Options));
+	optionsInGame.push_back(MenuOption(MOT_MAIN,	string("Main Menu"),OptionAction_MainMenu));
+	optionsInGame.push_back(MenuOption(MOT_EXIT,	string("Exit"),	OptionAction_Exit));
+	// these need an offset for the fact that there's no main menu
+	g_pMenusInGame[MOT_HELP-1]	= new CMenu(-1, pos, MOT_HELP, optionsInGame, HelpMenu::Render, HelpMenu::Update, HelpMenu::Input);
+	g_pMenusInGame[MOT_OPTIONS-1] = new CMenu(-1, pos, MOT_OPTIONS, optionsInGame, OptionMenu::Render, OptionMenu::Update, OptionMenu::Input);
 }
 //////////////////////////////////////////////////////////////////////////
 

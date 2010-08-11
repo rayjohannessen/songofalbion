@@ -129,12 +129,18 @@ bool CHUD::Input(const POINT& mouse)
 	m_pQuickBar->Input(mouse);
 
 	// handle button input - don't handle if there is a window open
+	bool mouseOverBtn = false;	
 	for (int i = 0; !Globals::g_bWindowOpen && i < BL_NUM_LOCATIONS; ++i)
 	{
 		if (m_arrBtnSlots[i].pButton)
 		{
+			if (mouseOverBtn)// if mouse over button, no need to do point in rect checks, just make sure to reset any hovers
+			{
+				m_arrBtnSlots[i].pButton->SetStateToUp();
+				continue;
+			}
 			CUIOptionsWindow* pWindow = NULL;	// Input creates window if necessary
-			m_arrBtnSlots[i].pButton->Input(mouse, (CUIWindowBase*&)pWindow);
+			mouseOverBtn = m_arrBtnSlots[i].pButton->Input(mouse, (CUIWindowBase*&)pWindow);
 			if ( pWindow )
 			{
 				Globals::g_bWindowOpen = true;
