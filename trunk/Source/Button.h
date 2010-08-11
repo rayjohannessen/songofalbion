@@ -20,7 +20,8 @@ public:
 	CButton() : m_eName(BN_NUM_BUTTONS), m_nImageIDup(-1), m_ActionFunc(NULL), m_nState(-1) {}
 
 	void Update(double dTimeStep);
-	void Input(const POINT& mouse, CUIWindowBase*& window);
+	// returns true if mouse is inside button (no need to check input for any other buttons then)
+	bool Input(const POINT& mouse, CUIWindowBase*& window);
 	void Render();
 
 	// ACCESSORS
@@ -36,5 +37,6 @@ public:
 	}
 	inline void SetRect(const rect& r) { m_Rect = r; }
 	inline void SetIDs(int up, int hover, int down) { m_nImageIDup = up; m_nImageIDhover = hover; m_nImageIDdown = down; m_nState = up; }
+	inline void SetStateToUp()	{ m_nState = m_nImageIDup; }
 	CUIWindowBase* SimulatePressed();
 };

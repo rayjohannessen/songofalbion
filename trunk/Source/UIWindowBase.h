@@ -35,7 +35,7 @@ class COption
 	OptionBtnActionFP	m_fpOptionAction;
 
 	// all parameters determined dynamically by the owner of this option
-	void Render(float zPos, float scale, DWORD color, bool IsCurrentlyTransparent);
+	void Render(float zPos, float scale, DWORD color);
 	bool IsMouseOverOption(const point& mouse)
 	{
 		rect adjustRect = m_Rect;
@@ -74,7 +74,7 @@ typedef struct _OptionProps
 	int			Spacing;
 	unsigned	MaxRows;
 	int			EdgePadding;
-	int		TopBtmInputRectOffset;
+	int			TopBtmInputRectOffset;
 
 	_OptionProps( int tbOffset = OD_INPUTRECT_OS, int _width = OD_WIDTH, int _spacing = OD_SPACING, unsigned _maxRows = OD_MAXROWS, int _edgePad = OD_EDGEPAD) : 
 			Width(_width), Spacing(_spacing), MaxRows(_maxRows), EdgePadding(_edgePad), TopBtmInputRectOffset(tbOffset)
@@ -97,17 +97,20 @@ typedef vector<COption> OptionsList;
 typedef vector<COption>::iterator OptionsListIter;
 
 const static int CLOSE_BTN_EDGE_DIST = 25;
+const static short TRANSPARENCY_LEVEL = 55;
 
 class CWindowVariablesBase 
 {
 	friend class CUIWindowBase;
 
 	// variables for the window box itself
-	bool			m_bIsTransparent;
+	bool			m_bCanAlpha;
 	bool			m_bCentered;
 	eClosePosition	m_eClosePos;
-	DWORD   m_dwColor;
+	DWORD   m_dwTextColor;
 	float	m_fZPos;
+	DWORD	m_dwBgClr;
+	DWORD	m_dwFrameClr;
 	float	m_fFrameTextZPos;
 	pointf	m_ptImageScale;
 	rect	m_rRect;	// position and size ( size is not for rendering purposes, used for input )
@@ -125,8 +128,8 @@ class CWindowVariablesBase
 
 public:
 						// srcRectTopLeft == the top left screen pos of the button that was pressed
-	CWindowVariablesBase( const point& srcRectTopLeft, string title, OptionsList& options, const OptionProps& optionProps,
-						  const pointf& scale = pointf(1.0f, 1.0f), eClosePosition closePos = CP_TOP_RIGHT, 
+	CWindowVariablesBase( const point& srcRectTopLeft, string title, OptionsList& options, const OptionProps& optionProps, bool canAlpha = true,
+						  const pointf& scale = pointf(1.0f, 1.0f), eClosePosition closePos = CP_TOP_RIGHT, DWORD bgClr = 0xff000000,
 						  DWORD color = YELLOW_WHITE, float zPos = DEPTH_WNDOPTIONS, float titleScale = 1.2f, DWORD titleColor = YELLOW_WHITE, bool centerWindow = false );
 
 	~CWindowVariablesBase() {}
@@ -134,26 +137,30 @@ public:
 
 class CUIWindowBase
 {
+	inline void SetAlphaBits( DWORD& clr, short a );
+
 protected:
 	int		m_nImageID;
 	CWindowVariablesBase* m_pVariables;
 
 	// accessors (including variables in m_pVariables)
+	inline bool canAlpha() const					{ return m_pVariables->m_bCanAlpha;		}
 	inline const rect& windowRect() const			{ return m_pVariables->m_rRect;			}
 	inline OptionsList& optionsList()				{ return m_pVariables->m_vOptions;		}
+	inline DWORD bgClr()	const					{ return m_pVariables->m_dwBgClr;		}
+	inline DWORD frameClr() const					{ return m_pVariables->m_dwFrameClr;	}
 	inline string title()	const					{ return m_pVariables->m_strTitle;		}
 	inline DWORD titleClr() const					{ return m_pVariables->m_dwTitleColor;	}
 	inline float titleScale() const					{ return m_pVariables->m_fTitleScale;	}
 	inline const pointf& scale() const				{ return m_pVariables->m_ptImageScale;	}
 	inline float zPos() const						{ return m_pVariables->m_fZPos;			}
 	inline float zPosTxtFrame() const				{ return m_pVariables->m_fFrameTextZPos;}
-	inline DWORD color() const						{ return m_pVariables->m_dwColor;		}
-	inline bool transparent() const					{ return m_pVariables->m_bIsTransparent;}
+	inline DWORD textClr() const					{ return m_pVariables->m_dwTextColor;	}
 	inline OptionProps& optionProperties()			{ return m_pVariables->m_OptionProps;	}
 	inline eClosePosition closePos() const			{ return m_pVariables->m_eClosePos;		}
 
 	// mutators
-	inline void ToggleTransparent() { m_pVariables->m_bIsTransparent = !m_pVariables->m_bIsTransparent; }
+	void SetAlpha(short a);
 
 public:
 	CUIWindowBase() : m_nImageID(-1), m_pVariables(NULL) {}

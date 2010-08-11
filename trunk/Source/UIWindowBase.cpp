@@ -7,21 +7,19 @@
 #include "UIQuickBar.h"
 
 //////////////////////////////////////////////////////////////////////////
-//	COption
+//	CUIWindowBase
 //////////////////////////////////////////////////////////////////////////
-
-void COption::Render(float zPos, float scale, DWORD color, bool IsCurrentlyTransparent)
+void CUIWindowBase::SetAlpha(short a)				 
+{ 
+	SetAlphaBits(m_pVariables->m_dwTitleColor, a);
+	SetAlphaBits(m_pVariables->m_dwTextColor, a);
+	SetAlphaBits(m_pVariables->m_dwFrameClr, a);
+	SetAlphaBits(m_pVariables->m_dwBgClr, a);
+}
+void CUIWindowBase::SetAlphaBits( DWORD& clr, short a )
 {
-	if (m_bIsHovered && !IsCurrentlyTransparent)	// only change to hovered color if this window is NOT transparent (meaning the mouse is not in the window currently)
-		color = HoveredColor;
-	else if (IsCurrentlyTransparent)
-	{
-		// TODO:: add alpha to color
-	}
-	point strPos = Globals::g_pBitMapFont->DrawStringAutoCenter(Name.c_str(), m_Rect, zPos, scale, color);
-	// draw the ability's icon to the left of the string
-	if (m_pQBObj)
-		Globals::g_pTM->DrawWithZSort(m_pQBObj->ImageID, strPos.x - 42, strPos.y - 10, zPos, 1.0f, 1.0f, &m_pQBObj->SrcRect);
+	clr &= (~0xFF000000);
+	clr |= (a << 24);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -30,23 +28,25 @@ void COption::Render(float zPos, float scale, DWORD color, bool IsCurrentlyTrans
 
 // CTOR
 CWindowVariablesBase::CWindowVariablesBase(const point& srcRectTopLeft, string title, OptionsList& options, 
-										   const OptionProps& optionProps, const pointf& scale /* = pointf(1.0f, 1.0f) */, 
-										   eClosePosition closePos /* = CP_TOP_RIGHT */, DWORD color /* = BLUE */, 
+										   const OptionProps& optionProps, bool canAlpha /*= true*/, const pointf& scale /* = pointf(1.0f, 1.0f) */, 
+										   eClosePosition closePos /* = CP_TOP_RIGHT */, DWORD bgClr /*= 0xff000000*/, DWORD textClr /* = YELLOW_WHITE */, 
 										   float zPos /* = DEPTH_WNDOPTIONS */, float titleScale /*= 1.2f*/, DWORD titleColor /*= YELLOW_WHITE */,
 										   bool centerWindow /* = false */)
 	:	
-m_dwColor(color), 
+m_bCanAlpha(canAlpha),
+m_dwTextColor(textClr), 
+m_dwBgClr(bgClr),
 m_fZPos(zPos), 
 m_fFrameTextZPos(zPos+DEPTH_OS_WNDFRAME),
 m_ptImageScale(scale), 
 m_strTitle(title), 
 m_vOptions(options), 
 m_eClosePos(closePos), 
-m_bIsTransparent(false), 
 m_bCentered(centerWindow),
 m_OptionProps(optionProps),
 m_fTitleScale(titleScale),
-m_dwTitleColor(titleColor)
+m_dwTitleColor(titleColor),
+m_dwFrameClr(0xFFFFFFFF)
 {
 	pointf size;
 	int numCols = 1;
@@ -172,4 +172,15 @@ CUIWindowBase* COption::ExecuteOptionAction()
 	if(m_fpOptionAction) // some options do not execute a function
 		m_fpOptionAction(this);
 	return NULL;	
+}
+
+void COption::Render(float zPos, float scale, DWORD color)
+{
+	if (m_bIsHovered)
+		color = HoveredColor;	// TODO::only set RGB (not alpha) components
+
+	point strPos = Globals::g_pBitMapFont->DrawStringAutoCenter(Name.c_str(), m_Rect, zPos, scale, color);
+	// draw the ability's icon to the left of the string
+	if (m_pQBObj)
+		Globals::g_pTM->DrawWithZSort(m_pQBObj->ImageID, strPos.x - 42, strPos.y - 10, zPos, 1.0f, 1.0f, &m_pQBObj->SrcRect, 0.0f, 0.0f, 0.0f, color);
 }

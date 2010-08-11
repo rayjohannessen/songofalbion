@@ -215,6 +215,7 @@ void CMap::HandleMovement( double dTimeStep, const POINT& mouse )
 		}
 	}
 }
+
 bool CMap::DetermineMoveSpecifics(const point& pt)
 {
 	// determine if there's an enemy there, if so, see if it's already selected or not
@@ -244,7 +245,7 @@ bool CMap::DetermineMoveSpecifics(const point& pt)
 				m_pCurrPlayerSelectedObj->FindPathToTarget(pt, m_vPath);
 				if (m_vPath.size())
 				{
-// TODO:: find and display path(s) available when unit is first clicked
+					// TODO:: find and display path(s) available when unit is first clicked
 					CUnit* unit = ((CUnit*)m_pCurrPlayerSelectedObj);
 					if (m_vPath[0]->DestID() != m_pCurrPlayerSelectedObj->GetCoord())	// make sure the units aren't on the same tile first
 					{
@@ -285,7 +286,6 @@ bool CMap::DetermineMoveSpecifics(const point& pt)
 	}
 	return false;
 }
-
 CObject* CMap::HoverObject(point& coord)
 {
 	// reset the color of the currently hovered object, if any

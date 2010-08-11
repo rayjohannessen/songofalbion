@@ -48,7 +48,7 @@ void CGamePlayState::Enter(void)
 
 	Globals::InitObjManager();
  
-	// TODO:: add a unit to each player for starters -- temporary
+	// TODO:: add a unit to each player for starters -- temporary (will leak)
 	// human
 	CPlayer* player = Globals::GetPlayerByFactionID(0);
 	CUnit* unit = new CUnit(UnitDefines::UNIT_UMKNIGHT, OBJ_UNIT, point(4, 5), Globals::g_pMap->IsoTilePlot(point(4, 5)), "UMKnight",
@@ -61,6 +61,7 @@ void CGamePlayState::Enter(void)
 	unit = new CUnit(UnitDefines::UNIT_UMKNIGHT, OBJ_UNIT, point(5, 5), Globals::g_pMap->IsoTilePlot(point(5, 5)), "UMKnight",
 					player->GetProfile()->name.c_str(), player->GetProfile()->nFactionID);
 	Globals::g_pObjManager->AddObject((CObject*&)(unit), (point)unit->GetSPos() );
+	Globals::g_pGame->SetInGameplay(true);
 }
 
 void CGamePlayState::Exit(void)
@@ -78,6 +79,7 @@ void CGamePlayState::Exit(void)
 	Globals::ShutdownHUD();
 	Globals::ShutdownObjManager();
 	Globals::ClearPlayers();
+	Globals::g_pGame->SetInGameplay(false);
 }
 
 CGamePlayState* CGamePlayState::GetInstance(void)

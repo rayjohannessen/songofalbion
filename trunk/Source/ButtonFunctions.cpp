@@ -53,7 +53,7 @@ CUIWindowBase* BtnAction_OptionBox(CObject* obj, CButton& btn)
 			OptionsList options;
 			MenuOptionList(options);
 																				// no title
-			CWindowVariablesBase* pVariables = new CWindowVariablesBase(point(0, 0), "", options, OptionProps(), PTF_DEF_ONE, CP_TOP_RIGHT, YELLOW_WHITE, 0.01f, 1.0f, 0, true);	
+			CWindowVariablesBase* pVariables = new CWindowVariablesBase(point(0, 0), "", options, OptionProps(), false, PTF_DEF_ONE, CP_TOP_RIGHT, 0xFF000000, YELLOW_WHITE, 0.01f, 1.0f, 0, true);	
 			pWindow = new CUIOptionsWindow(Globals::g_pAssets->GetGUIasts()->BlackPixel(), pVariables, false);	// no close button for menu ( resume assumes this functionality )
 
 		}break;
@@ -118,17 +118,16 @@ void MenuOptionList( OptionsList& options )
 
 void OptionAction_Options(COption* const)
 {
-	Globals::g_pGame->ChangeMenu(MT_OPTIONS);
+	Globals::g_pGame->ChangeMenu(MOT_OPTIONS);
 }
 void OptionAction_Help(COption* const)
 {
-	Globals::g_pGame->ChangeMenu(MT_HELP);
+	Globals::g_pGame->ChangeMenu(MOT_HELP);
 }
 void OptionAction_MainMenu(COption* const)
 {
-	Globals::g_pGame->ChangeMenu(MT_MAIN);
-	if (Globals::g_pGame->GetCurrState())
-		Globals::g_pGame->ChangeState(NULL);
+	Globals::g_pGame->ChangeMenu(MOT_MAIN);
+	Globals::g_pGame->ChangeState(NULL);
 }
 void OptionAction_Exit(COption* const)
 {
@@ -138,10 +137,15 @@ void OptionAction_Exit(COption* const)
 	exit(0);
 }
 
-void OptionAction_Play(COption* const)
+void OptionAction_Play(COption* const)	// "play" signifies we're entering a new game (going into gameplay state)
 {
 	Globals::g_pGame->SetCurrMenu(NULL);
 	Globals::g_pGame->ChangeState(CGamePlayState::GetInstance());
+}
+
+void OptionAction_Resume(COption* const)
+{
+	Globals::g_pGame->SetCurrMenu(NULL);	// just go back into game (no menu to update/render/input)
 }
 
 void OptionAction_SetQBSlot(COption* const option)

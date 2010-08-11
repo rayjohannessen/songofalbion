@@ -18,6 +18,7 @@ private:
 	string				m_sCurrProfName;
 
 	// variables
+	bool	m_bInGameplay;	// used for differentiating which menus to use, i.e., in-game or regular
 	bool	m_bIsRunning;
 	int		m_nScreenWidth;
 	int		m_nScreenHeight;
@@ -39,7 +40,7 @@ private:
 
 
 public:
-	void ChangeMenu(eMenuType mt, bool exitingGameplay);
+	void ChangeMenu(eMenuOptionType mt);
 	///////////////////////////////////////////////
 	//	Function:	ChangeState
 	//
@@ -106,6 +107,7 @@ public:
 	inline void SetIsRunning	(bool _bIsRunning)		{m_bIsRunning = _bIsRunning;}
 	inline void SetProfName		(string& profName)		{m_sCurrProfName = profName;}
 	inline void SetCurrMenu		(CMenu* const menu)		{m_pCurrMenu = menu;		}
+	inline void SetInGameplay	(bool inGameplay)		{m_bInGameplay = inGameplay;}
 	//	void SetIsPaused	()					{m_bIsPaused = !m_bIsPaused;}
 	// 	void SetLastScore	(int _nLastScore)		{m_nLastScore = _nLastScore;}
 };

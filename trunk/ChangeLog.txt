@@ -161,5 +161,12 @@ Menus
 	- You now enter the main menu on launch
 	- fixed bugs
 
+8/11/2010
+---------
+Menus
+	- Fixed in-game menus, allowing to resume game (instead of restarting when clicking option/help menu)
+UIOptionsWindow
+	- added transparency when mouse is not over window (this can be disabled as well)
+Fixed bug where a tile-click was being registered when pressing "end turn"
 
 

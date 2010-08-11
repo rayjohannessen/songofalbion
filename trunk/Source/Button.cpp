@@ -15,10 +15,11 @@ void CButton::Update(double dTimeStep)
 	}
 }
 
-void CButton::Input(const POINT& mouse, CUIWindowBase*& window)
+bool CButton::Input(const POINT& mouse, CUIWindowBase*& window)
 {
 	if (m_Rect.IsPointInRect(mouse))
 	{
+		Globals::g_pMap->ToggleMapFlagOn(MF_MOUSE_IN_QUICK_BAR);
 		if (m_nState != m_nImageIDdown)
 			m_nState = m_nImageIDhover;
 		if (Globals::g_pDI->MouseButtonPressed(MOUSE_LEFT))
@@ -27,9 +28,14 @@ void CButton::Input(const POINT& mouse, CUIWindowBase*& window)
 			window = m_ActionFunc(Globals::g_pMap->GetSelectedObject(), *this);
 			m_Timer.StartTimer(0.3);
 		}
+		return true;
 	}
 	else
+	{
 		m_nState = m_nImageIDup;
+		Globals::g_pMap->ToggleMapFlagOff(MF_MOUSE_IN_QUICK_BAR);
+	}
+	return false;
 }
 
 CUIWindowBase* CButton::SimulatePressed()

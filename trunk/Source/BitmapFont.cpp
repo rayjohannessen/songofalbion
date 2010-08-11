@@ -168,7 +168,9 @@ void CBitmapFont::LoadProfiles()
 CBitmapFont::CBitmapFont()
 {
 	for (unsigned i = 0; i < NUM_BFPROFILES; ++i)
+	{
 		m_arrProfiles[i] = NULL;
+	}
 	LoadProfiles();
 }
 CBitmapFont::~CBitmapFont(void)

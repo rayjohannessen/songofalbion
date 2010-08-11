@@ -7,7 +7,7 @@
 #include "Wrappers/CSGD_TextureManager.h"
 #include "Wrappers/CSGD_DirectInput.h"
 
-CMenu::CMenu(int imageID, point& menuPos, eMenuType menuType, MenuOptions& options,
+CMenu::CMenu(int imageID, point& menuPos, eMenuOptionType menuType, MenuOptions& options,
 			 RenderPtr renderFunc, UpdatePtr updateFunc, InputPtr inputFunc,
 			 DWORD clr, DWORD hoverClr, int itemSpacing /*= 30*/, const point& bgPos /*= point(0, 0)*/) 
 	:
