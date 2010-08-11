@@ -149,6 +149,17 @@ Cleaned up unused code
 Added const and pass-by-reference as needed in many places
 
 
+8/05/2010
+---------
+Menus
+	- Added basic structure (input, rendering, selection)
+
+
+8/07/2010
+---------
+Menus
+	- You now enter the main menu on launch
+	- fixed bugs
 
 
 

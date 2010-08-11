@@ -143,10 +143,6 @@ void OptionAction_Play(COption* const)
 	Globals::g_pGame->SetCurrMenu(NULL);
 	Globals::g_pGame->ChangeState(CGamePlayState::GetInstance());
 }
-void OptionAction_Back(COption* const)
-{
-	Globals::g_pGame->ChangeMenu(Globals::g_pGame->GetCurrMenu()->GetPrev()->GetType());
-}
 
 void OptionAction_SetQBSlot(COption* const option)
 {

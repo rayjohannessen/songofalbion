@@ -39,7 +39,7 @@ private:
 
 
 public:
-	void ChangeMenu(eMenuType mt);
+	void ChangeMenu(eMenuType mt, bool exitingGameplay);
 	///////////////////////////////////////////////
 	//	Function:	ChangeState
 	//
