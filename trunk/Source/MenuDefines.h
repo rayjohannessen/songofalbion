@@ -4,7 +4,7 @@
 
 class CMenu;
 
-enum eMenuType { MT_MAIN, MT_HELP, MT_OPTIONS, MT_PLAY, MT_BACK, MT_EXIT, NUM_MENU_TYPES };
+enum eMenuType { MT_MAIN, MT_HELP, MT_OPTIONS, MT_PLAY, MT_EXIT, NUM_MENU_TYPES };
 const static short NUM_MENUS = 4;	// main, help, options, play (back & exit are not menus, only options)
 const static char* gMenuTitles[NUM_MENUS] = 
 {

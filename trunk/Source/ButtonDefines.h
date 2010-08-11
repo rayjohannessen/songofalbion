@@ -74,6 +74,5 @@ void OptionAction_Help(COption* const);
 void OptionAction_MainMenu(COption* const);
 void OptionAction_Exit(COption* const);
 void OptionAction_Play(COption* const);
-void OptionAction_Back(COption* const);
 
 void OptionAction_SetQBSlot(COption* const);

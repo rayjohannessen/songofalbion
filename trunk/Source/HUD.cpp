@@ -17,7 +17,7 @@ using namespace ObjectDefines;
 // BUTTON POS/SIZE VALUES
 const int	POS_X			 = 585;
 const int	POS_Y			 = 656;
-const point	BTN_SIZE		 = point(127, 30);
+const point	BTN_SIZE		 = point(127, 27);
 
 const point POS_SLOT_1_1 = point(POS_X, POS_Y);
 const point POS_SLOT_2_1 = point(POS_X + BTN_SIZE.x, POS_Y);

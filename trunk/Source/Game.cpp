@@ -107,12 +107,11 @@ bool CGame::Main(const POINT& mouse)
 	return true;
 }
 
-void CGame::ChangeMenu(eMenuType mt)
+void CGame::ChangeMenu(eMenuType mt, bool exitingGameplay)
 {
-	CMenu* prevMenu = m_pCurrMenu;
 	m_pCurrMenu->Exit();
 	m_pCurrMenu = Globals::g_pMenus[mt];
-	m_pCurrMenu->Enter(prevMenu);
+	m_pCurrMenu->Enter();
 }
 void CGame::ChangeState(IGameState *pGameState)
 {

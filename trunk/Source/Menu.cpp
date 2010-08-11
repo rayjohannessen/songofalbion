@@ -9,9 +9,8 @@
 
 CMenu::CMenu(int imageID, point& menuPos, eMenuType menuType, MenuOptions& options,
 			 RenderPtr renderFunc, UpdatePtr updateFunc, InputPtr inputFunc,
-			 DWORD clr, DWORD hoverClr, int itemSpacing /*= 20*/, const point& bgPos /*= point(0, 0)*/) 
+			 DWORD clr, DWORD hoverClr, int itemSpacing /*= 30*/, const point& bgPos /*= point(0, 0)*/) 
 	:
-m_pPrevMenu(NULL),
 m_pCurrHover(NULL),
 m_eType(menuType),
 m_nBGImageID(imageID),
@@ -97,9 +96,8 @@ bool CMenu::Input(double elapsedTime, const POINT& mousePt)
 	return false;
 }
 
-void CMenu::Enter(CMenu* const prevMenu)
+void CMenu::Enter()
 {
-	m_pPrevMenu = prevMenu;
 }
 void CMenu::Exit()
 {

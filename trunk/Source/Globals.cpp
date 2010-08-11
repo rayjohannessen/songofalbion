@@ -250,10 +250,6 @@ void Globals::InitMenus()
 
 	point pos((g_ptScreenSize.width >> 1) - (11*g_pBitMapFont->GetSize() >> 1), 350 );
 	g_pMenus[MT_MAIN]	= new CMenu(-1, pos, MT_MAIN, options, MainMenu::Render, MainMenu::Update, MainMenu::Input);
-
-	options.erase(options.end()-1);
-	options.push_back(MenuOption(MT_BACK,	string("Back"),			OptionAction_Back));
-
 	g_pMenus[MT_HELP]	= new CMenu(-1, pos, MT_HELP, options, HelpMenu::Render, HelpMenu::Update, HelpMenu::Input);
 	g_pMenus[MT_OPTIONS]= new CMenu(-1, pos, MT_OPTIONS, options, OptionMenu::Render, OptionMenu::Update, OptionMenu::Input);
 }

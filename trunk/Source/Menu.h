@@ -13,7 +13,6 @@
 
 class CMenu
 {
-	CMenu*		m_pPrevMenu;	
 	MenuOption*	m_pCurrHover;
 	eMenuType	m_eType;
 	int			m_nBGImageID;				// bg image ID
@@ -46,7 +45,7 @@ public:
 
 	CMenu(int imageID, point& menuPos, eMenuType menuType, MenuOptions& options, 
 		RenderPtr renderFunc, UpdatePtr updateFunc, InputPtr inputFunc,
-		DWORD clr = YELLOW_WHITE, DWORD hoverClr = LIGHT_RED, int itemSpacing = 20, const point& bgPos = point(0, 0));
+		DWORD clr = YELLOW_WHITE, DWORD hoverClr = LIGHT_RED, int itemSpacing = 30, const point& bgPos = point(0, 0));
 
 	~CMenu();
 
@@ -79,7 +78,7 @@ public:
 	//
 	//	Purpose		:	Play click sound, other misc stuff
 	//////////////////////////////////////////////////////////////////////////
-	void Enter(CMenu* const prevMenu);
+	void Enter();
 	//////////////////////////////////////////////////////////////////////////
 	//	Function	:	Exit
 	//
@@ -93,7 +92,6 @@ public:
 	inline eMenuType GetType()			const	{	return m_eType;				}
 	inline int GetMenuItemSpacing()		const	{	return m_nMenuItemSpacing;	}
 	inline int GetBGImageID()			const	{	return m_nBGImageID;		}
-	inline CMenu* const GetPrev()		const	{	return m_pPrevMenu;			}
 	inline const point& GetBGPos()		const 	{	return m_ptBGPos;			}
 	inline const MenuOptions& GetOpts() const	{	return m_vMenuOptions;		}
 
