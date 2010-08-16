@@ -44,8 +44,10 @@ void CMenu::Render()
 	if (m_nBGImageID > -1)
 		Globals::g_pTM->DrawWithZSort(m_nBGImageID, m_ptBGPos.x, m_ptBGPos.y, 1.0f, 1.0f, 1.0f, NULL, 0.0f, 0.0f, 0.0f, D3DCOLOR_XRGB(150, 150, 150));
 
+//	Globals::g_pBitMapFont->DrawStringAutoCenter("Song of Albion", rect(50, 0, 0, Globals::g_ptScreenSize.width), DEPTH_WNDOPTIONS, 2.0f, YELLOW_WHITE);
+
 	// draw the title
-	Globals::g_pBitMapFont->DrawStringAutoCenter(gMenuTitles[m_eType], rect(25, 0, 0, Globals::g_ptScreenSize.width), DEPTH_WNDOPTIONS, 2.0f, m_dwColor);
+	Globals::g_pBitMapFont->DrawStringAutoCenter(gMenuTitles[m_eType], rect(105, 0, 0, Globals::g_ptScreenSize.width), DEPTH_WNDOPTIONS, 2.0f, m_dwColor);
 
 	// render options
 	rect r;
@@ -76,6 +78,19 @@ void CMenu::Update(double dTimeStep)
 
 bool CMenu::Input(double elapsedTime, const POINT& mousePt)
 {
+	// keyboard input
+	if (Globals::g_pDI->KeyPressed(DIK_ESCAPE))
+	{
+		if (m_eType == MOT_MAIN)
+			OptionAction_Exit(NULL);
+		else
+		{
+			OptionAction_MainMenu(NULL);
+			return true;
+		}
+	}
+
+	// mouse input
 	m_pCurrHover = NULL;
 	m_ptMouse = mousePt;
 	m_fpInput(elapsedTime, mousePt, this);

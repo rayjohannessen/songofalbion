@@ -8,7 +8,7 @@ enum eMenuOptionType { MOT_MAIN, MOT_HELP, MOT_OPTIONS, MOT_PLAY, MOT_EXIT, NUM_
 const static short NUM_MENUS = 3;	// main, help, options, play (back & exit are not menus, only options)
 const static char* gMenuTitles[NUM_MENUS] = 
 {
-	"Main",
+	"",			// main menu
 	"Help",
 	"Options"
 };

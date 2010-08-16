@@ -49,6 +49,8 @@ public:
 /////////////////////////////// CAssetsGUI ///////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
+#include "MenuDefines.h"
+
 class CAssetsGUI : BaseAsset
 {
 	enum {FAC_LOGRESS, FAC_PRYDAIN, NUM_FACTIONS};
@@ -65,6 +67,7 @@ class CAssetsGUI : BaseAsset
 	int m_nEnemyInfoBG;
 	int m_nWindowFrame;
 	int m_nFactions[NUM_FACTIONS];
+	int m_nMenuBGs[NUM_MENUS];
 
 	CAssetsGUI();
 	// TODO::not sure if all these will be loaded up front yet...
@@ -80,13 +83,14 @@ public:
 	inline int Mouse() const		{ return m_nMouse;			}
 	inline int HUD()   const		{ return m_nHUD;			}
 	inline int Frame() const		{ return m_nHUDFrame;		}
-	inline int PlayerInfoBG()		{ return m_nPlayerInfoBG;	}
-	inline int EnemyInfoBG()		{ return m_nEnemyInfoBG;	}
+	inline int PlayerInfoBG() const	{ return m_nPlayerInfoBG;	}
+	inline int EnemyInfoBG() const	{ return m_nEnemyInfoBG;	}
 	inline int* FactionImages()		{ return m_nFactions;		}
 	inline int BlackPixel()	const	{ return m_nBlackPixel;		}
 	inline int QuickBar() const		{ return m_nQBFrame;		}
 	inline int AbilityImages() const{ return m_nAbilityImages;	}
 	inline int WindowFrame() const  { return m_nWindowFrame;	}
+	inline int* MenuBGs()			{ return m_nMenuBGs;		}
 };
 
 //////////////////////////////////////////////////////////////////////////

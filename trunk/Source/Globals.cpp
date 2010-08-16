@@ -253,8 +253,9 @@ void Globals::InitMenus()
 	options.push_back(MenuOption(MOT_OPTIONS,string("Option Menu"),		OptionAction_Options));
 	options.push_back(MenuOption(MOT_EXIT,	string("Exit"),				OptionAction_Exit));
 
-	point pos((g_ptScreenSize.width >> 1) - (11*g_pBitMapFont->GetSize() >> 1), 350 );	// 11 is the size of the longest menu name string
-	g_pMenus[MOT_MAIN]	= new CMenu(-1, pos, MOT_MAIN, options, MainMenu::Render, MainMenu::Update, MainMenu::Input);
+	//point pos((g_ptScreenSize.width >> 1) - (11*g_pBitMapFont->GetSize() >> 1), 350 );	// 11 is the size of the longest menu name string
+	point pos(60, 300);
+	g_pMenus[MOT_MAIN]	= new CMenu(Globals::g_pAssets->GetGUIasts()->MenuBGs()[MOT_MAIN], pos, MOT_MAIN, options, MainMenu::Render, MainMenu::Update, MainMenu::Input);
 	g_pMenus[MOT_HELP]	= new CMenu(-1, pos, MOT_HELP, options, HelpMenu::Render, HelpMenu::Update, HelpMenu::Input);
 	g_pMenus[MOT_OPTIONS]= new CMenu(-1, pos, MOT_OPTIONS, options, OptionMenu::Render, OptionMenu::Update, OptionMenu::Input);
 

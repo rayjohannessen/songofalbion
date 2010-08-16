@@ -97,7 +97,7 @@ typedef vector<COption> OptionsList;
 typedef vector<COption>::iterator OptionsListIter;
 
 const static int CLOSE_BTN_EDGE_DIST = 25;
-const static short TRANSPARENCY_LEVEL = 55;
+const static short TRANSPARENCY_LEVEL = 65;
 
 class CWindowVariablesBase 
 {
