@@ -68,6 +68,7 @@ const int CAssetsGUI::LoadAssets(int index)
 	m_nBlackPixel			= Globals::g_pTM->LoadTexture((GetPath() + "BlackPixel.png").c_str());
 	m_nQBFrame				= Globals::g_pTM->LoadTexture((GetPath() + "QuickBar.png").c_str());
 	m_nAbilityImages		= Globals::g_pTM->LoadTexture((GetPath() + "AbilityImages.png").c_str());
+	m_nMenuBGs[MOT_MAIN]	= Globals::g_pTM->LoadTexture((GetPath() + "BGS/Celtic_Cross_BG.png").c_str());
 
 	return 0;
 }
