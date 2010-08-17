@@ -139,13 +139,13 @@ void OptionAction_Exit(COption* const)
 
 void OptionAction_Play(COption* const)	// "play" signifies we're entering a new game (going into gameplay state)
 {
-	Globals::g_pGame->SetCurrMenu(NULL);
+	Globals::g_pGame->ChangeMenu(NUM_MENUOPTION_TYPES);
 	Globals::g_pGame->ChangeState(CGamePlayState::GetInstance());
 }
 
 void OptionAction_Resume(COption* const)
 {
-	Globals::g_pGame->SetCurrMenu(NULL);	// just go back into game (no menu to update/render/input)
+	Globals::g_pGame->ChangeMenu(NUM_MENUOPTION_TYPES);	// just go back into game (no menu to update/render/input)
 }
 
 void OptionAction_SetQBSlot(COption* const option)

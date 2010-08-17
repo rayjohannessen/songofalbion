@@ -16,6 +16,7 @@ class CMenu
 	MenuOption*	m_pCurrHover;
 	eMenuOptionType	m_eType;
 	int			m_nBGImageID;				// bg image ID
+	int			m_nMusicID;
 	int			m_nMenuItemSpacing;			// the distance between one menu item and the next
 	DWORD		m_dwColor;
 	DWORD		m_dwHoverClr;
@@ -43,9 +44,9 @@ protected:
 
 public:
 
-	CMenu(int imageID, point& menuPos, eMenuOptionType menuType, MenuOptions& options, 
+	CMenu(int bgImageID, int musicID, point& menuPos, eMenuOptionType menuType, MenuOptions& options, 
 		RenderPtr renderFunc, UpdatePtr updateFunc, InputPtr inputFunc,
-		DWORD clr = YELLOW_WHITE, DWORD hoverClr = LIGHT_RED, int itemSpacing = 30, const point& bgPos = point(0, 0));
+		DWORD clr = YELLOW_WHITE, DWORD hoverClr = LIGHT_RED, int itemSpacing = 40, const point& bgPos = point(0, 0));
 
 	~CMenu();
 
@@ -84,12 +85,12 @@ public:
 	//
 	//	Purpose		:	TODO:: may not be necessary..???
 	//////////////////////////////////////////////////////////////////////////
-	void Exit();
+	void Exit(eMenuOptionType changeTo);
 
 	//////////////////////////////////////////////////////////////////////////
 	//	Accessors
 	//////////////////////////////////////////////////////////////////////////
-	inline eMenuOptionType GetType()			const	{	return m_eType;				}
+	inline eMenuOptionType GetType()	const	{	return m_eType;				}
 	inline int GetMenuItemSpacing()		const	{	return m_nMenuItemSpacing;	}
 	inline int GetBGImageID()			const	{	return m_nBGImageID;		}
 	inline const point& GetBGPos()		const 	{	return m_ptBGPos;			}

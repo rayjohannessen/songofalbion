@@ -106,7 +106,6 @@ public:
 	inline void SetMusicVolume	(float _nMusicVolume);
 	inline void SetIsRunning	(bool _bIsRunning)		{m_bIsRunning = _bIsRunning;}
 	inline void SetProfName		(string& profName)		{m_sCurrProfName = profName;}
-	inline void SetCurrMenu		(CMenu* const menu)		{m_pCurrMenu = menu;		}
 	inline void SetInGameplay	(bool inGameplay)		{m_bInGameplay = inGameplay;}
 	//	void SetIsPaused	()					{m_bIsPaused = !m_bIsPaused;}
 	// 	void SetLastScore	(int _nLastScore)		{m_nLastScore = _nLastScore;}

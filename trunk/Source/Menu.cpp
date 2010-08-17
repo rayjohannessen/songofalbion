@@ -7,13 +7,14 @@
 #include "Wrappers/CSGD_TextureManager.h"
 #include "Wrappers/CSGD_DirectInput.h"
 
-CMenu::CMenu(int imageID, point& menuPos, eMenuOptionType menuType, MenuOptions& options,
+CMenu::CMenu(int bgImageID, int musicID, point& menuPos, eMenuOptionType menuType, MenuOptions& options,
 			 RenderPtr renderFunc, UpdatePtr updateFunc, InputPtr inputFunc,
 			 DWORD clr, DWORD hoverClr, int itemSpacing /*= 30*/, const point& bgPos /*= point(0, 0)*/) 
 	:
 m_pCurrHover(NULL),
 m_eType(menuType),
-m_nBGImageID(imageID),
+m_nBGImageID(bgImageID),
+m_nMusicID(musicID),
 m_nMenuItemSpacing(itemSpacing),
 m_dwColor(clr),
 m_dwHoverClr(hoverClr),
@@ -42,28 +43,31 @@ CMenu::~CMenu()
 void CMenu::Render()
 {
 	if (m_nBGImageID > -1)
-		Globals::g_pTM->DrawWithZSort(m_nBGImageID, m_ptBGPos.x, m_ptBGPos.y, 1.0f, 1.0f, 1.0f, NULL, 0.0f, 0.0f, 0.0f, D3DCOLOR_XRGB(150, 150, 150));
+ 		Globals::g_pTM->DrawWithZSort(m_nBGImageID, m_ptBGPos.x, m_ptBGPos.y, 1.0f, 1.0f, 1.0f, NULL, 0.0f, 0.0f, 0.0f, 0x44ffffff);
+
+	Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->SOATitle(), 270, 40, 1.0f);
+//	Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->Harp(), 165, 170, 1.0f, 1.0f, 1.0f, NULL, 0.0f, 0.0f, 0.0f, 0x55ffffff);
 
 //	Globals::g_pBitMapFont->DrawStringAutoCenter("Song of Albion", rect(50, 0, 0, Globals::g_ptScreenSize.width), DEPTH_WNDOPTIONS, 2.0f, YELLOW_WHITE);
 
 	// draw the title
-	Globals::g_pBitMapFont->DrawStringAutoCenter(gMenuTitles[m_eType], rect(105, 0, 0, Globals::g_ptScreenSize.width), DEPTH_WNDOPTIONS, 2.0f, m_dwColor);
+	Globals::g_pBitMapFont->DrawStringAutoCenter(gMenuTitles[m_eType], rect(145, 0, 0, Globals::g_ptScreenSize.width), DEPTH_WNDOPTIONS, 2.0f, m_dwColor);
 
 	// render options
-	rect r;
-	MenuOptIter iter, end;
-	for (iter = m_vMenuOptions.begin(), end = m_vMenuOptions.end(); iter != end; ++iter)
-	{
-		r = (*iter).Rect; 
-		r.right = 0; r.bottom = 0;
-		Globals::g_pBitMapFont->DrawStringAutoCenter((*iter).Text.c_str(), r, DEPTH_WNDOPTIONS, 1.0f, m_dwColor);
-	}
-	if (m_pCurrHover)
-	{
-		r = m_pCurrHover->Rect; 
-		r.right = 0; r.bottom = 0;
-		Globals::g_pBitMapFont->DrawStringAutoCenter(m_pCurrHover->Text.c_str(), r, DEPTH_WNDOPTIONS, 1.0f, m_dwHoverClr);
-	}
+// 	rect r;
+// 	MenuOptIter iter, end;
+// 	for (iter = m_vMenuOptions.begin(), end = m_vMenuOptions.end(); iter != end; ++iter)
+// 	{
+// 		r = (*iter).Rect; 
+// 		r.right = 0; r.bottom = 0;
+// 		Globals::g_pBitMapFont->DrawStringAutoCenter((*iter).Text.c_str(), r, DEPTH_WNDOPTIONS, 1.0f, m_dwColor);
+// 	}
+// 	if (m_pCurrHover)
+// 	{
+// 		r = m_pCurrHover->Rect; 
+// 		r.right = 0; r.bottom = 0;
+// 		Globals::g_pBitMapFont->DrawStringAutoCenter(m_pCurrHover->Text.c_str(), r, DEPTH_WNDOPTIONS, 1.0f, m_dwHoverClr);
+// 	}
 
 	// draw the mouse cursor
 	Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->Mouse(), m_ptMouse.x, m_ptMouse.y, DEPTH_MOUSE);
@@ -113,10 +117,16 @@ bool CMenu::Input(double elapsedTime, const POINT& mousePt)
 
 void CMenu::Enter()
 {
+	if (m_nMusicID > -1 && !Globals::g_pFMOD->IsSoundPlaying(m_nMusicID))
+		Globals::g_pFMOD->PlaySound(m_nMusicID);
 }
-void CMenu::Exit()
+void CMenu::Exit(eMenuOptionType changeTo)
 {
-
+	if (m_nMusicID > -1 && changeTo == NUM_MENUOPTION_TYPES)	// only stop sound if we're changing to a non-menu (going into game for instance)
+	{
+		Globals::g_pFMOD->StopSound(m_nMusicID);
+		Globals::g_pFMOD->ResetSound(m_nMusicID);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
