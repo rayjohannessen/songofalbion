@@ -51,16 +51,16 @@ void CGamePlayState::Enter(void)
 	// TODO:: add a unit to each player for starters -- temporary (will leak)
 	// human
 	CPlayer* player = Globals::GetPlayerByFactionID(0);
-	CUnit* unit = new CUnit(UnitDefines::UNIT_UMKNIGHT, OBJ_UNIT, point(4, 5), Globals::g_pMap->IsoTilePlot(point(4, 5)), "UMKnight",
-					player->GetProfile()->name.c_str(), player->GetProfile()->nFactionID);
-	Globals::g_pObjManager->AddObject((CObject*&)(unit), (point)unit->GetSPos() );
+// 	CUnit* unit = new CUnit(UnitDefines::UNIT_UMKNIGHT, OBJ_UNIT, point(4, 5), Globals::g_pMap->IsoTilePlot(point(4, 5)), "UMKnight",
+// 					player->GetProfile()->name.c_str(), player->GetProfile()->nFactionID);
+// 	Globals::g_pObjManager->AddObject((CObject*&)(unit), (point)unit->GetSPos() );
 	Globals::g_pObjManager->StartTurn(player);
 
 	// comp
 	player = Globals::GetPlayerByFactionID(1);
-	unit = new CUnit(UnitDefines::UNIT_UMKNIGHT, OBJ_UNIT, point(5, 5), Globals::g_pMap->IsoTilePlot(point(5, 5)), "UMKnight",
-					player->GetProfile()->name.c_str(), player->GetProfile()->nFactionID);
-	Globals::g_pObjManager->AddObject((CObject*&)(unit), (point)unit->GetSPos() );
+// 	unit = new CUnit(UnitDefines::UNIT_UMKNIGHT, OBJ_UNIT, point(5, 5), Globals::g_pMap->IsoTilePlot(point(5, 5)), "UMKnight",
+// 					player->GetProfile()->name.c_str(), player->GetProfile()->nFactionID);
+// 	Globals::g_pObjManager->AddObject((CObject*&)(unit), (point)unit->GetSPos() );
 	Globals::g_pGame->SetInGameplay(true);
 }
 
@@ -73,7 +73,7 @@ void CGamePlayState::Exit(void)
 	}
 	if(m_pCurrentMenuState)
 	{
-		m_pCurrentMenuState->Exit();
+		m_pCurrentMenuState->Exit(MOT_PLAY);
 		m_pCurrentMenuState = NULL;
 	}
 	Globals::ShutdownHUD();

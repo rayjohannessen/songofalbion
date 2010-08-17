@@ -49,7 +49,7 @@ void CGame::Initialize(HWND hWnd, HINSTANCE hInstance, int nScreenWidth, int nSc
 
 	SetIsRunning(true);
 
-	m_pCurrMenu = Globals::g_pMenus[MOT_MAIN];
+	ChangeMenu(MOT_MAIN);
 	m_bInGameplay = false;
 }
 
@@ -111,11 +111,17 @@ bool CGame::Main(const POINT& mouse)
 void CGame::ChangeMenu(eMenuOptionType mt)
 {
 	if (m_pCurrMenu)
-		m_pCurrMenu->Exit();
-	if (m_bInGameplay && mt != MOT_MAIN)	// no main menu in the in-game menus
+		m_pCurrMenu->Exit(mt);
+	if (mt == NUM_MENUOPTION_TYPES)	// signals changing to a non-menu
+	{
+		m_pCurrMenu = NULL;
+		return;
+	}
+	else if (m_bInGameplay && mt != MOT_MAIN)	// no main menu in the in-game menus
 		m_pCurrMenu = Globals::g_pMenusInGame[mt-1];	// offset for the fact that there's no main menu
 	else
 		m_pCurrMenu = Globals::g_pMenus[mt];
+
 	m_pCurrMenu->Enter();
 }
 void CGame::ChangeState(IGameState *pGameState)

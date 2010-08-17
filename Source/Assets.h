@@ -68,6 +68,8 @@ class CAssetsGUI : BaseAsset
 	int m_nWindowFrame;
 	int m_nFactions[NUM_FACTIONS];
 	int m_nMenuBGs[NUM_MENUS];
+	int m_nHarp;
+	int m_nSOATitle;
 
 	CAssetsGUI();
 	// TODO::not sure if all these will be loaded up front yet...
@@ -91,6 +93,8 @@ public:
 	inline int AbilityImages() const{ return m_nAbilityImages;	}
 	inline int WindowFrame() const  { return m_nWindowFrame;	}
 	inline int* MenuBGs()			{ return m_nMenuBGs;		}
+	inline int Harp() const			{ return m_nHarp;			}
+	inline int SOATitle() const		{ return m_nSOATitle;		}
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -140,6 +144,21 @@ public:
 	const int UnmountedKnightAttacks()	const	{ return m_nUnmountedKnightAttacks;	}
 };
 
+class CAssetsMenuSnds : BaseAsset
+{
+	friend class CAssets;
+
+	int m_nMenuMusic[NUM_MENUS];
+	
+	CAssetsMenuSnds();
+	const int LoadAssets(int index = -1);
+	
+public:
+	~CAssetsMenuSnds() {}
+
+	int* MenuMusic()	{ return m_nMenuMusic; }
+};
+
 //////////////////////////////////////////////////////////////////////////
 //////////////////////// CAssets /////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
@@ -149,8 +168,9 @@ class CAssets
 	CAssetsGUI* m_pGUI;
 	CAssetsMap* m_pMap;
 	CAssetsUnits* m_pUNITS;
+	CAssetsMenuSnds* m_pMenuSnds;
 
-	CAssets()	: m_pGUI(NULL), m_pMap(NULL), m_pUNITS(NULL)
+	CAssets()	: m_pGUI(NULL), m_pMap(NULL), m_pUNITS(NULL), m_pMenuSnds(NULL)
 	{
 	}
 	~CAssets()
@@ -165,6 +185,7 @@ public:
 	int  LoadGUI  (int index = -1);
 	int  LoadMap  (int index = -1);
 	int  LoadUnits(int index = -1);
+	int  LoadMenuSounds();
 	void LoadInGameGUI();	
 	void LoadAllAssets();
 
@@ -176,6 +197,7 @@ public:
 	inline CAssetsGUI* GetGUIasts()		const {return m_pGUI;	}
 	inline CAssetsMap* GetMapasts()		const {return m_pMap;	}
 	inline CAssetsUnits* GetUnits()		const {return m_pUNITS;	}
+	inline CAssetsMenuSnds* GetMenuSnds() const {return m_pMenuSnds; }
 };
 
 #endif

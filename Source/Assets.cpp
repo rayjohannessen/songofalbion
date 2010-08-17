@@ -22,12 +22,17 @@ int CAssets::LoadUnits(int index)
 {
 	return m_pUNITS->LoadAssets(index);
 }
+int CAssets::LoadMenuSounds()
+{
+	return m_pMenuSnds->LoadAssets(0);
+}
 
 void CAssets::LoadAllAssets()	// debug
 {
 	LoadGUI();
 	LoadMap();
 	LoadUnits();
+	LoadMenuSounds();
 }
 
 void CAssets::LoadInGameGUI()
@@ -40,6 +45,7 @@ void CAssets::Init()
 	m_pGUI		= new CAssetsGUI();
 	m_pMap		= new CAssetsMap();
 	m_pUNITS	= new CAssetsUnits();
+	m_pMenuSnds = new CAssetsMenuSnds();
 	LoadGUI();
 }
 void CAssets::Shutdown()
@@ -47,6 +53,7 @@ void CAssets::Shutdown()
 	SAFE_DELETE(m_pUNITS);
 	SAFE_DELETE(m_pMap);
 	SAFE_DELETE(m_pGUI);
+	SAFE_DELETE(m_pMenuSnds);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -68,7 +75,9 @@ const int CAssetsGUI::LoadAssets(int index)
 	m_nBlackPixel			= Globals::g_pTM->LoadTexture((GetPath() + "BlackPixel.png").c_str());
 	m_nQBFrame				= Globals::g_pTM->LoadTexture((GetPath() + "QuickBar.png").c_str());
 	m_nAbilityImages		= Globals::g_pTM->LoadTexture((GetPath() + "AbilityImages.png").c_str());
-	m_nMenuBGs[MOT_MAIN]	= Globals::g_pTM->LoadTexture((GetPath() + "BGS/Celtic_Cross_BG.png").c_str());
+	m_nMenuBGs[MOT_MAIN]	= Globals::g_pTM->LoadTexture((GetPath() + "BGS/MainMenu_BG.png").c_str());
+	m_nHarp					= Globals::g_pTM->LoadTexture((GetPath() + "BGS/Angel_harp.png").c_str());
+	m_nSOATitle				= Globals::g_pTM->LoadTexture((GetPath() + "BGS/SOA_Title.png").c_str());
 
 	return 0;
 }
@@ -166,6 +175,25 @@ const int CAssetsUnits::LoadAssets(int index)
 
 	return 0;	// TODO:: use return code?
 }
+
+//////////////////////////////////////////////////////////////////////////
+//	Menu Sounds															//
+//////////////////////////////////////////////////////////////////////////
+
+CAssetsMenuSnds::CAssetsMenuSnds()
+{
+	SetPath("Resources/Music/Menus/");
+}
+
+const int CAssetsMenuSnds::LoadAssets(int index)
+{
+	m_nMenuMusic[MOT_MAIN] = Globals::g_pFMOD->LoadSound((GetPath() + "DarkIsland.mp3").c_str(), FMOD_LOOP_NORMAL);
+
+	return 0;
+}
+
+
+//////////////////////////////////////////////////////////////////////////
 
 // private
 void CAssetsUnits::GetAnimPropsFromFileName( string name, string &unitName, string &animName, int &numFrames, int &frameSize )
