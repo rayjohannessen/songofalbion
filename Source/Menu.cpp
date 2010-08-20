@@ -7,10 +7,11 @@
 #include "Wrappers/CSGD_TextureManager.h"
 #include "Wrappers/CSGD_DirectInput.h"
 
-CMenu::CMenu(int bgImageID, int musicID, point& menuPos, eMenuOptionType menuType, MenuOptions& options,
-			 RenderPtr renderFunc, UpdatePtr updateFunc, InputPtr inputFunc,
-			 DWORD clr, DWORD hoverClr, int itemSpacing /*= 30*/, const point& bgPos /*= point(0, 0)*/) 
+CMenu::CMenu(int bgImageID, int musicID, point& optionsStartPos, eMenuOptionType menuType, MenuOptions& options,
+			 RenderPtr renderFunc, UpdatePtr updateFunc, InputPtr inputFunc, bool optionsInLine /*= true*/,
+			 DWORD clr /*= YELLOW_WHITE*/, DWORD hoverClr /*= LIGHT_RED*/, int itemSpacing /*= 30*/, const point& bgPos /*= point(0, 0)*/) 
 	:
+m_bOptionsInLine(optionsInLine),
 m_pCurrHover(NULL),
 m_eType(menuType),
 m_nBGImageID(bgImageID),
@@ -21,17 +22,30 @@ m_dwHoverClr(hoverClr),
 m_ptBGPos(bgPos)
 {
 	int bmfSize = Globals::g_pBitMapFont->GetSize();
-	point thisPt= menuPos;
 	m_fpRender = renderFunc;
 	m_fpUpdate = updateFunc;
 	m_fpInput  = inputFunc;
-	for (unsigned i = 0; i < options.size(); ++i)
-	{	// set the options except for this one (we can't click to goto the menu we're already on)
-		if (options[i].Type != m_eType)
-		{
-			options[i].SetRect(rect(thisPt, size(options[i].Text.size() * bmfSize, bmfSize)));
-			m_vMenuOptions.push_back(options[i]);
-			thisPt.y += m_nMenuItemSpacing;
+
+	// otherwise, the rects have been set before-hand
+	if (optionsInLine)
+	{
+		point thisPt= optionsStartPos;
+		for (unsigned i = 0; i < options.size(); ++i)
+		{	// set the options except for this one (we can't click to goto the menu we're already on)
+			if (options[i].Type != m_eType)
+			{
+				options[i].SetRect(rect(thisPt, size(options[i].Text.size() * bmfSize, bmfSize)));
+				m_vMenuOptions.push_back(options[i]);
+				thisPt.y += m_nMenuItemSpacing;
+			}
+		}
+	}
+	else
+	{
+		for (unsigned i = 0; i < options.size(); ++i)
+		{	// set the options except for this one (we can't click to goto the menu we're already on)
+			if (options[i].Type != m_eType)
+				m_vMenuOptions.push_back(options[i]);
 		}
 	}
 }
@@ -43,31 +57,33 @@ CMenu::~CMenu()
 void CMenu::Render()
 {
 	if (m_nBGImageID > -1)
- 		Globals::g_pTM->DrawWithZSort(m_nBGImageID, m_ptBGPos.x, m_ptBGPos.y, 1.0f, 1.0f, 1.0f, NULL, 0.0f, 0.0f, 0.0f, 0x44ffffff);
+ 		Globals::g_pTM->DrawWithZSort(m_nBGImageID, m_ptBGPos.x, m_ptBGPos.y, 1.0f, 1.0f, 1.0f, NULL, 0.0f, 0.0f, 0.0f, 0xaaffffff);
 
 	Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->SOATitle(), 270, 40, 1.0f);
-//	Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->Harp(), 165, 170, 1.0f, 1.0f, 1.0f, NULL, 0.0f, 0.0f, 0.0f, 0x55ffffff);
-
-//	Globals::g_pBitMapFont->DrawStringAutoCenter("Song of Albion", rect(50, 0, 0, Globals::g_ptScreenSize.width), DEPTH_WNDOPTIONS, 2.0f, YELLOW_WHITE);
 
 	// draw the title
 	Globals::g_pBitMapFont->DrawStringAutoCenter(gMenuTitles[m_eType], rect(145, 0, 0, Globals::g_ptScreenSize.width), DEPTH_WNDOPTIONS, 2.0f, m_dwColor);
 
 	// render options
-// 	rect r;
-// 	MenuOptIter iter, end;
-// 	for (iter = m_vMenuOptions.begin(), end = m_vMenuOptions.end(); iter != end; ++iter)
-// 	{
-// 		r = (*iter).Rect; 
-// 		r.right = 0; r.bottom = 0;
-// 		Globals::g_pBitMapFont->DrawStringAutoCenter((*iter).Text.c_str(), r, DEPTH_WNDOPTIONS, 1.0f, m_dwColor);
-// 	}
-// 	if (m_pCurrHover)
-// 	{
-// 		r = m_pCurrHover->Rect; 
-// 		r.right = 0; r.bottom = 0;
-// 		Globals::g_pBitMapFont->DrawStringAutoCenter(m_pCurrHover->Text.c_str(), r, DEPTH_WNDOPTIONS, 1.0f, m_dwHoverClr);
-// 	}
+ 	rect r;
+	MenuOptIter iter, end;
+	for (iter = m_vMenuOptions.begin(), end = m_vMenuOptions.end(); iter != end; ++iter)
+	{
+		r = (*iter).Rect; 
+		if (m_bOptionsInLine)
+		{ r.right = 0; r.bottom = 0; }
+		Globals::g_pBitMapFont->DrawStringAutoCenter((*iter).Text.c_str(), r, DEPTH_WNDOPTIONS, 1.5f, m_dwColor);
+	}
+	if (m_pCurrHover)
+	{
+		if (!m_bOptionsInLine) // draw the hover image
+			Globals::g_pTM->DrawWithZSort(m_pCurrHover->HoverID, m_pCurrHover->HoverPos.x, m_pCurrHover->HoverPos.y, DEPTH_WNDOPTIONS, 1.0f, 1.0f, &m_pCurrHover->SrcRect);
+
+		r = m_pCurrHover->Rect; 
+		if (m_bOptionsInLine)
+		{ r.right = 0; r.bottom = 0; }
+		Globals::g_pBitMapFont->DrawStringAutoCenter(m_pCurrHover->Text.c_str(), r, DEPTH_WNDOPTIONS, 1.5f, m_dwHoverClr);
+	}
 
 	// draw the mouse cursor
 	Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->Mouse(), m_ptMouse.x, m_ptMouse.y, DEPTH_MOUSE);

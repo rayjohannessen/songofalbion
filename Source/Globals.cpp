@@ -251,30 +251,30 @@ void Globals::InitMenus()
 
 	//////////////////////////////////////////////////////////////////////////
 	// menus out-of-game
+	int hoverID = Globals::g_pAssets->GetGUIasts()->MenuGlows();
 	MenuOptions options;
-	options.push_back(MenuOption(MOT_PLAY,	string("Play"),				OptionAction_Play));
-	options.push_back(MenuOption(MOT_MAIN,	string("Main Menu"),		OptionAction_MainMenu));
-	options.push_back(MenuOption(MOT_HELP,	string("Help Menu"),		OptionAction_Help));
-	options.push_back(MenuOption(MOT_OPTIONS,string("Option Menu"),		OptionAction_Options));
-	options.push_back(MenuOption(MOT_EXIT,	string("Exit"),				OptionAction_Exit));
+	options.push_back(MenuOption(MOT_PLAY,	string("Play"),		OptionAction_Play,		rect(317, 531, 258, 459),	rect(0, 341, 425, 692), hoverID, point(236, 261)));
+	options.push_back(MenuOption(MOT_MAIN,	string("Main"),		OptionAction_MainMenu));
+	options.push_back(MenuOption(MOT_HELP,	string("Help"),		OptionAction_Help,		rect(235, 317, 171, 291),	rect(367, 502, 815, 965), hoverID, point(154, 216)));
+	options.push_back(MenuOption(MOT_OPTIONS,string("Options"),	OptionAction_Options,	rect(326, 556, 792, 980),	rect(0, 363, 707, 1024), hoverID, point(708, 256)));
+	options.push_back(MenuOption(MOT_EXIT,	string("Exit"),		OptionAction_Exit,		rect(460, 567, 515, 743),	rect(0, 254, 0, 412), hoverID, point(416, 380)));
 
 	point pos((g_ptScreenSize.width >> 1) - (11*g_pBitMapFont->GetSize() >> 1) + 30, 330 );	// 11 is the size of the longest menu name string
 	//point pos(60, 300);
 	int menuMusic = Globals::g_pAssets->GetMenuSnds()->MenuMusic()[MOT_MAIN];
 	g_pMenus[MOT_MAIN]	 = new CMenu(Globals::g_pAssets->GetGUIasts()->MenuBGs()[MOT_MAIN], 
-									 menuMusic,
-									 pos, MOT_MAIN, options, MainMenu::Render, MainMenu::Update, MainMenu::Input);
+									 menuMusic, pos, MOT_MAIN, options, MainMenu::Render, MainMenu::Update, MainMenu::Input, false);
 	g_pMenus[MOT_HELP]	 = new CMenu(-1, menuMusic, pos, MOT_HELP, options, HelpMenu::Render, HelpMenu::Update, HelpMenu::Input);
 	g_pMenus[MOT_OPTIONS]= new CMenu(-1, menuMusic, pos, MOT_OPTIONS, options, OptionMenu::Render, OptionMenu::Update, OptionMenu::Input);
 
 	//////////////////////////////////////////////////////////////////////////
 	// menus in-game (gameplay state)
 	MenuOptions optionsInGame;
-	optionsInGame.push_back(MenuOption(MOT_PLAY,	string("Resume"),			OptionAction_Resume));
-	optionsInGame.push_back(MenuOption(MOT_HELP,	string("Help Menu"),		OptionAction_Help));
-	optionsInGame.push_back(MenuOption(MOT_OPTIONS,string("Option Menu"),	OptionAction_Options));
-	optionsInGame.push_back(MenuOption(MOT_MAIN,	string("Main Menu"),OptionAction_MainMenu));
-	optionsInGame.push_back(MenuOption(MOT_EXIT,	string("Exit"),	OptionAction_Exit));
+	optionsInGame.push_back(MenuOption(MOT_PLAY,	string("Resume"),	OptionAction_Resume));
+	optionsInGame.push_back(MenuOption(MOT_HELP,	string("Help"),		OptionAction_Help));
+	optionsInGame.push_back(MenuOption(MOT_OPTIONS, string("Options"),	OptionAction_Options));
+	optionsInGame.push_back(MenuOption(MOT_MAIN,	string("Main"),		OptionAction_MainMenu));
+	optionsInGame.push_back(MenuOption(MOT_EXIT,	string("Exit"),		OptionAction_Exit));
 	// these need an offset for the fact that there's no main menu
 	g_pMenusInGame[MOT_HELP-1]	= new CMenu(-1, -1, pos, MOT_HELP, optionsInGame, HelpMenu::Render, HelpMenu::Update, HelpMenu::Input);
 	g_pMenusInGame[MOT_OPTIONS-1] = new CMenu(-1, -1, pos, MOT_OPTIONS, optionsInGame, OptionMenu::Render, OptionMenu::Update, OptionMenu::Input);
