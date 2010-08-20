@@ -13,6 +13,7 @@
 
 class CMenu
 {
+	bool		m_bOptionsInLine;			// are the options just lined up in a vertical line, or are they randomly scattered?
 	MenuOption*	m_pCurrHover;
 	eMenuOptionType	m_eType;
 	int			m_nBGImageID;				// bg image ID
@@ -45,8 +46,8 @@ protected:
 public:
 
 	CMenu(int bgImageID, int musicID, point& menuPos, eMenuOptionType menuType, MenuOptions& options, 
-		RenderPtr renderFunc, UpdatePtr updateFunc, InputPtr inputFunc,
-		DWORD clr = YELLOW_WHITE, DWORD hoverClr = LIGHT_RED, int itemSpacing = 40, const point& bgPos = point(0, 0));
+		RenderPtr renderFunc, UpdatePtr updateFunc, InputPtr inputFunc, bool optionsInLine = true,
+		DWORD clr = YELLOW_WHITE, DWORD hoverClr = 0xffffffff, int itemSpacing = 40, const point& bgPos = point(0, 0));
 
 	~CMenu();
 

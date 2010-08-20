@@ -68,6 +68,7 @@ class CAssetsGUI : BaseAsset
 	int m_nWindowFrame;
 	int m_nFactions[NUM_FACTIONS];
 	int m_nMenuBGs[NUM_MENUS];
+	int m_nMainMenuGlows;
 	int m_nHarp;
 	int m_nSOATitle;
 
@@ -93,6 +94,7 @@ public:
 	inline int AbilityImages() const{ return m_nAbilityImages;	}
 	inline int WindowFrame() const  { return m_nWindowFrame;	}
 	inline int* MenuBGs()			{ return m_nMenuBGs;		}
+	inline int MenuGlows() const	{ return m_nMainMenuGlows;	}
 	inline int Harp() const			{ return m_nHarp;			}
 	inline int SOATitle() const		{ return m_nSOATitle;		}
 };

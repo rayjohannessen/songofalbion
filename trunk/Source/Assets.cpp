@@ -76,6 +76,7 @@ const int CAssetsGUI::LoadAssets(int index)
 	m_nQBFrame				= Globals::g_pTM->LoadTexture((GetPath() + "QuickBar.png").c_str());
 	m_nAbilityImages		= Globals::g_pTM->LoadTexture((GetPath() + "AbilityImages.png").c_str());
 	m_nMenuBGs[MOT_MAIN]	= Globals::g_pTM->LoadTexture((GetPath() + "BGS/MainMenu_BG.png").c_str());
+	m_nMainMenuGlows		= Globals::g_pTM->LoadTexture((GetPath() + "BGS/MainMenu_BG_glows.png").c_str());
 	m_nHarp					= Globals::g_pTM->LoadTexture((GetPath() + "BGS/Angel_harp.png").c_str());
 	m_nSOATitle				= Globals::g_pTM->LoadTexture((GetPath() + "BGS/SOA_Title.png").c_str());
 

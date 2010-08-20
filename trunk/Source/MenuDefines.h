@@ -20,16 +20,29 @@ typedef bool (*InputPtr)(double, const POINT&, CMenu* const);
 struct MenuOption 
 {
 	eMenuOptionType	Type;	// the menu type to switch to if this option is pressed
+	int			HoverID;
 	string		Text;
+	point		HoverPos;
 	rect		Rect;		// the input/render rect is set when the menu is created
+	rect		SrcRect;
 	OptionBtnActionFP Action;	// performed when this option is selected
 
-	MenuOption(eMenuOptionType type, string text, OptionBtnActionFP fpAction) : Type(type), Text(text)
-	{ Action = fpAction; }
+	MenuOption(eMenuOptionType type, string text, OptionBtnActionFP fpAction, rect r = rect(), const rect hoverSrc = rect(), int hoverID = -1, const point& hovPos = point()) 
+		: 
+	Type(type), 
+	HoverID(hoverID),
+	Text(text), 
+	HoverPos(hovPos),
+	Rect(r), 
+	SrcRect(hoverSrc)
+	{ 
+		Action = fpAction; 
+	}
 
 	// the input/render rect is set when the menu is created
 	inline void SetRect(const rect& r)	{ Rect = r; }
 };
+
 
 typedef vector<MenuOption> MenuOptions;
 typedef vector<MenuOption>::iterator MenuOptIter;
