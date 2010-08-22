@@ -12,6 +12,8 @@ const static char* gMenuTitles[NUM_MENUS] =
 	"Help",
 	"Options"
 };
+const float TitleScale = 1.5f;
+const float OptionsScale = 0.95f;
 
 typedef void (*RenderPtr)(CMenu* const);
 typedef void (*UpdatePtr)(double, CMenu* const);
@@ -21,25 +23,29 @@ struct MenuOption
 {
 	eMenuOptionType	Type;	// the menu type to switch to if this option is pressed
 	int			HoverID;
+	int			HoverSnd;
+	int			ClickSnd;
 	string		Text;
 	point		HoverPos;
-	rect		Rect;		// the input/render rect is set when the menu is created
+	rect		Rect;			// the input/render rect (maybe set at creation manually, or done automatically in-lined)
 	rect		SrcRect;
 	OptionBtnActionFP Action;	// performed when this option is selected
 
-	MenuOption(eMenuOptionType type, string text, OptionBtnActionFP fpAction, rect r = rect(), const rect hoverSrc = rect(), int hoverID = -1, const point& hovPos = point()) 
+	MenuOption(eMenuOptionType type, string text, OptionBtnActionFP fpAction, int clickSnd, rect inputRect = rect(), int hoverSnd = -1, const rect hoverSrc = rect(), int hoverID = -1, const point& hovPos = point()) 
 		: 
 	Type(type), 
 	HoverID(hoverID),
+	HoverSnd(hoverSnd),
+	ClickSnd(clickSnd),
 	Text(text), 
 	HoverPos(hovPos),
-	Rect(r), 
+	Rect(inputRect), 
 	SrcRect(hoverSrc)
 	{ 
 		Action = fpAction; 
 	}
 
-	// the input/render rect is set when the menu is created
+	// the input/render rect may be set when the menu is created (after CTOR call)
 	inline void SetRect(const rect& r)	{ Rect = r; }
 };
 

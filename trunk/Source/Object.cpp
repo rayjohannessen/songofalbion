@@ -97,7 +97,7 @@ void CObject::Render(const rect& viewPort )
 	
 	if (m_bHovered)
 	{
-		Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->FactionImages()[m_nFactionID], (int)m_ptScreenPos.x+32, (int)m_ptScreenPos.y, m_fZDepth, 0.8f, 0.8f);
+		Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->FactionImages(m_nFactionID), (int)m_ptScreenPos.x+32, (int)m_ptScreenPos.y, m_fZDepth, 0.8f, 0.8f);
 
 		// TODO::add health bars on hover
 	}

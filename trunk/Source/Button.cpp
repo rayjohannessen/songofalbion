@@ -5,6 +5,7 @@
 #include "BitmapFont.h"
 #include "Map.h"
 #include "UIWindowBase.h"
+#include "Assets.h"
 
 void CButton::Update(double dTimeStep)
 {
@@ -14,7 +15,6 @@ void CButton::Update(double dTimeStep)
 		m_Timer.ResetTimer(true);
 	}
 }
-
 bool CButton::Input(const POINT& mouse, CUIWindowBase*& window)
 {
 	if (m_Rect.IsPointInRect(mouse))
@@ -26,6 +26,10 @@ bool CButton::Input(const POINT& mouse, CUIWindowBase*& window)
 		{
 			m_nState = m_nImageIDdown;
 			window = m_ActionFunc(Globals::g_pMap->GetSelectedObject(), *this);
+			if (window)
+				Globals::g_pFMOD->PlaySound(Globals::g_pAssets->GetMenuSnds()->BtnInGameSnd());
+			else
+				Globals::g_pFMOD->PlaySound(Globals::g_pAssets->GetMenuSnds()->MenuClickSnd());
 			m_Timer.StartTimer(0.3);
 		}
 		return true;

@@ -23,6 +23,7 @@ class CMenu
 	DWORD		m_dwHoverClr;
 	point		m_ptBGPos;
 	point		m_ptMouse;
+	rect		m_rBGSrc;
 	MenuOptions m_vMenuOptions;
 
 	RenderPtr m_fpRender;
@@ -45,7 +46,7 @@ protected:
 
 public:
 
-	CMenu(int bgImageID, int musicID, point& menuPos, eMenuOptionType menuType, MenuOptions& options, 
+	CMenu(int bgImageID, const rect& bgSrc, int musicID, point& menuPos, eMenuOptionType menuType, MenuOptions& options, 
 		RenderPtr renderFunc, UpdatePtr updateFunc, InputPtr inputFunc, bool optionsInLine = true,
 		DWORD clr = YELLOW_WHITE, DWORD hoverClr = 0xffffffff, int itemSpacing = 40, const point& bgPos = point(0, 0));
 

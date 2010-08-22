@@ -28,6 +28,7 @@ public:
 
 	//////////////////////////////////////////////////////////////////////////
 
+	void DebugVoidPtr(void* data);
 	void DebugString(const string _text);
 	void DebugString(const char* _text);
 

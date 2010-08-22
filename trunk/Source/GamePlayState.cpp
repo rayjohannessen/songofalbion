@@ -18,6 +18,7 @@
 #include "Globals.h"
 #include "ObjectManager.h"
 #include "Assets.h"
+#include "AbilitiesManager.h"
 
 //TEMPORARY
 #include "Unit.h"
@@ -41,14 +42,15 @@ void CGamePlayState::Enter(void)
 
 	Globals::InitHUD();
 	Globals::g_pAssets->LoadInGameGUI();
-	Globals::g_pAssets->LoadMap();
-	Globals::g_pAssets->LoadUnits();
 
+	Globals::g_pAssets->LoadMapAssets();
 	Globals::g_pMap->Init(	Globals::g_pGame->GetScreenWidth(), Globals::g_pGame->GetScreenHeight() );
 
+	Globals::g_pAssets->LoadUnitAssets();
+	Globals::g_pAbilitiesManager->Init();
 	Globals::InitObjManager();
  
-	// TODO:: add a unit to each player for starters -- temporary (will leak)
+	// TODO:: temporary (will leak)
 	// human
 	CPlayer* player = Globals::GetPlayerByFactionID(0);
 // 	CUnit* unit = new CUnit(UnitDefines::UNIT_UMKNIGHT, OBJ_UNIT, point(4, 5), Globals::g_pMap->IsoTilePlot(point(4, 5)), "UMKnight",

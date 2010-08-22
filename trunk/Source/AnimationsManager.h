@@ -21,7 +21,7 @@ public:
 
 	static CAnimationsManager* GetInstance();
 
-	void AddAnim(const string &animName, AnimProperties& anim);
+	void AddAnim(const string &animName, const AnimProperties& anim);
 	void Shutdown();
 
 	//////////////////////////////////////////////////////////////////////////
@@ -29,5 +29,5 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 
 	//	returns all the animations for a given object
-	ObjAnimations& GetAnimations(const string objName) { return m_mAnimationsInfo[objName]; }
+	inline ObjAnimations& GetAnimations(const string objName) { return m_mAnimationsInfo[objName]; }
 };

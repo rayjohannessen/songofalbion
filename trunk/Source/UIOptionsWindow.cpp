@@ -48,6 +48,7 @@ eReturnCode  CUIOptionsWindow::Input(POINT mouse, CUIWindowBase* window /*= NULL
 		{
 			if ( (*iter).IsMouseOverOption(point(mouse)) && Globals::g_pDI->MouseButtonPressed(MOUSE_LEFT)  )
 			{							// simply determines if the current option == close button (last element in optionsList)
+				Globals::g_pFMOD->PlaySound(Globals::g_pAssets->GetMenuSnds()->MenuClickSnd());
 				index = (*iter).GetRetCode();
 				window = (*iter).ExecuteOptionAction(); // returns null if no window is created
 				return index; // we're done
