@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Menu.h"
+#include "MenuDefines.h"
 class CBitmapFont;
 class CAssets;
 class CSGD_DirectInput;

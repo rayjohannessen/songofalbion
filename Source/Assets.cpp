@@ -10,35 +10,40 @@
 ///////////////////////////////// CAssets /////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int CAssets::LoadGUI(int index)
+void CAssets::LoadNecessaryGUIElements()
 {
-	return m_pGUI->LoadAssets(index);
+	m_pGUI->LoadAssets();
 }
-int CAssets::LoadMap(int index)
+void CAssets::LoadMapAssets()
 {
-	return m_pMap->LoadAssets(index);
+	m_pMap->LoadAssets();
 }
-int CAssets::LoadUnits(int index)
+void CAssets::LoadUnitAssets(int index)
 {
-	return m_pUNITS->LoadAssets(index);
+	m_pUNITS->LoadAssets(index);
 }
-int CAssets::LoadMenuSounds()
+void CAssets::LoadMenuSounds()
 {
-	return m_pMenuSnds->LoadAssets(0);
+	m_pMenuSnds->LoadAssets();
 }
-
-void CAssets::LoadAllAssets()	// debug
-{
-	LoadGUI();
-	LoadMap();
-	LoadUnits();
-	LoadMenuSounds();
-}
-
 void CAssets::LoadInGameGUI()
 {
 	m_pGUI->LoadInGameHUD();
 }
+void CAssets::LoadMenuAssets()
+{
+	m_pGUI->LoadMenuAssets();
+}
+
+//////////////////////////////////////////////////////////////////////////
+void CAssets::LoadAllAssets()	// debug
+{
+	LoadNecessaryGUIElements();
+	LoadMapAssets();
+	LoadUnitAssets();
+	LoadMenuSounds();
+}
+//////////////////////////////////////////////////////////////////////////
 
 void CAssets::Init()
 {
@@ -46,7 +51,7 @@ void CAssets::Init()
 	m_pMap		= new CAssetsMap();
 	m_pUNITS	= new CAssetsUnits();
 	m_pMenuSnds = new CAssetsMenuSnds();
-	LoadGUI();
+	LoadNecessaryGUIElements();
 }
 void CAssets::Shutdown()
 {
@@ -69,34 +74,27 @@ CAssetsGUI::CAssetsGUI()
 	SetPath("Resources/GUI/");
 }
 // TODO::not sure if all these will be loaded up front yet...
-const int CAssetsGUI::LoadAssets(int index)
+void CAssetsGUI::LoadAssets(int index)
 {
 	m_nMouse				= Globals::g_pTM->LoadTexture((GetPath() + "mouse.png").c_str());
 	m_nBlackPixel			= Globals::g_pTM->LoadTexture((GetPath() + "BlackPixel.png").c_str());
-	m_nQBFrame				= Globals::g_pTM->LoadTexture((GetPath() + "QuickBar.png").c_str());
-	m_nAbilityImages		= Globals::g_pTM->LoadTexture((GetPath() + "AbilityImages.png").c_str());
-	m_nMenuBGs[MOT_MAIN]	= Globals::g_pTM->LoadTexture((GetPath() + "BGS/MainMenu_BG.png").c_str());
-	m_nMainMenuGlows		= Globals::g_pTM->LoadTexture((GetPath() + "BGS/MainMenu_BG_glows.png").c_str());
-	m_nHarp					= Globals::g_pTM->LoadTexture((GetPath() + "BGS/Angel_harp.png").c_str());
-	m_nSOATitle				= Globals::g_pTM->LoadTexture((GetPath() + "BGS/SOA_Title.png").c_str());
-
-	return 0;
 }
-
+// private
 void CAssetsGUI::LoadInGameHUD()
 {
+	m_nAbilityImages		= Globals::g_pTM->LoadTexture((GetPath() + "AbilityImages.png").c_str());
+	m_nQBFrame				= Globals::g_pTM->LoadTexture((GetPath() + "QuickBar.png").c_str());
 	m_nHUD					= Globals::g_pTM->LoadTexture((GetPath() + "HUD.png").c_str(),			white);
 	m_nHUDFrame				= Globals::g_pTM->LoadTexture((GetPath() + "HUD_Frame.png").c_str(),	white);
 	m_nPlayerInfoBG			= Globals::g_pTM->LoadTexture((GetPath() + "playerInfoBG.png").c_str(), white);
 	m_nEnemyInfoBG			= Globals::g_pTM->LoadTexture((GetPath() + "enemyInfoBG.png").c_str(),	white);
 	m_nWindowFrame			= Globals::g_pTM->LoadTexture((GetPath() + "Window.png").c_str(), white);
 
-	m_nFactions[FAC_LOGRESS] = Globals::g_pTM->LoadTexture((GetPath() + "faction-1.png").c_str(), white);
-	m_nFactions[FAC_PRYDAIN] = Globals::g_pTM->LoadTexture((GetPath() + "faction-2.png").c_str(), white);
+	m_arrFactions[FAC_LOGRESS] = Globals::g_pTM->LoadTexture((GetPath() + "faction-1.png").c_str(), white);
+	m_arrFactions[FAC_PRYDAIN] = Globals::g_pTM->LoadTexture((GetPath() + "faction-2.png").c_str(), white);
 
 	SetHUDButtons();
 }
-
 void CAssetsGUI::SetHUDButtons()
 {
 	// set the 3 button states' images (up, hover, down) for all buttons
@@ -105,6 +103,17 @@ void CAssetsGUI::SetHUDButtons()
 	int down  = Globals::g_pTM->LoadTexture((GetPath() + "btn-down.png").c_str(), btn_brown);
 	for (int i = 0; i < BN_NUM_BUTTONS; ++i)
 		Globals::g_pHUD->GetButtonArray()[i].SetIDs(up, hover, down);
+}
+
+// private
+void CAssetsGUI::LoadMenuAssets()
+{
+	m_arrMenuBGs[MOT_MAIN]	= Globals::g_pTM->LoadTexture((GetPath() + "BGS/MainMenu_BG.png").c_str());
+	m_arrMenuBGs[MOT_OPTIONS]=Globals::g_pTM->LoadTexture((GetPath() + "BGS/Harp_and_Title.png").c_str());
+	m_arrMenuBGs[MOT_HELP]	= Globals::g_pTM->LoadTexture((GetPath() + "BGS/Celtic_Cross_BG.png").c_str());
+	m_nMainMenuGlows		= Globals::g_pTM->LoadTexture((GetPath() + "BGS/MainMenu_BG_glows.png").c_str());
+	m_nHarp					= Globals::g_pTM->LoadTexture((GetPath() + "BGS/Harp_and_Title.png").c_str());
+	m_nSOATitle				= Globals::g_pTM->LoadTexture((GetPath() + "BGS/Harp_and_Title.png").c_str());
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -116,12 +125,10 @@ CAssetsMap::CAssetsMap() : m_nCity(0), m_nCastle(0)
 	SetPath("Resources/Map/");
 }
 // TODO::not sure if all these will be loaded up front yet...
-const int CAssetsMap::LoadAssets(int index)
+void CAssetsMap::LoadAssets(int index)
 {
 	m_nCity		= Globals::g_pTM->LoadTexture((GetPath() + "cities.png").c_str(), white);
 	m_nCastle	= Globals::g_pTM->LoadTexture((GetPath() + "castles.png").c_str(), white);
-
-	return 0;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -133,7 +140,7 @@ CAssetsUnits::CAssetsUnits()
 	SetPath("Resources/Objects/Units/");
 	m_nUnmountedKnightAttacks = -1;
 }
-const int CAssetsUnits::LoadAssets(int index)
+void CAssetsUnits::LoadAssets(int index)
 {
 	// get all the folders in the "Resources/Units/" directory
 	vector<string> folders; vector<string> toIgnore;
@@ -173,8 +180,6 @@ const int CAssetsUnits::LoadAssets(int index)
 			Globals::g_pAnimManager->AddAnim(unitName, vars);
 		}
 	}
-
-	return 0;	// TODO:: use return code?
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -186,13 +191,17 @@ CAssetsMenuSnds::CAssetsMenuSnds()
 	SetPath("Resources/Music/Menus/");
 }
 
-const int CAssetsMenuSnds::LoadAssets(int index)
+void CAssetsMenuSnds::LoadAssets(int index)
 {
-	m_nMenuMusic[MOT_MAIN] = Globals::g_pFMOD->LoadSound((GetPath() + "DarkIsland.mp3").c_str(), FMOD_LOOP_NORMAL);
-
-	return 0;
+	m_arrMenuMusic[MOT_MAIN]		= Globals::g_pFMOD->LoadSound((GetPath() + "DarkIsland.mp3").c_str(), FMOD_LOOP_NORMAL);
+	m_arrMenuHoverSnd[MOT_HELP]		= Globals::g_pFMOD->LoadSound((GetPath() + "magic_swirl.mp3").c_str());
+	m_arrMenuHoverSnd[MOT_OPTIONS]	= Globals::g_pFMOD->LoadSound((GetPath() + "harp.mp3").c_str());
+	m_arrMenuHoverSnd[MOT_PLAY] 	= Globals::g_pFMOD->LoadSound((GetPath() + "horse_whinny.mp3").c_str());
+	m_arrMenuHoverSnd[MOT_EXIT] 	= Globals::g_pFMOD->LoadSound((GetPath() + "fire_crackle.mp3").c_str());
+	m_nMenuClickSnd					= Globals::g_pFMOD->LoadSound((GetPath() + "option_click.mp3").c_str());
+	m_nInGameBtnInvalid				= Globals::g_pFMOD->LoadSound((GetPath() + "btn_invalid.mp3").c_str());
+	m_nInGameBtnClick				= Globals::g_pFMOD->LoadSound((GetPath() + "Btn_ingame.mp3").c_str());
 }
-
 
 //////////////////////////////////////////////////////////////////////////
 

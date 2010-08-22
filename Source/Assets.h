@@ -39,7 +39,7 @@ public:
 
 	// set up to return NULL if assets are already loaded,
 	// otherwise the array is populated with the proper image IDs
-	virtual const int LoadAssets(int index = -1) = 0;
+	virtual void LoadAssets(int index = -1) = 0;
 
 	void SetPath(string path) {m_strPath = path;}
 	string GetPath() const {return m_strPath;}
@@ -66,20 +66,21 @@ class CAssetsGUI : BaseAsset
 	int m_nPlayerInfoBG;
 	int m_nEnemyInfoBG;
 	int m_nWindowFrame;
-	int m_nFactions[NUM_FACTIONS];
-	int m_nMenuBGs[NUM_MENUS];
+	int m_arrFactions[NUM_FACTIONS];
+	int m_arrMenuBGs[NUM_MENUS];
 	int m_nMainMenuGlows;
 	int m_nHarp;
 	int m_nSOATitle;
 
 	CAssetsGUI();
 	// TODO::not sure if all these will be loaded up front yet...
-	const int LoadAssets(int index = -1);
+	void LoadAssets(int index = -1);
 	void SetHUDButtons();
+	void LoadInGameHUD();
+	void LoadMenuAssets();
 
 public:
 	~CAssetsGUI() {}
-	void LoadInGameHUD();
 
 	//////////////////////////////////////////////////////////////////////////
 	// accessors
@@ -88,12 +89,12 @@ public:
 	inline int Frame() const		{ return m_nHUDFrame;		}
 	inline int PlayerInfoBG() const	{ return m_nPlayerInfoBG;	}
 	inline int EnemyInfoBG() const	{ return m_nEnemyInfoBG;	}
-	inline int* FactionImages()		{ return m_nFactions;		}
+	inline int FactionImages(int factionID)	const	{ return m_arrFactions[factionID];	}
 	inline int BlackPixel()	const	{ return m_nBlackPixel;		}
 	inline int QuickBar() const		{ return m_nQBFrame;		}
 	inline int AbilityImages() const{ return m_nAbilityImages;	}
 	inline int WindowFrame() const  { return m_nWindowFrame;	}
-	inline int* MenuBGs()			{ return m_nMenuBGs;		}
+	inline int MenuBGs(eMenuOptionType menu) const	{ return m_arrMenuBGs[menu];	}
 	inline int MenuGlows() const	{ return m_nMainMenuGlows;	}
 	inline int Harp() const			{ return m_nHarp;			}
 	inline int SOATitle() const		{ return m_nSOATitle;		}
@@ -113,7 +114,7 @@ class CAssetsMap : BaseAsset
 
 	CAssetsMap();
 	// TODO::not sure if all these will be loaded up front yet...
-	const int LoadAssets(int index = -1);
+	void LoadAssets(int index = -1);
 
 public:
 	~CAssetsMap()
@@ -137,28 +138,36 @@ class CAssetsUnits : BaseAsset
 	int m_nUnmountedKnightAttacks;
 
 	CAssetsUnits();
-	const int LoadAssets(int index = -1);
+	void LoadAssets(int index = -1);
 	void GetAnimPropsFromFileName( string name, string &unitName, string &animName, int &numFrames, int &frameSize );
 
 public:
 	~CAssetsUnits() {}
 
-	const int UnmountedKnightAttacks()	const	{ return m_nUnmountedKnightAttacks;	}
+	int UnmountedKnightAttacks()	const	{ return m_nUnmountedKnightAttacks;	}
 };
 
 class CAssetsMenuSnds : BaseAsset
 {
 	friend class CAssets;
 
-	int m_nMenuMusic[NUM_MENUS];
+	int m_arrMenuMusic[NUM_MENUS];
+	int m_arrMenuHoverSnd[NUM_MENUOPTION_TYPES];
+	int m_nMenuClickSnd;
+	int m_nInGameBtnInvalid;
+	int m_nInGameBtnClick;
 	
 	CAssetsMenuSnds();
-	const int LoadAssets(int index = -1);
+	void LoadAssets(int index = -1);
 	
 public:
 	~CAssetsMenuSnds() {}
 
-	int* MenuMusic()	{ return m_nMenuMusic; }
+	int MenuMusic(eMenuOptionType menu)		const	{ return m_arrMenuMusic[menu];		}
+	int MenuHoverSnd(eMenuOptionType menu)	const	{ return m_arrMenuHoverSnd[menu];	}
+	int MenuClickSnd()	const						{ return m_nMenuClickSnd;			}
+	int BtnInvalidSnd()	const						{ return m_nInGameBtnInvalid;		}
+	int BtnInGameSnd() const						{ return m_nInGameBtnClick;			}
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -184,22 +193,27 @@ public:
 
 	static CAssets* GetInstance() { static CAssets instance; return &instance;}
 
-	int  LoadGUI  (int index = -1);
-	int  LoadMap  (int index = -1);
-	int  LoadUnits(int index = -1);
-	int  LoadMenuSounds();
+	void LoadNecessaryGUIElements();
+	void LoadMapAssets();
+	void LoadUnitAssets(int index = -1);
+	void LoadMenuSounds();
 	void LoadInGameGUI();	
+	void LoadMenuAssets();
+
+	//////////////////////////////////////////////////////////////////////////
+	// should not be used except for debugging
 	void LoadAllAssets();
+	//////////////////////////////////////////////////////////////////////////
 
 	void Init();
 	void Shutdown();
 
 	//////////////////////////////////////////////////////////////////////////
 	// ACCESSORS
-	inline CAssetsGUI* GetGUIasts()		const {return m_pGUI;	}
-	inline CAssetsMap* GetMapasts()		const {return m_pMap;	}
-	inline CAssetsUnits* GetUnits()		const {return m_pUNITS;	}
-	inline CAssetsMenuSnds* GetMenuSnds() const {return m_pMenuSnds; }
+	inline const CAssetsGUI* const		GetGUIasts()	const { return m_pGUI;		}
+	inline const CAssetsMap* const		GetMapasts()	const { return m_pMap;		}
+	inline const CAssetsUnits* const	GetUnits()		const { return m_pUNITS;	}
+	inline const CAssetsMenuSnds* const	GetMenuSnds()	const { return m_pMenuSnds;	}
 };
 
 #endif

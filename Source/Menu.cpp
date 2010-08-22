@@ -7,7 +7,7 @@
 #include "Wrappers/CSGD_TextureManager.h"
 #include "Wrappers/CSGD_DirectInput.h"
 
-CMenu::CMenu(int bgImageID, int musicID, point& optionsStartPos, eMenuOptionType menuType, MenuOptions& options,
+CMenu::CMenu(int bgImageID, const rect& bgSrc, int musicID, point& optionsStartPos, eMenuOptionType menuType, MenuOptions& options,
 			 RenderPtr renderFunc, UpdatePtr updateFunc, InputPtr inputFunc, bool optionsInLine /*= true*/,
 			 DWORD clr /*= YELLOW_WHITE*/, DWORD hoverClr /*= LIGHT_RED*/, int itemSpacing /*= 30*/, const point& bgPos /*= point(0, 0)*/) 
 	:
@@ -19,7 +19,8 @@ m_nMusicID(musicID),
 m_nMenuItemSpacing(itemSpacing),
 m_dwColor(clr),
 m_dwHoverClr(hoverClr),
-m_ptBGPos(bgPos)
+m_ptBGPos(bgPos),
+m_rBGSrc(bgSrc)
 {
 	int bmfSize = Globals::g_pBitMapFont->GetSize();
 	m_fpRender = renderFunc;
@@ -34,7 +35,7 @@ m_ptBGPos(bgPos)
 		{	// set the options except for this one (we can't click to goto the menu we're already on)
 			if (options[i].Type != m_eType)
 			{
-				options[i].SetRect(rect(thisPt, size(options[i].Text.size() * bmfSize, bmfSize)));
+				options[i].SetRect(rect(thisPt, size(options[i].Text.size() * int((float)bmfSize * OptionsScale), int((float)bmfSize * OptionsScale))));
 				m_vMenuOptions.push_back(options[i]);
 				thisPt.y += m_nMenuItemSpacing;
 			}
@@ -48,6 +49,10 @@ m_ptBGPos(bgPos)
 				m_vMenuOptions.push_back(options[i]);
 		}
 	}
+	if (m_rBGSrc.width() < Globals::g_ptScreenSize.width && m_rBGSrc.height() < Globals::g_ptScreenSize.height)
+	{
+		CenterBGImage();
+	}
 }
 CMenu::~CMenu()
 {
@@ -57,12 +62,12 @@ CMenu::~CMenu()
 void CMenu::Render()
 {
 	if (m_nBGImageID > -1)
- 		Globals::g_pTM->DrawWithZSort(m_nBGImageID, m_ptBGPos.x, m_ptBGPos.y, 1.0f, 1.0f, 1.0f, NULL, 0.0f, 0.0f, 0.0f, 0xaaffffff);
+ 		Globals::g_pTM->DrawWithZSort(m_nBGImageID, m_ptBGPos.x, m_ptBGPos.y, 1.0f, 1.0f, 1.0f, &m_rBGSrc, 0.0f, 0.0f, 0.0f, 0xaaffffff);
 
-	Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->SOATitle(), 270, 40, 1.0f);
+	Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->SOATitle(), 270, 25, 1.0f, 1.0f, 1.0f, &rect(454, 591, 0, 565));
 
 	// draw the title
-	Globals::g_pBitMapFont->DrawStringAutoCenter(gMenuTitles[m_eType], rect(145, 0, 0, Globals::g_ptScreenSize.width), DEPTH_WNDOPTIONS, 2.0f, m_dwColor);
+	Globals::g_pBitMapFont->DrawStringAutoCenter(gMenuTitles[m_eType], rect(145, 0, 0, Globals::g_ptScreenSize.width), DEPTH_WNDOPTIONS, TitleScale, m_dwColor);
 
 	// render options
  	rect r;
@@ -72,7 +77,7 @@ void CMenu::Render()
 		r = (*iter).Rect; 
 		if (m_bOptionsInLine)
 		{ r.right = 0; r.bottom = 0; }
-		Globals::g_pBitMapFont->DrawStringAutoCenter((*iter).Text.c_str(), r, DEPTH_WNDOPTIONS, 1.5f, m_dwColor);
+		Globals::g_pBitMapFont->DrawStringAutoCenter((*iter).Text.c_str(), r, DEPTH_WNDOPTIONS, OptionsScale, m_dwColor);
 	}
 	if (m_pCurrHover)
 	{
@@ -82,7 +87,7 @@ void CMenu::Render()
 		r = m_pCurrHover->Rect; 
 		if (m_bOptionsInLine)
 		{ r.right = 0; r.bottom = 0; }
-		Globals::g_pBitMapFont->DrawStringAutoCenter(m_pCurrHover->Text.c_str(), r, DEPTH_WNDOPTIONS, 1.5f, m_dwHoverClr);
+		Globals::g_pBitMapFont->DrawStringAutoCenter(m_pCurrHover->Text.c_str(), r, DEPTH_WNDOPTIONS, OptionsScale, m_dwHoverClr);
 	}
 
 	// draw the mouse cursor
@@ -96,6 +101,7 @@ void CMenu::Update(double dTimeStep)
 	m_fpUpdate(dTimeStep, this);
 }
 
+static eMenuOptionType prevHov = NUM_MENUOPTION_TYPES;
 bool CMenu::Input(double elapsedTime, const POINT& mousePt)
 {
 	// keyboard input
@@ -121,13 +127,36 @@ bool CMenu::Input(double elapsedTime, const POINT& mousePt)
 		if ( (*iter).Rect.IsPointInRect(mousePt))
 		{
 			m_pCurrHover = &(*iter);
+
+			// play hover sound, only once per option entrance
+			if ((*iter).HoverSnd > -1 && !Globals::g_pFMOD->IsSoundPlaying((*iter).HoverSnd) && prevHov != m_pCurrHover->Type)
+			{
+				// stop any others being played
+				for (MenuOptIter i = m_vMenuOptions.begin(); i != m_vMenuOptions.end(); ++i)
+				{
+					if ((*i).HoverSnd > -1)
+						Globals::g_pFMOD->StopSound((*i).HoverSnd);
+				}
+				Globals::g_pFMOD->PlaySound((*iter).HoverSnd);
+			}
+
+			prevHov = m_pCurrHover->Type;
+
 			if (Globals::g_pDI->MouseButtonPressed(MOUSE_LEFT))
 			{
+				// stop hover sound (if playing) and play click
+				if ((*iter).HoverSnd > -1 && Globals::g_pFMOD->IsSoundPlaying((*iter).HoverSnd))
+					Globals::g_pFMOD->StopSound((*iter).HoverSnd);
+				Globals::g_pFMOD->PlaySound((*iter).ClickSnd);
+
 				(*iter).Action(NULL);
+
 				return true;
 			}
+			return false;
 		}
 	}
+	prevHov = NUM_MENUOPTION_TYPES; // no hover, set to NULL (NUM_MENUOPTION_TYPES == invalid/NULL)
 	return false;
 }
 
@@ -150,6 +179,6 @@ void CMenu::Exit(eMenuOptionType changeTo)
 //////////////////////////////////////////////////////////////////////////
 void CMenu::CenterBGImage()
 {
-	m_ptBGPos = point((Globals::g_ptScreenSize.width >> 1) - (Globals::g_pTM->GetTextureWidth(m_nBGImageID) >> 1), 
-					  (Globals::g_ptScreenSize.height >> 1) - (Globals::g_pTM->GetTextureHeight(m_nBGImageID) >> 1));
+	m_ptBGPos = point((Globals::g_ptScreenSize.width >> 1) - (m_rBGSrc.width() >> 1), 
+					  (Globals::g_ptScreenSize.height >> 1) - (m_rBGSrc.height() >> 1));
 }

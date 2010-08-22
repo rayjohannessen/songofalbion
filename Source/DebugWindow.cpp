@@ -33,7 +33,10 @@ DebugWindow* DebugWindow::GetInstance()
 }
 
 //////////////////////////////////////////////////////////////////////////
-
+void DebugWindow::DebugVoidPtr(void* data)
+{
+	cout << data << endl;
+}
 void DebugWindow::DebugString(const std::string _text)
 {
 	cout << _text.c_str() << endl << endl;

@@ -235,7 +235,7 @@ void CHUD::DrawSelectedObjInfo( )
 			break;
 		}
 
-		Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->FactionImages()[m_pSelectedPlayerObj->GetFactionID()], POS_FACTION.x, POS_FACTION.y, DEPTH_PLAYERINFO, FACTION_SCALE, FACTION_SCALE);
+		Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->FactionImages(m_pSelectedPlayerObj->GetFactionID()), POS_FACTION.x, POS_FACTION.y, DEPTH_PLAYERINFO, FACTION_SCALE, FACTION_SCALE);
 		Globals::g_pBitMapFont->DrawString(m_pSelectedPlayerObj->GetName().c_str(), POS_NAME.x, POS_NAME.y, DEPTH_PLAYERINFO, INFO_TEXT_SCALE);
 	}
 }
@@ -271,7 +271,7 @@ void CHUD::DrawTargetInfo( )
 			break;
 		}
 
-		Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->FactionImages()[m_pSelectedTarget->GetFactionID()], POS_FACTION_T.x, POS_FACTION_T.y, DEPTH_PLAYERINFO, FACTION_SCALE, FACTION_SCALE);
+		Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->FactionImages(m_pSelectedTarget->GetFactionID()), POS_FACTION_T.x, POS_FACTION_T.y, DEPTH_PLAYERINFO, FACTION_SCALE, FACTION_SCALE);
 		Globals::g_pBitMapFont->DrawString(m_pSelectedTarget->GetName().c_str(), POS_NAME_T.x, POS_NAME_T.y, DEPTH_PLAYERINFO, INFO_TEXT_SCALE);
 	}
 }

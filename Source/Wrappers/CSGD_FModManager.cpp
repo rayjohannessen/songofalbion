@@ -127,6 +127,9 @@ int CSGD_FModManager::LoadSound(const char *szFilename, FMOD_MODE unMode )
 		{
 			FMODERR( result );
 		}
+		float freq, vol, pan; int priority;
+		newSound.fmSound->getDefaults(&freq, &vol, &pan, &priority);
+		newSound.fmSound->setDefaults(freq, 0.3f, pan, priority);
 
 		//	push new allocated sound onto vector
 		FMOD::Channel* channel;
@@ -259,15 +262,19 @@ bool CSGD_FModManager::SetVolume( int nID, float fVolume )
 	FMOD_RESULT result;
 	bool bOutcome = false;
 
-	//	iterate all the channels in this sound
-	list<FMOD::Channel*>::iterator iter = m_SoundList[nID].m_SoundChannels.begin();
-	while( iter != m_SoundList[nID].m_SoundChannels.end() ) 
+	//	iterate all the channels in all sounds
+	vector<tSoundInfo>::iterator slIter = m_SoundList.begin();
+	for (; slIter != m_SoundList.end(); ++slIter)
 	{
-		if( ( result = (*iter)->isPlaying( &bOutcome ) ) == FMOD_OK ) 
+		list<FMOD::Channel*>::iterator iter = (*slIter).m_SoundChannels.begin();
+		while( iter != (*slIter).m_SoundChannels.end() ) 
 		{
-			(*iter)->setVolume( fVolume );
+			if( ( result = (*iter)->isPlaying( &bOutcome ) ) == FMOD_OK ) 
+			{
+				(*iter)->setVolume( fVolume );
+			}
+			iter++;
 		}
-		iter++;
 	}
 
 	//	return the outcome of this function

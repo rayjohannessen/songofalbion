@@ -8,7 +8,7 @@ CAnimationsManager* CAnimationsManager::GetInstance()
 	return &instance;
 }
 
-void CAnimationsManager::AddAnim(const string& animName, AnimProperties& anim)
+void CAnimationsManager::AddAnim(const string& animName, const AnimProperties& anim)
 {
 	m_mAnimationsInfo[animName].push_back(anim);
 }

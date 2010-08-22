@@ -40,24 +40,20 @@ CGame* CGame::GetInstance(void)
 void CGame::Initialize(HWND hWnd, HINSTANCE hInstance, int nScreenWidth, int nScreenHeight, bool bIsWindowed)
 {
 	m_pTimer = new CTimer();
-
 	m_nScreenWidth = nScreenWidth;
 	m_nScreenHeight = nScreenHeight;
 
 	// initialize all the globals (d3d, directInput, fmod, assets, etc...)
 	Globals::InitGlobals(hWnd, hInstance, nScreenWidth, nScreenHeight, bIsWindowed);
-
 	SetIsRunning(true);
-
 	ChangeMenu(MOT_MAIN);
 	m_bInGameplay = false;
 }
 
 void CGame::Shutdown()
 {
-	delete m_pTimer;
+	SAFE_DELETE(m_pTimer);
 	ChangeState(NULL);
-
 	Globals::ShutdownGlobals();
 }
 
