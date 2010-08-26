@@ -42,7 +42,7 @@ CUIQuickBar::~CUIQuickBar()
 void CUIQuickBar::Render()
 {
 	// TODO:: get image id for the actual bar from assets
-	Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->QuickBar(), m_ptScreenPos.x, m_ptScreenPos.y, DEPTH_QUICKBAR);
+	Globals::g_pTM->Render(Globals::g_pAssets->GetGUIasts()->QuickBar(), m_ptScreenPos.x, m_ptScreenPos.y, DEPTH_QUICKBAR);
 
 	if (!m_pOwner)
 		return;	// nothing more to render
@@ -51,7 +51,7 @@ void CUIQuickBar::Render()
 	for (unsigned i = 0; i < NUM_QB_SLOTS; ++i)
 	{
 		if (m_arrQBSlots[i])
-			Globals::g_pTM->DrawWithZSort(m_arrQBSlots[i]->ImageID, m_rRects[i].left, m_rRects[i].top, DEPTH_QBICONS, 1.0f, 1.0f, &m_arrQBSlots[i]->SrcRect);
+			Globals::g_pTM->Render(m_arrQBSlots[i]->ImageID, m_rRects[i].left, m_rRects[i].top, DEPTH_QBICONS, 1.0f, 1.0f, &m_arrQBSlots[i]->SrcRect);
 	}
 	// draw the highlight around the currently selected attack ability
 	if (m_nCurrSelectedAttack > -1)
@@ -62,7 +62,7 @@ void CUIQuickBar::Render()
 		if (m_nCurrSelectedDefense > -1 && m_nCurrSelectedAttack == m_nCurrSelectedDefense)	// if the same ability is selected for both att/def, draw half/half
 			src = rect(point(0, 0), point(QBSLOT_SIZE.x >> 1, QBSLOT_SIZE.y));
 
-		Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->AbilityImages(), left, top, 
+		Globals::g_pTM->Render(Globals::g_pAssets->GetGUIasts()->AbilityImages(), left, top, 
 									DEPTH_QBICONHIGHLT, 1.0f, 1.0f, &src, 0.0f, 0.0f, 0.0f, DARKBLUE);
 	}
 	// draw the highlight around the currently selected defense ability
@@ -77,13 +77,13 @@ void CUIQuickBar::Render()
 			left += 16;
 		}
 
-		Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->AbilityImages(), 
+		Globals::g_pTM->Render(Globals::g_pAssets->GetGUIasts()->AbilityImages(), 
 					left, top, DEPTH_QBICONHIGHLT, 1.0f, 1.0f, &src, 0.0f, 0.0f, 0.0f, RED);
 	}
 
 	// draw the drag object, if valid
 	if (m_pDragQBObj)
-		Globals::g_pTM->DrawWithZSort(m_pDragQBObj->ImageID, // set the icon to draw so the middle is at the tip of the mouse
+		Globals::g_pTM->Render(m_pDragQBObj->ImageID, // set the icon to draw so the middle is at the tip of the mouse
 									m_ptMousePos.x - int((float)QBSLOT_SIZE.x * 0.5f), m_ptMousePos.y - int((float)QBSLOT_SIZE.y * 0.5f), 
 									DEPTH_QBOBJDRAG, 1.0f, 1.0f, &m_pDragQBObj->SrcRect);
 }

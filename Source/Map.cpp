@@ -82,7 +82,7 @@ void CMap::Render()
 
 	////////////////////////////////////////////////////////////////////////// 
 	// draw the current mouse image
-	Globals::g_pTM->DrawWithZSort(m_nCurrMouseID, m_ptMouseScrn.x, m_ptMouseScrn.y, 0.0f, 1.0f, 1.0f);
+	Globals::g_pTM->Render(m_nCurrMouseID, m_ptMouseScrn.x, m_ptMouseScrn.y, 0.0f, 1.0f, 1.0f);
 }
 void CMap::DrawTiles()
 {
@@ -112,10 +112,10 @@ void CMap::DrawTiles()
 			{ BIT_ON(m_nMapFlags, MF_MOUSE_BELOW_BTM); break; }	// no need to draw any more tiles (still draw any free-placed tiles)
 
 			if (m_pTilesL1[tileID].DestXID() > -1)
-				Globals::g_pTM->DrawWithZSort( m_pTilesL1[tileID].ImageID(), mapPt.x, mapPt.y, DEPTH_TILES, 1.0f, 1.0f, 
+				Globals::g_pTM->Render( m_pTilesL1[tileID].ImageID(), mapPt.x, mapPt.y, DEPTH_TILES, 1.0f, 1.0f, 
 					m_pTilesL1[tileID].SourceRect(), 0.0f, 0.0f, 0.0f, m_pTilesL1[tileID].Color());
 			if (m_pTilesL2[tileID].DestXID() > -1)
-				Globals::g_pTM->DrawWithZSort( m_pTilesL2[tileID].ImageID(), mapPt.x, mapPt.y, DEPTH_TILES, 1.0f, 1.0f,
+				Globals::g_pTM->Render( m_pTilesL2[tileID].ImageID(), mapPt.x, mapPt.y, DEPTH_TILES, 1.0f, 1.0f,
 					m_pTilesL2[tileID].SourceRect(), 0.0f, 0.0f, 0.0f, m_pTilesL2[tileID].Color());
 		}
 		if (BIT_TEST_ON(m_nMapFlags, MF_MOUSE_BELOW_BTM))
@@ -123,8 +123,8 @@ void CMap::DrawTiles()
 	}
 	for (int i = 0; i < m_nFreeTileCount; ++i)	// TODO:: draw with z?
 	{
-		Globals::g_pTM->Draw( m_pFreeTiles[i].ImageID(), m_pFreeTiles[i].DestX(), m_pFreeTiles[i].DestY(), 1.0f, 1.0f, 
-			m_pFreeTiles[i].SourceRect(), /*0, 0, m_pFreeTiles[i].Rotation(),*/ D3DCOLOR_ARGB(m_pFreeTiles[i].Alpha(), 255, 255, 255));
+		Globals::g_pTM->Render( m_pFreeTiles[i].ImageID(), m_pFreeTiles[i].DestX(), m_pFreeTiles[i].DestY(), DEPTH_TILES, 1.0f, 1.0f, 
+			m_pFreeTiles[i].SourceRect(), 0.0f, 0.0f, m_pFreeTiles[i].Rotation(), D3DCOLOR_ARGB(m_pFreeTiles[i].Alpha(), 255, 255, 255));
 	}
 }
 
@@ -187,11 +187,12 @@ eMapInputRet CMap::Input(double dTimeStep, const POINT& mouse)
 	if (NULL != (m_pCurrHoverObject = HoverObject(m_ptCurrMouseTile)) )
 	{
 		m_ptCurrMouseTile = m_pCurrHoverObject->GetCoord();	// set mouse to hover object's tile NO MATTER WHAT
-		m_pCurrHoverObject->SetHovered(true);
+		DWORD clr;
 		if (m_pCurrHoverObject->GetFactionID() == Globals::GetCurrPlayer()->GetProfile()->nFactionID)
-			m_pCurrHoverObject->SetColor(DARKBLUE);
+			clr = DARKBLUE;
 		else
-			m_pCurrHoverObject->SetColor(DARKRED);
+			clr = DARKRED;
+		m_pCurrHoverObject->SetInputStatus(IT_HOVER, clr);
 	}
 	HandleMouseInput();
 
@@ -225,19 +226,16 @@ bool CMap::DetermineMoveSpecifics(const point& pt)
 		if ( !m_pEnemyObj )	// there's not currently a target, so just select as new target
 		{
 			m_pEnemyObj = pTarget;
-			m_pEnemyObj->SetColor(DARKRED);
-			m_pEnemyObj->SetHovered(true);
+			m_pEnemyObj->SetInputStatus(IT_SELECT_L, DARKRED);
 		}
 		else
 		{
 			if (pTarget != m_pEnemyObj)	// in case there's already a target selected, simply select it (NO attack) and deselect current
 			{	// deselect current target
-				m_pEnemyObj->SetColor(WHITE);
-				m_pEnemyObj->SetHovered(false);
+				m_pEnemyObj->SetInputStatus(IT_DESELECT, WHITE);
 				// set the new target
 				m_pEnemyObj = pTarget;
-				m_pEnemyObj->SetColor(DARKRED);
-				m_pEnemyObj->SetHovered(true);
+				m_pEnemyObj->SetInputStatus(IT_SELECT_L, DARKRED);
 			}
 			else	// otherwise, the current target was clicked again, begin pathfinding to determine if reachable
 			{
@@ -965,7 +963,7 @@ void CMap::HandleViewScroll( const POINT &mouse, double dTimeStep )
 	}
 	else {BIT_OFF(m_nMapFlags, MF_DO_SCROLL_N); BIT_OFF(m_nMapFlags, MF_IN_SCROLL_AREA_N);}
 	//////////////////////////////////////////////////////////////////////////
-	if (Globals::g_pDI->KeyDown(DIK_RIGHTARROW) || mouse.x >= m_nScreenWidth/*m_rViewport.right*/ - SCROLL_AREA)
+	if (Globals::g_pDI->KeyDown(DIK_RIGHTARROW) || mouse.x >= m_nScreenWidth - SCROLL_AREA)
 	{
 		if (BIT_TEST_ON(m_nMapFlags, MF_DO_SCROLL_E) || Globals::g_pDI->KeyDown(DIK_RIGHTARROW))
 			ScrollMapRight(dTimeStep);
@@ -974,14 +972,14 @@ void CMap::HandleViewScroll( const POINT &mouse, double dTimeStep )
 	}
 	else {BIT_OFF(m_nMapFlags, MF_DO_SCROLL_E); BIT_OFF(m_nMapFlags, MF_IN_SCROLL_AREA_E);}
 	//////////////////////////////////////////////////////////////////////////
-	if (Globals::g_pDI->KeyDown(DIK_LEFTARROW) || mouse.x <= /*m_rViewport.left +*/ SCROLL_AREA)
+	if (Globals::g_pDI->KeyDown(DIK_LEFTARROW) || mouse.x <= SCROLL_AREA)
 	{
 		if (BIT_TEST_ON(m_nMapFlags, MF_DO_SCROLL_W) || Globals::g_pDI->KeyDown(DIK_LEFTARROW))
 			ScrollMapLeft(dTimeStep);
 		else
 			BIT_ON(m_nMapFlags, MF_IN_SCROLL_AREA_W);
 	}
-	else {BIT_OFF(m_nMapFlags, MF_DO_SCROLL_W); BIT_OFF(m_nMapFlags, MF_IN_SCROLL_AREA_W);}
+	else { BIT_OFF(m_nMapFlags, MF_DO_SCROLL_W); BIT_OFF(m_nMapFlags, MF_IN_SCROLL_AREA_W); }
 	//////////////////////////////////////////////////////////////////////////
 
 	// NOT in any scroll area, reset & stop the timer
@@ -1037,6 +1035,9 @@ bool CMap::HandleKBInput()
 	// bring up combat skills (if applicable)
  	else if (Globals::g_pDI->KeyPressed(DIK_C) && m_pCurrPlayerSelectedObj)
 		Globals::g_pHUD->AddWindow(Globals::g_pHUD->GetButton(BL_SLOT_1_1)->SimulatePressed());
+	// show info screen of currently selected object
+	else if (Globals::g_pDI->KeyPressed(DIK_TAB) && m_pCurrPlayerSelectedObj)
+		m_pCurrPlayerSelectedObj->ToggleDisplay();
 	// skip current unit
 	else if (Globals::g_pDI->KeyPressed(DIK_SPACE) && m_pCurrPlayerSelectedObj)
 		Globals::g_pHUD->GetButton(BL_SLOT_2_1)->SimulatePressed();
@@ -1063,8 +1064,7 @@ bool CMap::HandleKBInput()
 
 void CMap::Deselect(CObject*& obj)
 {
-	obj->SetColor(WHITE);
-	obj->SetHovered(false);
+	obj->SetInputStatus(IT_DESELECT, WHITE);
 	obj = NULL;
 }
 void CMap::Select(CObject* const obj)
@@ -1075,8 +1075,7 @@ void CMap::Select(CObject* const obj)
 		if (m_pCurrPlayerSelectedObj)
 			Deselect(m_pCurrPlayerSelectedObj);
 		m_pCurrPlayerSelectedObj = obj;
-		m_pCurrPlayerSelectedObj->SetHovered(true);
-		m_pCurrPlayerSelectedObj->SetColor(DARKBLUE);
+		m_pCurrPlayerSelectedObj->SetInputStatus(IT_SELECT_L, DARKBLUE);
 
 		// if there's an enemy already selected, and curr player's is an OBJ_UNIT, determine if we need to face it
 		if (m_pEnemyObj && m_pCurrPlayerSelectedObj->GetType() == OBJ_UNIT)
@@ -1100,8 +1099,7 @@ void CMap::Select(CObject* const obj)
 		else if (m_pEnemyObj)	// there was another enemy object, deselect it first
 			Deselect(m_pEnemyObj);
 		m_pEnemyObj = obj;
-		m_pEnemyObj->SetHovered(true);
-		m_pEnemyObj->SetColor(DARKRED);
+		m_pEnemyObj->SetInputStatus(IT_SELECT_L, DARKRED);
 
 		// if we have a unit selected, determine if we need to face the newly selected enemy
 		if (m_pCurrPlayerSelectedObj && m_pCurrPlayerSelectedObj->GetType() == OBJ_UNIT)
@@ -1119,9 +1117,6 @@ void CMap::InitiateAttack(bool setfacing /*= true*/)
 	CUnit* playerUnit = ((CUnit*)m_pCurrPlayerSelectedObj);
 	if (setfacing)
 		playerUnit->FaceTarget(m_pEnemyObj->GetCoord());
-
-// TODO:: SETUP ATTACK WHERE ATTACKER GOES TO ENEMY TILE PART-WAY, DOES COMBAT, AND STAYS (unless a special ability allows it either to leave)
-	// also need to decrement stamina for the terrain cost
 
 	playerUnit->DecrementStamina(playerUnit->GetCurrAttackAbility()->GetCombatProps().AttackStam);
 //	BIT_ON(m_nMapFlags, MF_ATTACKING);
@@ -1219,7 +1214,7 @@ void CMap::SelectObj(CObject*& obj, bool deselectAll /*= false*/)
 		return;
 	}
 
-	// If we reach this point, an object is selected, if it's an enemy, turn it red, if it's yours, turn it blue
+	// If we reach this point, an object is selected
 	Select(obj);
 }
 

@@ -38,7 +38,7 @@ void CBitmapFont::DrawString(const char* szString, int posX, int posY, float pos
 		int id = (int)(ch - m_pCurrBMProf->StartChar);
 		rect rcell = CellAlgorithm(id);
 
-		CSGD_TextureManager::GetInstance()->DrawWithZSort(m_pCurrBMProf->ID, posX, posY, posZ, scale, scale, &rcell, 0.f, 0.f, 0.f, dwcolor);
+		CSGD_TextureManager::GetInstance()->Render(m_pCurrBMProf->ID, posX, posY, posZ, scale, scale, &rcell, 0.f, 0.f, 0.f, dwcolor);
 		posX += int((m_pCurrBMProf->Size + SPACING_MOD) * scale);
 	}
 }
@@ -77,7 +77,7 @@ point CBitmapFont::DrawStringAutoCenter (const char* szString, const rect& r, fl
 		int nID = (int)(ch  - m_pCurrBMProf->StartChar);
 		rect rCell = CellAlgorithm(nID);
 
-		CSGD_TextureManager::GetInstance()->DrawWithZSort(m_pCurrBMProf->ID, posX, posY, zPos, 
+		CSGD_TextureManager::GetInstance()->Render(m_pCurrBMProf->ID, posX, posY, zPos, 
 															fScale, fScale, &rCell, 0.f, 0.f, 0.f, dwColor);
 
 		posX += (int)totalSize;

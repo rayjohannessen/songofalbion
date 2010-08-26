@@ -11,36 +11,38 @@
 #include "CombatSkill.h"
 #include "Pathfinding.h"
 #include "Map.h"
+#include "Wrappers/CSGD_DirectInput.h"
 using namespace Pathfinding;
 
 CObject::CObject() :
 	m_nImageID(-1),
-	m_bHovered(false),
+	m_eCurrInputStatus(IT_NONE),
 	m_strName("BOB"),
 	m_pCurrAttackAbility(NULL),
 	m_pCurrDefenseAbility(NULL)
 { }
 
 CObject::CObject(int type, point coord, point scrnPos, string name, const char* faction, int factionID) :
+	m_bDisplayInfo(false),
 	m_nImageID(-1),
 	m_nType(type),
 	m_rSrc(0, 128, 0, 128),
+	m_rSelectionRect(scrnPos, point(128, 128)),
 	m_strName(name),
 	m_ptScreenPos(scrnPos),	// gives us the top-left screen pos (used to make the rect for selection)
 	m_ptCoord(coord),
 	m_ptSize(0, 0),
 	m_szFaction(faction),
 	m_nFactionID(factionID),
-	m_bHovered(false),
 	m_fScaleX(1.0f),
 	m_fScaleY(1.0f),
 	m_dwColor(WHITE),
 	m_pCurrAttackAbility(NULL),
 	m_pCurrDefenseAbility(NULL),
-	m_fZDepth(DEPTH_OBJECT)
+	m_fZDepth(DEPTH_OBJECT),
+	m_eCurrInputStatus(IT_NONE),
+	m_eDefaultAbilityType(BN_COMBAT_SKILLS)
 {
-	m_rSelectionRect = rectf(m_ptScreenPos, point(128, 128));
-
 	// set up the offset so the object is centered on the tiles
 	switch (type)
 	{
@@ -61,8 +63,8 @@ CObject::CObject(int type, point coord, point scrnPos, string name, const char* 
 			m_fZDepth = DEPTH_BUILDING;
 		}break;		
 	}
-	m_eDefaultAbilityType = BN_COMBAT_SKILLS;
 	
+	// setup starting abilities and quick bar slots
 	Globals::g_pAbilitiesManager->GetUnlockedStartingAbilities(m_strName, m_mAbilities);
 	ClearQBSlotORSlots();
 	AbilitiesIter iter, end; unsigned i;
@@ -93,11 +95,11 @@ void CObject::Render(const rect& viewPort )
 {
 	// units draw themselves...
 	if (m_nType != OBJ_UNIT)																
-		Globals::g_pTM->DrawWithZSort(GetImageID(), (int)m_ptScreenPos.x, (int)m_ptScreenPos.y, m_fZDepth, m_fScaleX, m_fScaleY, GetSrc(), 0.0f, 0.0f, 0.0f, m_dwColor);	
+		Globals::g_pTM->Render(GetImageID(), (int)m_ptScreenPos.x, (int)m_ptScreenPos.y, m_fZDepth, m_fScaleX, m_fScaleY, GetSrc(), 0.0f, 0.0f, 0.0f, m_dwColor);	
 	
-	if (m_bHovered)
+	if (m_eCurrInputStatus < IT_DESELECT)	// this means anything needing to draw for being hovered/selected
 	{
-		Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->FactionImages(m_nFactionID), (int)m_ptScreenPos.x+32, (int)m_ptScreenPos.y, m_fZDepth, 0.8f, 0.8f);
+		Globals::g_pTM->Render(Globals::g_pAssets->GetGUIasts()->FactionImages(m_nFactionID), (int)m_ptScreenPos.x+32, (int)m_ptScreenPos.y, m_fZDepth, 0.8f, 0.8f);
 
 		// TODO::add health bars on hover
 	}
@@ -152,7 +154,6 @@ void CObject::CopyAll( CObject &obj )
 	m_ptSize		= obj.GetSize();
 	m_szFaction 	= obj.GetFaction();
 	m_nFactionID	= obj.GetFactionID();
-	m_bHovered  	= obj.GetIsHovered();
 	m_rSelectionRect= obj.GetSelectionRect();
 	m_ptOffset		= obj.GetOS();
 	m_fScaleX		= obj.GetScaleX();
@@ -162,6 +163,7 @@ void CObject::CopyAll( CObject &obj )
 	m_pCurrAttackAbility	= obj.GetCurrAttackAbility();
 	m_pCurrDefenseAbility	= obj.GetCurrDefenseAbility();
 	m_eDefaultAbilityType	= obj.GetDefAbilityType();
+	m_eCurrInputStatus		= obj.GetCurrInputStatus();
 	m_mAbilities	= obj.GetAbilitiesMap();
 	for (unsigned i = 0; i < NUM_QB_SLOTS; ++i)
 		m_arrQBSlots[i] = obj.GetQBSlots()[i];

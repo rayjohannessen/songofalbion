@@ -53,7 +53,7 @@ CUIWindowBase* CButton::SimulatePressed()
 
 void CButton::Render()
 {
-	Globals::g_pTM->DrawWithZSort(m_nState, m_Rect.left, m_Rect.top, DEPTH_BUTTON);
+	Globals::g_pTM->Render(m_nState, m_Rect.left, m_Rect.top, DEPTH_BUTTON);
 
 	if (m_nState == m_nImageIDdown)
 		Globals::g_pBitMapFont->DrawStringAutoCenter(m_strText.c_str(), m_Rect, DEPTH_BUTTONTXT, TEXT_SCALE, GREY);

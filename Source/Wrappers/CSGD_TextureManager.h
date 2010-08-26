@@ -199,9 +199,9 @@ public:
 	//	NOTE:	Drawing a section of an image will only work properly if 
 	//			that image is a power of 2!
 	///////////////////////////////////////////////////////////////////
-	bool Draw(int nID, int nX, int nY, float fScaleX = 1.0f, float fScaleY = 1.0f,
-		rect* pSection = NULL, /*float fRotCenterX = 0.0f, float fRotCenterY = 0.0f, float fRotation = 0.0f,*/ DWORD dwColor = 0xFFFFFFFF);
+// 	bool Draw(int nID, int nX, int nY, float fScaleX = 1.0f, float fScaleY = 1.0f,
+// 		rect* pSection = NULL, /*float fRotCenterX = 0.0f, float fRotCenterY = 0.0f, float fRotation = 0.0f,*/ DWORD dwColor = 0xFFFFFFFF);
 
-	bool DrawWithZSort(int nID, int nX, int nY, float nZ, float fScaleX = 1.0f, float fScaleY = 1.0f,
+	bool Render(int nID, int nX, int nY, float nZ, float fScaleX = 1.0f, float fScaleY = 1.0f,
 		rect* const pSection = NULL, float fRotCenterX = 0.0f, float fRotCenterY = 0.0f, float fRotation = 0.0f, DWORD dwColor = 0xFFFFFFFF);
 };

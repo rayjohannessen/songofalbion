@@ -74,7 +74,7 @@ void CUIOptionsWindow::Update(float dTimeStep)
 void CUIOptionsWindow::Render()
 {
 	// the window bg
-	Globals::g_pTM->DrawWithZSort(m_nImageID, windowRect().left, windowRect().top, zPos(), scale().x, scale().y, NULL, 0.0f, 0.0f, 0.0f, bgClr());
+	Globals::g_pTM->Render(m_nImageID, windowRect().left, windowRect().top, zPos(), scale().x, scale().y, NULL, 0.0f, 0.0f, 0.0f, bgClr());
 
 	// the title
 	if (title().size())
@@ -135,31 +135,31 @@ void CUIOptionsWindow::DrawFrame()
 	// sides
 	//////////////////////////////////////////////////////////////////////////
 	// top
-	Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->WindowFrame(), windowRect().left, windowRect().top-12, zPosTxtFrame(), 
+	Globals::g_pTM->Render(Globals::g_pAssets->GetGUIasts()->WindowFrame(), windowRect().left, windowRect().top-12, zPosTxtFrame(), 
 		m_fFrameWMultiplier, 1.0f, &(rect)sideSrc, 0.0f, 0.0f, 0.0f, frameClr());	
 	// btm
-	Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->WindowFrame(), windowRect().left, windowRect().bottom-5, zPosTxtFrame(), 
+	Globals::g_pTM->Render(Globals::g_pAssets->GetGUIasts()->WindowFrame(), windowRect().left, windowRect().bottom-5, zPosTxtFrame(), 
 		m_fFrameWMultiplier, 0.95f, &(rect)sideSrc, 0.0f, 0.0f, 0.0f, frameClr());	
 	// left
-	Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->WindowFrame(), windowRect().left+5, windowRect().top, zPosTxtFrame(), 
+	Globals::g_pTM->Render(Globals::g_pAssets->GetGUIasts()->WindowFrame(), windowRect().left+5, windowRect().top, zPosTxtFrame(), 
 		0.95f, m_fFrameHMultiplier, &(rect)sideSrc, 0.0f, 0.0f, 1.57f, frameClr());
 	// right
-	Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->WindowFrame(), windowRect().right+12, windowRect().top, zPosTxtFrame(), 
+	Globals::g_pTM->Render(Globals::g_pAssets->GetGUIasts()->WindowFrame(), windowRect().right+12, windowRect().top, zPosTxtFrame(), 
 		0.95f, m_fFrameHMultiplier, &(rect)sideSrc, 0.0f, 0.0f, 1.57f, frameClr());
 
 	//////////////////////////////////////////////////////////////////////////
 	// corners
 	//////////////////////////////////////////////////////////////////////////
 	// top-left
-	Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->WindowFrame(), windowRect().left-cornerOS, windowRect().top-cornerOS, zPosTxtFrame(), 
+	Globals::g_pTM->Render(Globals::g_pAssets->GetGUIasts()->WindowFrame(), windowRect().left-cornerOS, windowRect().top-cornerOS, zPosTxtFrame(), 
 		1.0, 1.0f, &(rect)cornerSrcTL, 0.0f, 0.0f, 0.0f, frameClr());
 	// top-right
-	Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->WindowFrame(), windowRect().right-cornerSrcTL.width()+cornerOS, windowRect().top-cornerOS, zPosTxtFrame(), 
+	Globals::g_pTM->Render(Globals::g_pAssets->GetGUIasts()->WindowFrame(), windowRect().right-cornerSrcTL.width()+cornerOS, windowRect().top-cornerOS, zPosTxtFrame(), 
 		1.0, 1.0f, &(rect)cornerSrcTR, 0.0f, 0.0f, 0.0f, frameClr());
 	// btm-left
-	Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->WindowFrame(), windowRect().left-cornerOS, windowRect().bottom-cornerSrcBL.height()+cornerOS+1, zPosTxtFrame(), 
+	Globals::g_pTM->Render(Globals::g_pAssets->GetGUIasts()->WindowFrame(), windowRect().left-cornerOS, windowRect().bottom-cornerSrcBL.height()+cornerOS+1, zPosTxtFrame(), 
 		1.0, 1.0f, &(rect)cornerSrcBL, 0.0f, 0.0f, 0.0f, frameClr());
 	// btm-right
-	Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->WindowFrame(), windowRect().right-cornerSrcBR.width()+cornerOS, windowRect().bottom-cornerSrcBR.height()+cornerOS+1, zPosTxtFrame(), 
+	Globals::g_pTM->Render(Globals::g_pAssets->GetGUIasts()->WindowFrame(), windowRect().right-cornerSrcBR.width()+cornerOS, windowRect().bottom-cornerSrcBR.height()+cornerOS+1, zPosTxtFrame(), 
 		1.0, 1.0f, &(rect)cornerSrcBR, 0.0f, 0.0f, 0.0f, frameClr());
 }

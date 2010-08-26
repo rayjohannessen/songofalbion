@@ -182,5 +182,5 @@ void COption::Render(float zPos, float scale, DWORD color)
 	point strPos = Globals::g_pBitMapFont->DrawStringAutoCenter(Name.c_str(), m_Rect, zPos, scale, color);
 	// draw the ability's icon to the left of the string
 	if (m_pQBObj)
-		Globals::g_pTM->DrawWithZSort(m_pQBObj->ImageID, strPos.x - 42, strPos.y - 10, zPos, 1.0f, 1.0f, &m_pQBObj->SrcRect, 0.0f, 0.0f, 0.0f, color);
+		Globals::g_pTM->Render(m_pQBObj->ImageID, strPos.x - 42, strPos.y - 10, zPos, 1.0f, 1.0f, &m_pQBObj->SrcRect, 0.0f, 0.0f, 0.0f, color);
 }

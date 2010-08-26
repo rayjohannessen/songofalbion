@@ -29,6 +29,7 @@ public:
 	void RemoveObj(CPlayer* player, CObject* obj);
 	//////////////////////////////////////////////////////////////////////////
 
+	void Input(const POINT& mouse);
 	void Update(double fElapsed, const pointf* moveAmt = NULL);
 	void Render();
 
