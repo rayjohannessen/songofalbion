@@ -14,6 +14,7 @@ L - selects the Llogress faction
 GUI--------------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------
 C - Brings up Combat Ability window for currently selected unit
+TAB - Brings up info/inventory screen of currently selected object
 ESC - Closes any open windows, otherwise brings up Menu window
 
   QUICK BAR (QB)

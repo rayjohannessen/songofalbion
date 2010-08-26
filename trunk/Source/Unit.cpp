@@ -217,7 +217,7 @@ void CUnit::Render( const rect& viewPort )
 	if (TestOnScreen(viewPort)) // don't draw if it's not onscreen
 	{
 		CObject::Render(viewPort);
-		Globals::g_pTM->DrawWithZSort(
+		Globals::g_pTM->Render(
 			m_mAnimations[m_strCurrAnim]->GetImageID(), 
 			(int)m_ptScreenPos.x, (int)m_ptScreenPos.y, m_fZDepth,
 			m_fScaleX, m_fScaleY, &m_mAnimations[m_strCurrAnim]->GetSourceRect(), 0.0f, 0.0f, 0.0f, m_dwColor);

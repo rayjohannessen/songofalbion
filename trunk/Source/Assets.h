@@ -5,17 +5,18 @@
 //				that are quick to load loaded up front and done for good.
 //				other assets such as units, which have tons of frames of anims,
 //				will be able to be loaded the first time they are used
-//				
-//////////////////////////////////////////////////////////////////////////
-//	Class: BaseAsset
-//				The BaseAsset class will be responsible for setting up the generic
-//				variables such as various color keys.
+//
 //////////////////////////////////////////////////////////////////////////
 #ifndef ASSETS_H
 #define ASSETS_H
 
 #include "HUD.h"
 
+//////////////////////////////////////////////////////////////////////////
+//	Class: BaseAsset
+//				The BaseAsset class will be responsible for setting up the generic
+//				variables such as various color keys.
+//////////////////////////////////////////////////////////////////////////
 class BaseAsset
 {
 	string m_strPath;
@@ -50,6 +51,7 @@ public:
 //////////////////////////////////////////////////////////////////////////
 
 #include "MenuDefines.h"
+#include "UIObjectInfoBase.h"
 
 class CAssetsGUI : BaseAsset
 {
@@ -67,10 +69,18 @@ class CAssetsGUI : BaseAsset
 	int m_nEnemyInfoBG;
 	int m_nWindowFrame;
 	int m_arrFactions[NUM_FACTIONS];
+
+	// menus
 	int m_arrMenuBGs[NUM_MENUS];
 	int m_nMainMenuGlows;
 	int m_nHarp;
 	int m_nSOATitle;
+
+	// object info windows
+	int m_nInventory[NUM_OIT];
+	int m_nEquipped[NUM_OIT];
+	int m_nInfo[NUM_OIT];
+	int m_nHoverIndicator;
 
 	CAssetsGUI();
 	// TODO::not sure if all these will be loaded up front yet...
@@ -94,10 +104,16 @@ public:
 	inline int QuickBar() const		{ return m_nQBFrame;		}
 	inline int AbilityImages() const{ return m_nAbilityImages;	}
 	inline int WindowFrame() const  { return m_nWindowFrame;	}
+	// menus
 	inline int MenuBGs(eMenuOptionType menu) const	{ return m_arrMenuBGs[menu];	}
 	inline int MenuGlows() const	{ return m_nMainMenuGlows;	}
 	inline int Harp() const			{ return m_nHarp;			}
 	inline int SOATitle() const		{ return m_nSOATitle;		}
+	// object info windows
+	inline int Inventory(eObjectInfoType type) const { return m_nInventory[type]; }
+	inline int Equipped(eObjectInfoType type)  const { return m_nEquipped[type];	 }
+	inline int Info(eObjectInfoType type)	   const { return m_nInfo[type];		 }
+	inline int HoverIndicator()				   const { return m_nHoverIndicator;	 }
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -113,7 +129,6 @@ class CAssetsMap : BaseAsset
 	int m_nCastle;
 
 	CAssetsMap();
-	// TODO::not sure if all these will be loaded up front yet...
 	void LoadAssets(int index = -1);
 
 public:

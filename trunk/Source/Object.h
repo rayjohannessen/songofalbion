@@ -13,8 +13,9 @@
 #include "Pathfinding.h"
 using namespace Pathfinding;
 
-enum eObjType	{OBJ_CITY, OBJ_UNIT, OBJ_BUILDING, };
+enum eObjType	{ OBJ_CITY, OBJ_UNIT, OBJ_BUILDING, };
 enum eAbSelType { AST_ATTACK = MOUSE_LEFT, AST_DEFENSE = MOUSE_RIGHT, };
+enum eInputType	{ IT_HOVER, IT_SELECT_L, IT_SELECT_R, IT_DESELECT, IT_NONE, };
 
 class CCombatSkill;
 
@@ -27,7 +28,11 @@ class CObject
 	rect	m_rSrc;		// source from the city images sheet
 
 protected:
+
+	bool	m_bDisplayInfo;	// the info screen master display switch
+
 	eButtonName m_eDefaultAbilityType;
+	eInputType	m_eCurrInputStatus;		// if this object is hovered/selected...
 	// selection variables (used for units primarily)
 	string		m_strName;
 	pointf		m_ptScreenPos;	// where the top-left of the selection rect starts
@@ -35,7 +40,6 @@ protected:
 	point		m_ptSize;		// width and height (x, y)
 	const char* m_szFaction;	// who owns this object (player, pc1, pc2...)
 	short		m_nFactionID;
-	bool		m_bHovered;		// notify object to display hover info
 	rectf		m_rSelectionRect;// selectable area of the object for the mouse
 
 	// drawing variables
@@ -72,6 +76,13 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	virtual void Update(double dTimeStep, const pointf* moveAmt = NULL);
 
+	//////////////////////////////////////////////////////////////////////////
+	//	FUNCTION: Input
+	//
+	//
+	//////////////////////////////////////////////////////////////////////////
+	virtual void Input(const POINT& mouse) {}
+
 	// uses the map's viewport to determine if the object needs to be rendered
 	bool TestOnScreen(const rect& viewPort);
 	bool IsOnQuickBar(const CQuickBarObject& qbObj);
@@ -92,10 +103,11 @@ public:
 	inline string GetName()			const	{ return m_strName;		}
 	inline const char* GetFaction()	const	{ return m_szFaction;   }
 	inline short GetFactionID()		const	{ return m_nFactionID;	}
-	inline bool GetIsHovered()		const	{ return m_bHovered;	}
+	inline bool GetIsHovered()		const	{ return m_eCurrInputStatus == IT_HOVER; }
 	inline DWORD GetColor()			const	{ return m_dwColor;		}
 	inline float GetZDepth()		const	{ return m_fZDepth;		}
 	inline eButtonName GetDefAbilityType()	{ return m_eDefaultAbilityType;	}
+	inline eInputType GetCurrInputStatus() const { return m_eCurrInputStatus;}
 	inline CCombatSkill* GetDefCombatAbility()		{ return (CCombatSkill*)m_mAbilities[BN_COMBAT_SKILLS][0]; }
 	inline CCombatSkill* GetCurrAttackAbility()		{ if (m_pCurrAttackAbility) return m_pCurrAttackAbility; else return (m_pCurrAttackAbility = GetDefCombatAbility());	}
 	inline CCombatSkill* GetCurrDefenseAbility()	{ if (m_pCurrDefenseAbility) return m_pCurrDefenseAbility; else return (m_pCurrDefenseAbility = GetDefCombatAbility()); }
@@ -115,13 +127,14 @@ public:
 	inline void SetCoord(const point& coord){m_ptCoord = coord; }
 	virtual void SetScrnPos(point& sPos)	{m_ptScreenPos.x = (float)sPos.x + (float)m_ptOffset.x; m_ptScreenPos.y = (float)sPos.y + (float)m_ptOffset.y;}
 	inline void SetFaction(char* faction)	{m_szFaction = faction;}
-	inline void SetHovered(bool bIsHovered) {m_bHovered = bIsHovered;}
 	// if slot == NULL, all QB slots are cleared instead of the one, does NOT check for invalid index
 	inline void SetQBSlot(int slot, CQuickBarObject* qbObj)	{ m_arrQBSlots[slot] = qbObj; }
 	inline void SetCurrAttackAbility(CCombatSkill* ability) { m_pCurrAttackAbility = ability; }
 	inline void SetCurrDefenseAbility(CCombatSkill* ability){ m_pCurrDefenseAbility= ability;	}
 	inline void SetCurrAbilOfType(eAbSelType type, CCombatSkill* ability)	
 			{ if (type == AST_ATTACK) m_pCurrAttackAbility = ability; else if (type == AST_DEFENSE) m_pCurrDefenseAbility = ability; }
+	inline void SetInputStatus(eInputType status, DWORD clr) { m_eCurrInputStatus = status; m_dwColor = clr; }	
+	inline void ToggleDisplay()						{ m_bDisplayInfo = !m_bDisplayInfo;	}
 };
 
 #endif

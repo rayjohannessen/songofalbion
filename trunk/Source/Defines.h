@@ -45,8 +45,11 @@
 // depths -- closest to farthest (into screen)
 #define DEPTH_MOUSE			0.0f
 #define DEPTH_QBOBJDRAG		0.009f
+#define DEPTH_INVOBJDRAG	DEPTH_QBOBJDRAG
 #define DEPTH_WNDOPTIONS	0.0095f
+#define DEPTH_INVOBJ		DEPTH_WNDOPTIONS
 #define DEPTH_WNDBG			0.01f
+#define DEPTH_INVENTORYBGS	DEPTH_WNDBG
 #define DEPTH_QBICONHIGHLT  0.028f
 #define DEPTH_QBICONS		0.029f
 #define DEPTH_QUICKBAR		0.03f

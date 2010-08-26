@@ -31,6 +31,7 @@ struct point
 	{ return (pt.x != x || pt.y != y);}
 	operator pointf() const;
 	point Offset(int osx, int osy)	{ return point(x += osx,  y += osy);  }
+	point Offset(int osxy)			{ return point(x += osxy, y += osxy); }
 	point Offset(point os)			{ return point(x += os.x, y += os.y); }
 };
 typedef point size;
@@ -112,6 +113,7 @@ struct rect
 	rect(int t, int b, int l, int r)			: top(t), bottom(b), left(l), right(r) { }
 	rect(const pointf& pos, int size)			: top((int)pos.y), bottom((int)pos.y + size), left((int)pos.x), right((int)pos.x + size) { }
 	rect(const pointf& pos, const point& size)	: top((int)pos.y), bottom((int)pos.y + size.y), left((int)pos.x), right((int)pos.x + size.x) { }
+	rect(const point& pos, int size)			: top(pos.y), bottom(pos.y + size), left(pos.x), right(pos.x + size) {}
 	rect(const point& pos, const point& size)	: top(pos.y), bottom(pos.y + size.y), left(pos.x), right(pos.x + size.x) { }
 	rect(const point& pos, const point& size, const point& offset) : top(pos.y), bottom(pos.y + size.y), left(pos.x), right(pos.x + size.x) { Offset(offset); }
 	inline const rect& operator= (const rect& r)
@@ -140,6 +142,8 @@ struct rect
 	}
 	inline int width()  const { if(right)return right-left; return 0;	}
 	inline int height() const { if(bottom)return bottom-top; return 0;	}
+	inline point pos()  const { return point(left, top); }
+	inline point pos(point pos) { top = pos.x; left = pos.y;			}
 };
 
 struct rectf
@@ -181,7 +185,12 @@ struct rectf
 	rectf& operator+= (const pointf& change)
 	{ top += change.y; bottom += change.y; left += change.x; right += change.x; return *this; }
 	operator rect() { return rect((int)top, (int)bottom, (int)left, (int)right); }
-	inline bool IsPointInRect(pointf& pt)
+	inline bool IsPointInRect(const pointf& pt)
+	{
+		return (pt.x >= left && pt.x <= right
+			&& pt.y >= top && pt.y <= bottom);
+	}
+	inline bool IsPointInRect(const POINT& pt)
 	{
 		return (pt.x >= left && pt.x <= right
 			&& pt.y >= top && pt.y <= bottom);

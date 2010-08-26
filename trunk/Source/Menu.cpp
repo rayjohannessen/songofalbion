@@ -62,9 +62,9 @@ CMenu::~CMenu()
 void CMenu::Render()
 {
 	if (m_nBGImageID > -1)
- 		Globals::g_pTM->DrawWithZSort(m_nBGImageID, m_ptBGPos.x, m_ptBGPos.y, 1.0f, 1.0f, 1.0f, &m_rBGSrc, 0.0f, 0.0f, 0.0f, 0xaaffffff);
+ 		Globals::g_pTM->Render(m_nBGImageID, m_ptBGPos.x, m_ptBGPos.y, 1.0f, 1.0f, 1.0f, &m_rBGSrc, 0.0f, 0.0f, 0.0f, 0xaaffffff);
 
-	Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->SOATitle(), 270, 25, 1.0f, 1.0f, 1.0f, &rect(454, 591, 0, 565));
+	Globals::g_pTM->Render(Globals::g_pAssets->GetGUIasts()->SOATitle(), 270, 25, 1.0f, 1.0f, 1.0f, &rect(454, 591, 0, 565));
 
 	// draw the title
 	Globals::g_pBitMapFont->DrawStringAutoCenter(gMenuTitles[m_eType], rect(145, 0, 0, Globals::g_ptScreenSize.width), DEPTH_WNDOPTIONS, TitleScale, m_dwColor);
@@ -82,7 +82,7 @@ void CMenu::Render()
 	if (m_pCurrHover)
 	{
 		if (!m_bOptionsInLine) // draw the hover image
-			Globals::g_pTM->DrawWithZSort(m_pCurrHover->HoverID, m_pCurrHover->HoverPos.x, m_pCurrHover->HoverPos.y, DEPTH_WNDOPTIONS, 1.0f, 1.0f, &m_pCurrHover->SrcRect);
+			Globals::g_pTM->Render(m_pCurrHover->HoverID, m_pCurrHover->HoverPos.x, m_pCurrHover->HoverPos.y, DEPTH_WNDOPTIONS, 1.0f, 1.0f, &m_pCurrHover->SrcRect);
 
 		r = m_pCurrHover->Rect; 
 		if (m_bOptionsInLine)
@@ -91,7 +91,7 @@ void CMenu::Render()
 	}
 
 	// draw the mouse cursor
-	Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->Mouse(), m_ptMouse.x, m_ptMouse.y, DEPTH_MOUSE);
+	Globals::g_pTM->Render(Globals::g_pAssets->GetGUIasts()->Mouse(), m_ptMouse.x, m_ptMouse.y, DEPTH_MOUSE);
 
 	m_fpRender(this);
 }

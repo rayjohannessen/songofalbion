@@ -99,6 +99,9 @@ eInputReturnType CGamePlayState::Input(double dTimeStep, const POINT& mousePt)
 	else if (mapRet == MIR_NEXTPLAYER)
 		Globals::GotoNextPlayer();
 
+	// object input
+	Globals::g_pObjManager->Input(mousePt);
+
 	// HUD input
 	if (Globals::g_pHUD->Input(mousePt))
 		return IRT_CHANGE_STATE;

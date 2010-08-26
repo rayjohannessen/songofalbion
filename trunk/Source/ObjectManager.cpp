@@ -87,6 +87,41 @@ void ObjectManager::EndTurn()
 	Globals::GotoNextPlayer();
 }
 
+void ObjectManager::Input(const POINT& mouse)
+{
+	m_iPlayersIter = Globals::GetPlayers().begin();
+	m_iPlayersIterEnd = Globals::GetPlayers().end();
+	for ( ; m_iPlayersIter != m_iPlayersIterEnd; ++m_iPlayersIter)
+	{
+		CPlayer* player = (*m_iPlayersIter);
+
+		// Draw buildings
+		CBuilding* bldng = player->GetBuildings(); int numBldngs = player->GetNumBldngs();
+		for (int i = 0; i < numBldngs; ++i)
+		{
+			if (bldng[i].GetImageID() == -1)
+				continue;
+			bldng[i].Input(mouse);
+		}
+		// Draw cities
+		CCity* city = player->GetCities(); int numCities = player->GetNumCities();
+		for (int i = 0; i < numCities; ++i)
+		{
+			if (city[i].GetImageID() == -1)
+				continue;
+			city[i].Input(mouse);
+		}
+		// Draw units
+		CUnit* unit = player->GetUnits(); int numUnits = player->GetNumUnits();	
+		for (int i = 0; i < numUnits; ++i)
+		{
+			if (unit[i].GetImageID() == -1)
+				continue;
+			unit[i].Input(mouse);
+		}
+	}
+}
+
 void ObjectManager::Update(double dTimeStep, const pointf* moveAmt)
 {
 	m_iPlayersIter = Globals::GetPlayers().begin();

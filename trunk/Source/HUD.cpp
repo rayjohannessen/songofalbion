@@ -77,8 +77,8 @@ void CHUD::Shutdown()
 
 void CHUD::Render()
 {
-	Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->HUD(), 0, 0, DEPTH_HUDFRAME);	// the main HUD's frame bg
-	Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->Frame(), 0, 0, DEPTH_HUDBORDER);	// the border
+	Globals::g_pTM->Render(Globals::g_pAssets->GetGUIasts()->HUD(), 0, 0, DEPTH_HUDFRAME);	// the main HUD's frame bg
+	Globals::g_pTM->Render(Globals::g_pAssets->GetGUIasts()->Frame(), 0, 0, DEPTH_HUDBORDER);	// the border
 	Globals::g_pBitMapFont->DrawString(Globals::g_pCurrPlayer->GetProfile()->name.c_str(), 230, 22, DEPTH_PLAYERINFO, 1.0f, YELLOW_WHITE);
 
 	m_pQuickBar->Render();
@@ -211,7 +211,7 @@ void CHUD::DrawSelectedObjInfo( )
 	char buff[32];
 	if (m_pSelectedPlayerObj)
 	{
-		Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->PlayerInfoBG(), POS_SEL_OBJ_BG.x, POS_SEL_OBJ_BG.y, DEPTH_PLAYERINFOBG);
+		Globals::g_pTM->Render(Globals::g_pAssets->GetGUIasts()->PlayerInfoBG(), POS_SEL_OBJ_BG.x, POS_SEL_OBJ_BG.y, DEPTH_PLAYERINFOBG);
 		switch(m_pSelectedPlayerObj->GetType())
 		{
 		case OBJ_UNIT:
@@ -235,7 +235,7 @@ void CHUD::DrawSelectedObjInfo( )
 			break;
 		}
 
-		Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->FactionImages(m_pSelectedPlayerObj->GetFactionID()), POS_FACTION.x, POS_FACTION.y, DEPTH_PLAYERINFO, FACTION_SCALE, FACTION_SCALE);
+		Globals::g_pTM->Render(Globals::g_pAssets->GetGUIasts()->FactionImages(m_pSelectedPlayerObj->GetFactionID()), POS_FACTION.x, POS_FACTION.y, DEPTH_PLAYERINFO, FACTION_SCALE, FACTION_SCALE);
 		Globals::g_pBitMapFont->DrawString(m_pSelectedPlayerObj->GetName().c_str(), POS_NAME.x, POS_NAME.y, DEPTH_PLAYERINFO, INFO_TEXT_SCALE);
 	}
 }
@@ -245,7 +245,7 @@ void CHUD::DrawTargetInfo( )
 	char buff[32];
 	if (m_pSelectedTarget)
 	{
-		Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->EnemyInfoBG(), POS_TARGET_BG.x, POS_TARGET_BG.y, DEPTH_PLAYERINFOBG);
+		Globals::g_pTM->Render(Globals::g_pAssets->GetGUIasts()->EnemyInfoBG(), POS_TARGET_BG.x, POS_TARGET_BG.y, DEPTH_PLAYERINFOBG);
 		switch(m_pSelectedTarget->GetType())
 		{
 		case OBJ_UNIT:
@@ -271,7 +271,7 @@ void CHUD::DrawTargetInfo( )
 			break;
 		}
 
-		Globals::g_pTM->DrawWithZSort(Globals::g_pAssets->GetGUIasts()->FactionImages(m_pSelectedTarget->GetFactionID()), POS_FACTION_T.x, POS_FACTION_T.y, DEPTH_PLAYERINFO, FACTION_SCALE, FACTION_SCALE);
+		Globals::g_pTM->Render(Globals::g_pAssets->GetGUIasts()->FactionImages(m_pSelectedTarget->GetFactionID()), POS_FACTION_T.x, POS_FACTION_T.y, DEPTH_PLAYERINFO, FACTION_SCALE, FACTION_SCALE);
 		Globals::g_pBitMapFont->DrawString(m_pSelectedTarget->GetName().c_str(), POS_NAME_T.x, POS_NAME_T.y, DEPTH_PLAYERINFO, INFO_TEXT_SCALE);
 	}
 }
