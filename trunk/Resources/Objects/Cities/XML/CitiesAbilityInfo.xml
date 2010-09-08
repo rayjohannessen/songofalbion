@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	A_HEALUNIT = 3, A_PROMOTEUNIT = 4,
+  
+  City->type value is not used
+-->
+
+<Cities>
+  <City type="0" name="Village">
+    <NonCombatInfo>
+      
+      <NonCombatAbility startingAbility="1" type="3" rectid="4">
+        Heal Unit
+      </NonCombatAbility>
+      <NonCombatAbility startingAbility="0" type="4" rectid="5">
+        Promote Unit
+      </NonCombatAbility>
+      
+    </NonCombatInfo>
+  </City>
+</Cities>
