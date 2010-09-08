@@ -20,17 +20,17 @@ class CMenu;
 class DebugWindow;
 enum eAnimationDirections;
 
-struct UnitData 
+struct ObjectData 
 {
 	string	Name;
 	int		Type;
-	UnitData() {}
+	ObjectData() {}
 };
 
 typedef string ObjectName;
 typedef string AbilityName;
 typedef int UnitType;
-typedef vector<UnitData> UnitNamesTypes;
+typedef vector<ObjectData> ObjectNamesTypes;
 typedef pair<int, int> TargetDirPair;
 typedef map<pair<int, int>, eAnimationDirections> CoordToDirMap;
 typedef map<eAnimationDirections, point> DirToCoordMap;
@@ -58,7 +58,7 @@ public:
 	static ObjectManager*			g_pObjManager;
 	static Players*					g_vPlayers;
 	static CPlayer*					g_pCurrPlayer;
-	static UnitNamesTypes*			g_vUnitNames;
+	static ObjectNamesTypes*		g_vUnitNames;
 	static CAnimationsManager*		g_pAnimManager; 	// initialized in CAssets
 	static CAbilitiesManager*		g_pAbilitiesManager;
 	static CMenu*					g_pMenus[NUM_MENUOPTION_TYPES];

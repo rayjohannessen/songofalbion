@@ -9,12 +9,15 @@
 #include "Wrappers/tinyxml/tinyxml.h"
 #include "AbilitiesFunctions.h"
 using namespace CombatFunctions;
+using namespace NonCombatFunctions;
 
-const static AttackInfo arrAttackInfo[NUM_ATTACKS] =
+const static AbilityInfo arrAbilityInfo[NUM_ABILITIES] =
 {
-	AttackInfo("Attack", NULL),
-	AttackInfo("Charge", Charge),
-	AttackInfo("Flank", Flank)
+	AbilityInfo("Attack", NULL),
+	AbilityInfo("Charge", Charge),
+	AbilityInfo("Flank", Flank),
+	AbilityInfo("Heal Unit", HealUnit),
+	AbilityInfo("Promote Unit", PromoteUnit)
 };
 
 #pragma region INITIALIZATION_FUNCTIONS
@@ -22,43 +25,6 @@ void CAbilitiesManager::Init()
 {
 	if( !LoadAbilityInfo("Resources/Objects/") )
 		MessageBox(NULL, "Some or all Attack info failed to load.", "Error", MB_OK);
-}
-void CAbilitiesManager::InitUnitCombatBaseAbility(const UnitData* unitData)
-{
-	eButtonName buttonEnum = BN_COMBAT_SKILLS;
-	Abilities vUnlockedAbilities;
-	CAbilityObjectBase* ability = NULL;
-	CQuickBarObject* qbObj = NULL;
-	// setup all the base attacks
-	switch (unitData->Type)
-	{
-	case UnitDefines::UT_GROUND:
-		{			// TODO:: load description string and rectID XML?, point pos?
-			qbObj = new CQuickBarObject(Globals::g_pAssets->GetGUIasts()->AbilityImages(), "Basic Attack bla bla", 1);
-			ability = new CCombatSkill(ABT_COMBAT_SKILL, point(0, 0), arrAttackInfo[A_BASE].Name, GroundBaseAttack, qbObj, CAbilityProperties(), CCombatAbilProperties());
-			m_vQBObjects.push_back(qbObj);
-			m_mObjectAbilities.insert( make_pair( unitData->Name, ability ) );
-		}break;
-	case UnitDefines::UT_AIR:
-		{
-			qbObj = new CQuickBarObject(Globals::g_pAssets->GetGUIasts()->AbilityImages(), "Basic Attack bla bla", 1);
-			ability = new CCombatSkill(ABT_COMBAT_SKILL, point(0, 0), arrAttackInfo[A_BASE].Name, AirBaseAttack, qbObj, CAbilityProperties(), CCombatAbilProperties());
-			m_vQBObjects.push_back(qbObj);
-			m_mObjectAbilities.insert( make_pair( unitData->Name, ability ) );
-		}break;
-	case UnitDefines::UT_SEA:
-		{
-			qbObj = new CQuickBarObject(Globals::g_pAssets->GetGUIasts()->AbilityImages(), "Basic Attack bla bla", 1);
-			ability = new CCombatSkill(ABT_COMBAT_SKILL, point(0, 0), arrAttackInfo[A_BASE].Name, SeaBaseAttack, qbObj, CAbilityProperties(), CCombatAbilProperties());
-			m_vQBObjects.push_back(qbObj);
-			m_mObjectAbilities.insert( make_pair( unitData->Name, ability ) );
-		}break;
-	}
-	// all base attacks are starting abilities
-	vUnlockedAbilities.push_back(ability);
-	// create the map for this unit name, put it in the abilities
-	UnlockedAbilitiesMap m; m[buttonEnum] = vUnlockedAbilities;
-	m_mStartingUnlockedAbilities.insert( make_pair( unitData->Name, m ) );
 }
 
 bool CAbilitiesManager::LoadAbilityInfo(const string &path)
@@ -101,10 +67,47 @@ bool CAbilitiesManager::LoadAbilityInfo(const string &path)
 	return bSuccess;
 }
 
+void CAbilitiesManager::InitUnitCombatBaseAbility(const ObjectData* unitData)
+{
+	eButtonName buttonEnum = BN_COMBAT_SKILLS;
+	Abilities vUnlockedAbilities;
+	CAbilityObjectBase* ability = NULL;
+	CQuickBarObject* qbObj = NULL;
+	// setup all the base attacks
+	switch (unitData->Type)
+	{
+	case UnitDefines::UT_GROUND:
+		{			// TODO:: read in point pos?
+			qbObj = new CQuickBarObject(Globals::g_pAssets->GetGUIasts()->AbilityImages(), "Basic Attack bla bla", 1);
+			ability = new CCombatSkill(ABT_COMBAT_SKILL, point(0, 0), arrAbilityInfo[A_BASE].Name, GroundBaseAttack, qbObj, CombatSkillProperties());
+			m_vQBObjects.push_back(qbObj);
+			m_mObjectAbilities.insert( make_pair( unitData->Name, ability ) );
+		}break;
+	case UnitDefines::UT_AIR:
+		{
+			qbObj = new CQuickBarObject(Globals::g_pAssets->GetGUIasts()->AbilityImages(), "Basic Attack bla bla", 1);
+			ability = new CCombatSkill(ABT_COMBAT_SKILL, point(0, 0), arrAbilityInfo[A_BASE].Name, AirBaseAttack, qbObj, CombatSkillProperties());
+			m_vQBObjects.push_back(qbObj);
+			m_mObjectAbilities.insert( make_pair( unitData->Name, ability ) );
+		}break;
+	case UnitDefines::UT_SEA:
+		{
+			qbObj = new CQuickBarObject(Globals::g_pAssets->GetGUIasts()->AbilityImages(), "Basic Attack bla bla", 1);
+			ability = new CCombatSkill(ABT_COMBAT_SKILL, point(0, 0), arrAbilityInfo[A_BASE].Name, SeaBaseAttack, qbObj, CombatSkillProperties());
+			m_vQBObjects.push_back(qbObj);
+			m_mObjectAbilities.insert( make_pair( unitData->Name, ability ) );
+		}break;
+	}
+	// all base attacks are starting abilities
+	vUnlockedAbilities.push_back(ability);
+	// create the map for this unit name, put it in the abilities
+	UnlockedAbilitiesMap m; m[buttonEnum] = vUnlockedAbilities;
+	m_mStartingUnlockedAbilities.insert( make_pair( unitData->Name, m ) );
+}
 void CAbilitiesManager::GetUnitInfo( TiXmlElement* pRoot )
 {
 	TiXmlElement* pUnit = pRoot->FirstChildElement("Unit");
-	eAttack eAttackType;
+	eAbility eAttackType;
 	bool bIsStartingAbility;
 	int  rectId;
 	float atkMod, defMod;
@@ -114,7 +117,7 @@ void CAbilitiesManager::GetUnitInfo( TiXmlElement* pRoot )
 
 	while (pUnit)	// continue while we have more units
 	{
-		UnitData nameAndType;
+		ObjectData nameAndType;
 		nameAndType.Type = atoi(pUnit->Attribute("type"));	// type (ground, air, sea...)
 		nameAndType.Name = pUnit->Attribute("name");		// load in unit name
 
@@ -129,7 +132,7 @@ void CAbilitiesManager::GetUnitInfo( TiXmlElement* pRoot )
 			{
 				// TODO:: load in any modifiers to the attack
 				bIsStartingAbility	= (bool)atoi(pAttack->Attribute("startingAbility"));
-				eAttackType			= (eAttack)atoi(pAttack->Attribute("type"));
+				eAttackType			= (eAbility)atoi(pAttack->Attribute("type"));
 				rectId				= atoi(pAttack->Attribute("rectid"));
 				atkMod				= (float)atof(pAttack->Attribute("attackModifier"));
 				defMod				= (float)atof(pAttack->Attribute("defenseModifier"));
@@ -137,12 +140,11 @@ void CAbilitiesManager::GetUnitInfo( TiXmlElement* pRoot )
 				atkStam				= atoi(pAttack->Attribute("attackStamina"));
 				freeCounter			= atoi(pAttack->Attribute("freeCounter"));
 
-				Globals::g_pAbilitiesManager->AddAttackName(arrAttackInfo[eAttackType].Name);
+				Globals::g_pAbilitiesManager->AddAttackName(arrAbilityInfo[eAttackType].Name);
 
-				// TODO:: load image and set pos from xml file
 				CQuickBarObject* qbObj = new CQuickBarObject(Globals::g_pAssets->GetGUIasts()->AbilityImages(), "Basic Attack bla bla", rectId);
 				m_vQBObjects.push_back(qbObj);
-				combatSkill = new CCombatSkill(ABT_COMBAT_SKILL, point(0,0), arrAttackInfo[eAttackType].Name, arrAttackInfo[eAttackType].FuncPtr, qbObj,  CAbilityProperties(atkMod, defMod), CCombatAbilProperties(atkStam, defStam, freeCounter));
+				combatSkill = new CCombatSkill(ABT_COMBAT_SKILL, point(0,0), arrAbilityInfo[eAttackType].Name, arrAbilityInfo[eAttackType].FuncPtr, qbObj, CombatSkillProperties(atkStam, defStam, freeCounter, atkMod, defMod));
 				m_mObjectAbilities.insert(make_pair(nameAndType.Name, combatSkill));
 
 				if (bIsStartingAbility)
@@ -165,7 +167,57 @@ void CAbilitiesManager::GetUnitInfo( TiXmlElement* pRoot )
 
 void CAbilitiesManager::GetCityInfo( TiXmlElement* pRoot )
 {
+	TiXmlElement* pcity = pRoot->FirstChildElement("City");
+	eAbility eAbilityType;
+	bool bIsStartingAbility;
+	int  rectId;
+	CCombatSkill* combatSkill;
+	CNonCombatSkill* nonCombatSkill;
+	eButtonName buttonEnum;
 
+	while (pcity)	// continue while we have more city types
+	{
+		ObjectData nameAndType;	// only Name needed for city
+		nameAndType.Name = pcity->Attribute("name");		// load in city name (same as size...?)
+		UnlockedAbilitiesMap m;
+
+		TiXmlElement* abilityInfo = pcity->FirstChildElement("NonCombatInfo");
+		if (abilityInfo)
+		{
+			buttonEnum = BN_NONCOMBAT_SKILLS;
+			Abilities vUnlockedAbilities;	// a new Abilities vector for each city typename
+
+			TiXmlElement* pAbility = abilityInfo->FirstChildElement("NonCombatAbility");
+			while (pAbility)	// continue while there are more abilities
+			{
+				bIsStartingAbility	= (bool)atoi(pAbility->Attribute("startingAbility"));
+				eAbilityType		= (eAbility)atoi(pAbility->Attribute("type"));
+				rectId				= atoi(pAbility->Attribute("rectid"));
+
+				Globals::g_pAbilitiesManager->AddAttackName(arrAbilityInfo[eAbilityType].Name);
+
+				CQuickBarObject* qbObj = new CQuickBarObject(Globals::g_pAssets->GetGUIasts()->AbilityImages(), "City NCombat Ability desc", rectId);
+				m_vQBObjects.push_back(qbObj);
+				nonCombatSkill = new CNonCombatSkill(ABT_NONCOMBAT_SKILL, point(0,0), arrAbilityInfo[eAbilityType].Name, arrAbilityInfo[eAbilityType].FuncPtr, qbObj, NonCombatSkillProperties());
+				m_mObjectAbilities.insert(make_pair(nameAndType.Name, nonCombatSkill));
+
+				if (bIsStartingAbility)
+				{	
+					vUnlockedAbilities.push_back(nonCombatSkill);
+				}
+
+				pAbility = pAbility->NextSiblingElement("NonCombatAbility");
+			}
+			// add to the unlocked ability map for this city's NON_COMBAT_SKILLS
+			m[buttonEnum] = vUnlockedAbilities;
+		}
+		else if ( (abilityInfo = pcity->FirstChildElement("CombatInfo")) )
+		{
+
+		}
+		pcity = pcity->NextSiblingElement("City");
+		m_mStartingUnlockedAbilities.insert( make_pair( nameAndType.Name, m ) );
+	}
 }
 
 void CAbilitiesManager::GetBuildingInfo( TiXmlElement* pRoot )

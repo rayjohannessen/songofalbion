@@ -192,7 +192,7 @@ eMapInputRet CMap::Input(double dTimeStep, const POINT& mouse)
 			clr = DARKBLUE;
 		else
 			clr = DARKRED;
-		m_pCurrHoverObject->SetInputStatus(IT_HOVER, clr);
+		m_pCurrHoverObject->SetInputStatus(IS_HOVER, clr);
 	}
 	HandleMouseInput();
 
@@ -226,16 +226,16 @@ bool CMap::DetermineMoveSpecifics(const point& pt)
 		if ( !m_pEnemyObj )	// there's not currently a target, so just select as new target
 		{
 			m_pEnemyObj = pTarget;
-			m_pEnemyObj->SetInputStatus(IT_SELECT_L, DARKRED);
+			m_pEnemyObj->SetInputStatus(IS_SELECT_L, DARKRED);
 		}
 		else
 		{
 			if (pTarget != m_pEnemyObj)	// in case there's already a target selected, simply select it (NO attack) and deselect current
 			{	// deselect current target
-				m_pEnemyObj->SetInputStatus(IT_DESELECT, WHITE);
+				m_pEnemyObj->SetInputStatus(IS_DESELECT, WHITE);
 				// set the new target
 				m_pEnemyObj = pTarget;
-				m_pEnemyObj->SetInputStatus(IT_SELECT_L, DARKRED);
+				m_pEnemyObj->SetInputStatus(IS_SELECT_L, DARKRED);
 			}
 			else	// otherwise, the current target was clicked again, begin pathfinding to determine if reachable
 			{
@@ -255,7 +255,7 @@ bool CMap::DetermineMoveSpecifics(const point& pt)
 					} 
 					else	// same tile, just start attacking now
 					{
-						if (unit->GetStamina() >= unit->GetCurrAttackAbility()->GetCombatProps().AttackStam)
+						if (unit->GetStamina() >= unit->GetCurrAttackAbility()->GetProps()->AttackStam)
 						{
 							m_vPath.clear();
 							InitiateAttack(false);
@@ -295,23 +295,23 @@ CObject* CMap::HoverObject(point& coord)
 	for (unsigned player = 0; player < Globals::GetPlayers().size(); ++player)
 	{
 		CPlayer* pPlayer = Globals::GetPlayers()[player];
-		CUnit* units = pPlayer->GetUnits();
-		for (int i = 0; i < pPlayer->GetNumUnits(); ++i)
-			if (units[i].MouseInRect(m_ptMouseScrn))
-				if ((CObject*)&units[i] != m_pCurrPlayerSelectedObj)
-					return (CObject*)&units[i]; 
+		CUnit** units = pPlayer->GetUnits();
+		for (unsigned i = 0; i < pPlayer->GetNumUnits(); ++i)
+			if (units[i]->MouseInRect(m_ptMouseScrn))
+				if ((CObject*)units[i] != m_pCurrPlayerSelectedObj)
+					return (CObject*)units[i]; 
 
-		CCity* cities = pPlayer->GetCities();
-		for (int i = 0; i < pPlayer->GetNumCities(); ++i)
-			if (coord == cities[i].GetCoord())
-				if((CObject*)&cities[i] != m_pCurrPlayerSelectedObj)
-					return (CObject*)&cities[i];
+		CCity** cities = pPlayer->GetCities();
+		for (unsigned i = 0; i < pPlayer->GetNumCities(); ++i)
+			if (coord == cities[i]->GetCoord())
+				if((CObject*)cities[i] != m_pCurrPlayerSelectedObj)
+					return (CObject*)cities[i];
 
-		CBuilding* bldngs = pPlayer->GetBuildings();
-		for (int i = 0; i < pPlayer->GetNumBldngs(); ++i)
-			if (coord == bldngs[i].GetCoord())
-				if ((CObject*)&bldngs[i] != m_pCurrPlayerSelectedObj)
-					return (CObject*)&bldngs[i]; 
+		CBuilding** bldngs = pPlayer->GetBuildings();
+		for (unsigned i = 0; i < pPlayer->GetNumBldngs(); ++i)
+			if (coord == bldngs[i]->GetCoord())
+				if ((CObject*)bldngs[i] != m_pCurrPlayerSelectedObj)
+					return (CObject*)bldngs[i]; 
 	}
 	return NULL;	// no objects are being hovered
 }
@@ -816,7 +816,7 @@ void CMap::DrawDebug()
 
 void CMap::HandleMouseInput()
 {
-	if (BIT_TEST_ON(m_nMapFlags, MF_MOUSE_IN_QUICK_BAR))	// no map interaction 
+	if (BIT_TEST_ON(m_nMapFlags, MF_MOUSE_IN_QUICK_BAR) || BIT_TEST_ON(m_nMapFlags, MF_MOUSE_OVER_BTN))	// no map interaction 
 		return;
 
 	if (Globals::g_pDI->MouseButtonPressed(MOUSE_LEFT) && m_rViewport.IsPointInRect(m_ptMouseScrn))
@@ -834,6 +834,7 @@ void CMap::HandleMouseInput()
 		{
 			m_pPlaceObj->SetCoord(m_ptCurrMouseTile);
 			Globals::g_pObjManager->AddObject(m_pPlaceObj, IsoTilePlot(m_ptCurrMouseTile));
+			m_pPlaceObj = NULL;
 		}
 		// removing an object
 		else if (m_nCurrPlaceType == MSA_REMOVE)
@@ -1002,29 +1003,29 @@ void CMap::HandleViewScroll( const POINT &mouse, double dTimeStep )
 
 bool CMap::HandleKBInput()
 {
-	// TODO:: change this to real functionality....
+	// TODO:: change this 1-5 hack stuff to real functionality....
 	if (Globals::g_pDI->KeyPressed(DIK_1))
 	{
 		m_nCurrPlaceType = MSA_CITY;
 		if (m_pPlaceObj)
 			delete m_pPlaceObj;
 		m_pPlaceObj = new CCity(OBJ_CITY, CITY_CELTIC, 1, m_ptCurrMouseTile, IsoTilePlot(m_ptCurrMouseTile), "Sycharth",
-							Globals::GetCurrPlayer()->GetProfile()->name.c_str(), Globals::GetCurrPlayer()->GetProfile()->nFactionID);
+			Globals::GetCurrPlayer()->GetProfile()->name.c_str(), Globals::GetCurrPlayer()->GetProfile()->nFactionID);
 	}
 	else if (Globals::g_pDI->KeyPressed(DIK_2))
 	{
 		m_nCurrPlaceType = MSA_UNIT;
 		if (m_pPlaceObj)
 			delete m_pPlaceObj;
-		m_pPlaceObj = new CUnit(UnitDefines::UNIT_UMKNIGHT, OBJ_UNIT, m_ptCurrMouseTile, IsoTilePlot(m_ptCurrMouseTile), "UMKnight",
-							Globals::GetCurrPlayer()->GetProfile()->name.c_str(), Globals::GetCurrPlayer()->GetProfile()->nFactionID);
+		m_pPlaceObj = new CUnit(UnitDefines::UNIT_UMKNIGHT, OBJ_UNIT, m_ptCurrMouseTile, IsoTilePlot(m_ptCurrMouseTile), "Random Name",
+			Globals::GetCurrPlayer()->GetProfile()->name.c_str(), Globals::GetCurrPlayer()->GetProfile()->nFactionID);
 	}
 	else if (Globals::g_pDI->KeyPressed(DIK_3))
 	{
 		m_nCurrPlaceType = MSA_BUILDING;
 		if (m_pPlaceObj)
 			delete m_pPlaceObj;
-		m_pPlaceObj = new CBuilding(BLDG_CASTLE, OBJ_BUILDING, m_ptCurrMouseTile, IsoTilePlot(m_ptCurrMouseTile), "Castle",
+		m_pPlaceObj = new CBuilding(BuildingDefines::BT_CASTLE, OBJ_BUILDING, m_ptCurrMouseTile, IsoTilePlot(m_ptCurrMouseTile), "Castle's Name",
 							Globals::GetCurrPlayer()->GetProfile()->name.c_str(), Globals::GetCurrPlayer()->GetProfile()->nFactionID);
 	}
 	else if (Globals::g_pDI->KeyPressed(DIK_5))
@@ -1032,19 +1033,22 @@ bool CMap::HandleKBInput()
 		m_nCurrFactionPlace = 0;
 		m_nCurrPlaceType = MSA_SELECT;
 	}
-	// bring up combat skills (if applicable)
+	// bring up Combat skills (if applicable)
  	else if (Globals::g_pDI->KeyPressed(DIK_C) && m_pCurrPlayerSelectedObj)
 		Globals::g_pHUD->AddWindow(Globals::g_pHUD->GetButton(BL_SLOT_1_1)->SimulatePressed());
 	// show info screen of currently selected object
 	else if (Globals::g_pDI->KeyPressed(DIK_TAB) && m_pCurrPlayerSelectedObj)
+	{
 		m_pCurrPlayerSelectedObj->ToggleDisplay();
+		Globals::g_bWindowOpen = true;
+	}
 	// skip current unit
 	else if (Globals::g_pDI->KeyPressed(DIK_SPACE) && m_pCurrPlayerSelectedObj)
 		Globals::g_pHUD->GetButton(BL_SLOT_2_1)->SimulatePressed();
-	// come back to this unit later (wait)
+	// come back to this unit later (Wait)
 	else if (Globals::g_pDI->KeyPressed(DIK_W) && m_pCurrPlayerSelectedObj)
 		Globals::g_pHUD->GetButton(BL_SLOT_2_3)->SimulatePressed();
-	// center the map on the currently selected unit
+	// cEnter the map on the currently selected unit
 	else if (m_pCurrPlayerSelectedObj && Globals::g_pDI->KeyPressed(DIK_E))
 		BIT_ON(m_nMapFlags, MF_CENTER_MAP);	
 
@@ -1064,7 +1068,9 @@ bool CMap::HandleKBInput()
 
 void CMap::Deselect(CObject*& obj)
 {
-	obj->SetInputStatus(IT_DESELECT, WHITE);
+	if (obj == m_pCurrPlayerSelectedObj)
+		Globals::g_pHUD->ClearQBSlots();
+	obj->SetInputStatus(IS_DESELECT, WHITE);
 	obj = NULL;
 }
 void CMap::Select(CObject* const obj)
@@ -1075,7 +1081,7 @@ void CMap::Select(CObject* const obj)
 		if (m_pCurrPlayerSelectedObj)
 			Deselect(m_pCurrPlayerSelectedObj);
 		m_pCurrPlayerSelectedObj = obj;
-		m_pCurrPlayerSelectedObj->SetInputStatus(IT_SELECT_L, DARKBLUE);
+		m_pCurrPlayerSelectedObj->SetInputStatus(IS_SELECT_L, DARKBLUE);
 
 		// if there's an enemy already selected, and curr player's is an OBJ_UNIT, determine if we need to face it
 		if (m_pEnemyObj && m_pCurrPlayerSelectedObj->GetType() == OBJ_UNIT)
@@ -1099,7 +1105,7 @@ void CMap::Select(CObject* const obj)
 		else if (m_pEnemyObj)	// there was another enemy object, deselect it first
 			Deselect(m_pEnemyObj);
 		m_pEnemyObj = obj;
-		m_pEnemyObj->SetInputStatus(IT_SELECT_L, DARKRED);
+		m_pEnemyObj->SetInputStatus(IS_SELECT_L, DARKRED);
 
 		// if we have a unit selected, determine if we need to face the newly selected enemy
 		if (m_pCurrPlayerSelectedObj && m_pCurrPlayerSelectedObj->GetType() == OBJ_UNIT)
@@ -1118,8 +1124,7 @@ void CMap::InitiateAttack(bool setfacing /*= true*/)
 	if (setfacing)
 		playerUnit->FaceTarget(m_pEnemyObj->GetCoord());
 
-	playerUnit->DecrementStamina(playerUnit->GetCurrAttackAbility()->GetCombatProps().AttackStam);
-//	BIT_ON(m_nMapFlags, MF_ATTACKING);
+	playerUnit->DecrementStamina(playerUnit->GetCurrAttackAbility()->GetProps()->AttackStam);
 
 	// TODO:: units will not turn to face if a surprise attack is happening:
 	((CUnit*)m_pEnemyObj)->SetFacing(playerUnit->GetOppositeFacing());
@@ -1140,6 +1145,13 @@ void CMap::ActionIfSelected(CObject* obj)
 			Deselect(m_pEnemyObj);
 	}
 	else if (obj == m_pEnemyObj)		// if the target unit is killed
+		Deselect(m_pEnemyObj);
+}
+void CMap::OnEndTurn()
+{
+	if (m_pCurrPlayerSelectedObj)
+		Deselect(m_pCurrPlayerSelectedObj);
+	if (m_pEnemyObj)
 		Deselect(m_pEnemyObj);
 }
 void CMap::FindNewCoord( int facing, int &newY, int &newX )
@@ -1230,7 +1242,7 @@ int  CMap::DetermineTotalMoveCost(bool attacking)
 	}
 	if (attacking)
 	{
-		cost += m_pCurrPlayerSelectedObj->GetCurrAttackAbility()->GetCombatProps().AttackStam;
+		cost += m_pCurrPlayerSelectedObj->GetCurrAttackAbility()->GetProps()->AttackStam;
 	}
 	return cost;
 }

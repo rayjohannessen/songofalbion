@@ -14,21 +14,20 @@ CBuilding::CBuilding()
 
 }
 
-CBuilding::CBuilding(int buildingType, int type, point coord, point sPos, 
-					 string name, const char* faction, int factionID)
-: CObject(type, coord, sPos, name, faction, factionID)
+CBuilding::CBuilding(eBuildingType buildingType, int type, point coord, point sPos, string name, const char* faction, int factionID)
+	: CObject(type, coord, sPos, name, faction, factionID, gBuildingNames[buildingType])
 {
 	m_nBuildingType = buildingType;
 	switch (buildingType)
 	{
-	case BLDG_CASTLE:
+	case BT_CASTLE:
 		SetImageID(Globals::g_pAssets->GetMapasts()->Castle());
 		SetSrcRect(rect(0, 64, 128, 256));
 		m_ptSize = point(128, 64);
 		m_nMaxHP = m_nHitPts = 1000;
 		m_nCapacity = 20;
 		break;
-	case BLDG_TOWER:
+	case BT_TOWER:
 		break;
 	}
 }
@@ -45,6 +44,8 @@ void CBuilding::Render( const rect& viewPort )
 {
 	if (TestOnScreen(viewPort))
 	{
+		Globals::g_pTM->Render(GetImageID(), (int)m_ptScreenPos.x, (int)m_ptScreenPos.y, m_fZDepth, m_fScaleX, m_fScaleY, GetSrc(), 0.0f, 0.0f, 0.0f, m_dwColor);	
+
 		CObject::Render(viewPort);
 	}
 }

@@ -3,7 +3,6 @@
 
 #include "Object.h"
 #include "Animation.h"
-#include "ObjectDefines.h"
 class CUnit;
 class CTile;
 
@@ -61,8 +60,8 @@ public:
 		string name, const char* faction = "Llwyddi", int factionID = 0);
 	~CUnit();
 
-	CUnit& operator= ( CUnit& unit);
-	void DeepCopyAll( CUnit &unit );
+	CUnit& operator= (CUnit& unit);
+	void DeepCopyAll(CUnit& unit);
 
 	// draws the unit at its current frame
 	void Render(const rect& viewPort);

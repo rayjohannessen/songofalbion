@@ -92,9 +92,15 @@ void CUIQuickBar::Input(const POINT& mouse)
 {
 	// determine if the mouse is over the quickbar, so we don't select anything underneath
 	if (m_rQuickBar.IsPointInRect(mouse))
-		Globals::g_pMap->ToggleMapFlagOn(MF_MOUSE_IN_QUICK_BAR);
+	{
+		if (BIT_TEST_OFF(Globals::g_pMap->GetMapFlags(), MF_MOUSE_IN_QUICK_BAR))
+			Globals::g_pMap->ToggleMapFlagOn(MF_MOUSE_IN_QUICK_BAR);
+	}
 	else
-		Globals::g_pMap->ToggleMapFlagOff(MF_MOUSE_IN_QUICK_BAR);
+	{
+		if (BIT_TEST_ON(Globals::g_pMap->GetMapFlags(), MF_MOUSE_IN_QUICK_BAR))
+			Globals::g_pMap->ToggleMapFlagOff(MF_MOUSE_IN_QUICK_BAR);
+	}
 
 	if (!m_pOwner)
 		return;	// nothing more to update
@@ -107,6 +113,7 @@ void CUIQuickBar::Input(const POINT& mouse)
 	{
 		if (m_rRects[i].IsPointInRect(mouse))
 		{
+			mouseIsInASlot = true;
 			// TODO::respond to hover
 
 			if (!m_bAddingNewQBObj)	// only dealing with qb objects already on the quick bar
@@ -124,7 +131,6 @@ void CUIQuickBar::Input(const POINT& mouse)
 					HandleInputAddNew(i);
 			}
 
-			mouseIsInASlot = true;
 			break; // mouse is in a slot, no need to keep looping
 		}
 	}

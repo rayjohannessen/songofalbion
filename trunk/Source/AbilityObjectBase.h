@@ -15,6 +15,7 @@ public:
 	CQuickBarObject() : ImageID(-1), Description(""), Ability(NULL)
 	{}
 	CQuickBarObject(int id, const string& description, int rectID) : 
+		Ability(NULL),
 		ImageID(id),
 		SrcRect( point((rectID % NUM_COLUMNS) * QBSLOT_SIZE.x, (rectID / NUM_COLUMNS) * QBSLOT_SIZE.y), QBSLOT_SIZE ),
 		Description(description)
@@ -25,54 +26,48 @@ public:
 #define NUM_QB_SLOTS 5
 
 //////////////////////////////////////////////////////////////////////////
-// CAbilityProperties -- specifies the particulars of each unique ability
-struct CAbilityProperties
-{
-	float AttkDamageMod;	// affects the owner's attack stat when attacking
-	float DefDamageMod;		// affects the owner's defense stat when defending
-
-	CAbilityProperties(bool bDefault = true) :
-	AttkDamageMod(0.0f),
-	DefDamageMod(0.0f)
-	{
-		if (bDefault)
-			DefaultBase();
-	}
-	CAbilityProperties(float atkMod, float defMod) :
-	AttkDamageMod(atkMod),
-	DefDamageMod(defMod)
-	{}
-	~CAbilityProperties() 
-	{}
-
-	void DefaultBase()
-	{
-		AttkDamageMod = 1.065f;
-		DefDamageMod  = 1.05f;
-	}
-};
-
+// Ability return structs - for holding/passing the results of an ability
+//							after having been used
+//////////////////////////////////////////////////////////////////////////
 class CObject;
 typedef vector<CObject*> ObjList;
-struct AbilityReturn
+struct AbilityReturnBase 
+{
+	bool Finished;
+
+	AbilityReturnBase() : Finished(false)
+	{}
+	virtual void Reset() = 0;
+};
+struct CombatAbilityReturn : public AbilityReturnBase
 {
 	ObjList HitObjs;
 	ObjList ObjsToEliminate;
-	bool	Finished;
 	bool	ApplyDamages;
 
-	void Clear()
+	virtual ~CombatAbilityReturn() {}
+	void Reset()
 	{
 		HitObjs.clear();
 		ObjsToEliminate.clear();
 		Finished = ApplyDamages = false;
 	}
-	AbilityReturn() : Finished(false), ApplyDamages(false)
+	CombatAbilityReturn() : AbilityReturnBase(), ApplyDamages(false)
 	{}
-
 };
+struct NonCombatAbilityReturn : public AbilityReturnBase 
+{
+	virtual ~NonCombatAbilityReturn() {}
+	void Reset()
+	{
+		Finished = false;
+	}
+	NonCombatAbilityReturn() : AbilityReturnBase()
+	{}
+};
+//////////////////////////////////////////////////////////////////////////
 
-typedef void (*AbilityFunction)(CObject* targetObj, CObject* thisPtr, AbilityReturn& abilRet);
+typedef void (*AbilityFunction)(CObject* targetObj, CObject* thisPtr, AbilityReturnBase* const abilRet);
 
 enum eAbilityTypes 
 {
@@ -82,7 +77,7 @@ enum eAbilityTypes
 	NUM_ABILITY_TYPES,
 };
 
-// TODO::TEMP
+// TODO::TEMP (simulated vfx)
 #include "Timer.h"
 
 class CAbilityObjectBase
@@ -99,22 +94,19 @@ protected:
 	string			m_strName;
 	point			m_ptPos;	// screen pos
 	AbilityFunction m_fpAbilityFunc;
-	CAbilityProperties m_Properties;
 
 	CTriggerTimer SimulatedVFX;
 
 public:
 	CAbilityObjectBase() : m_strName("NONE"), m_ptPos(0, 0), m_pTarget(NULL), m_pOwner(NULL), m_pQBObj(NULL) {}
-	CAbilityObjectBase(eAbilityTypes type, point pos, string name, AbilityFunction abilityFunc, CQuickBarObject* qbObj, CAbilityProperties& props) : 
-//		m_bIsUpdating(false),
+	CAbilityObjectBase(eAbilityTypes type, point pos, string name, AbilityFunction abilityFunc, CQuickBarObject* qbObj) : 
 		m_bResultsApplied(false),
 		m_eType(type), 
 		m_pTarget(NULL), 
 		m_pOwner(NULL), 
 		m_strName(name), 
 		m_ptPos(pos), 
-		m_fpAbilityFunc(abilityFunc),
-		m_Properties(props)
+		m_fpAbilityFunc(abilityFunc)
 	{
 		m_pQBObj = new CQuickBarObject(*qbObj);
 		m_pQBObj->Ability = this;
@@ -128,15 +120,13 @@ public:
 		m_strName 		= obj.m_strName;
 		m_ptPos   		= obj.m_ptPos;
 		m_fpAbilityFunc = obj.m_fpAbilityFunc;
-		m_Properties	= obj.m_Properties;
 		m_pQBObj		= new CQuickBarObject(*obj.m_pQBObj);
 		m_pQBObj->Ability = this;
 	}
 
-	virtual ~CAbilityObjectBase() {SAFE_DELETE(m_pQBObj);}
+	virtual ~CAbilityObjectBase() { SAFE_DELETE(m_pQBObj); }
 
-	// return true when this ability is complete
-	virtual void Update(double dTimeStep, AbilityReturn& abilRet) = 0;
+	virtual void Update(double dTimeStep, AbilityReturnBase* const abilRet) = 0;
 	virtual void Render() = 0;
 
 	//////////////////////////////////////////////////////////////////////////
@@ -144,7 +134,6 @@ public:
 	inline string GetName()				const	{ return m_strName;			}
 	inline eAbilityTypes GetType()		const	{ return m_eType;			}
 	inline CQuickBarObject* GetQBObj()	const	{ return m_pQBObj;			}
-	inline CAbilityProperties& GetProps()		{ return m_Properties;	}
 
 	//////////////////////////////////////////////////////////////////////////
 	// Mutators

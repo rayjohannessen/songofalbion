@@ -116,7 +116,10 @@ void CHUD::Update(double dTimeStep)
 	if (m_pPrevSelectedPlayerObjState != m_pSelectedPlayerObj)
 	{
 		if (m_pSelectedPlayerObj)
+		{
+			ClearButtons();
 			SetButtons();
+		}
 		else
 			ClearButtons();
 	}

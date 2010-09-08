@@ -26,7 +26,7 @@ enum eCardinalDirections {N, S, E, W,};
 enum eDebugMapInteraction {MSA_CITY, MSA_UNIT, MSA_BUILDING, MSA_ADDING, MSA_REMOVE, MSA_SELECT, };
 enum eMapFlags { MF_CENTER_MAP, MF_CENTERING, 
 				 MF_CENTER_DIR_N, MF_CENTER_DIR_S, MF_CENTER_DIR_E, MF_CENTER_DIR_W,
-				 MF_MOUSE_BELOW_BTM, MF_CENTER_DIR_END = MF_MOUSE_BELOW_BTM, MF_MOUSE_IN_QUICK_BAR,
+				 MF_MOUSE_BELOW_BTM, MF_CENTER_DIR_END = MF_MOUSE_BELOW_BTM, MF_MOUSE_IN_QUICK_BAR, MF_MOUSE_OVER_BTN,
 				 MF_DO_SCROLL_N, MF_DO_SCROLL_S, MF_DO_SCROLL_E, MF_DO_SCROLL_W, MF_DO_SCROLL_END,
 				 MF_AT_EDGE_W, MF_AT_EDGE_E, MF_AT_EDGE_N, MF_AT_EDGE_S,
 				 MF_IN_SCROLL_AREA_N, MF_IN_SCROLL_AREA_S, MF_IN_SCROLL_AREA_E, MF_IN_SCROLL_AREA_W, MF_IN_SCROLL_AREA_END,
@@ -211,6 +211,7 @@ public:
 	// deselects the obj on the map if it is selected (e.g., if a unit is destroyed that is selected)
 	void ActionIfSelected(CObject* obj);
 	void InitiateAttack(bool setfacing = true);
+	void OnEndTurn();
 
 	//////////////////////////////////////////////////////////////////////////
 	// Mutators
@@ -235,6 +236,7 @@ public:
 	inline int	  GetNumCols()		const		{ return m_nNumCols;		 }
 	inline int	  GetNumRows()		const		{ return m_nNumRows;		 }
 	inline point  GetNumColsRows()	const		{ return point(m_nNumCols, m_nNumRows);	}
+	inline int	  GetMapFlags()		const		{ return m_nMapFlags;		 }
 };
 
 #endif MAP_H

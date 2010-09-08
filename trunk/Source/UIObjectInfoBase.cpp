@@ -3,10 +3,12 @@
 #include "UIObjectInfoBase.h"
 #include "Globals.h"
 #include "Assets.h"
+#include "Object.h"
 
-UIObjectInfoBase::UIObjectInfoBase(eObjectInfoType type, int equipID, int infoID, int inventoryID, Grid& gInv, Grid& gEquip,
+UIObjectInfoBase::UIObjectInfoBase(CObject* const obj, eObjectInfoType type, int equipID, int infoID, int inventoryID, Grid& gInv, Grid& gEquip,
 								   const point& invPos, const point& equipPos, const point& infoPos, const size& invInput, const size& equipInput) :
 m_eType(type),
+m_pObject(obj),
 m_nEquippedImage(equipID),
 m_nInfoImage(infoID),
 m_nInventoryImage(inventoryID),
@@ -96,7 +98,7 @@ void UIObjectInfoBase::Render()
 //////////////////////////////////////////////////////////////////////////
 void UIObjectInfoBase::Update(double dTimeStep)
 {
-
+	m_Timer.Update(dTimeStep);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -107,79 +109,18 @@ void UIObjectInfoBase::Update(double dTimeStep)
 enum eInvInputCode {IIC_NONE, IIC_INV, IIC_EQUIP, };
 void UIObjectInfoBase::Input(const POINT& mouse)
 {
+	if (!m_Timer.IsTimerRunning())
+		m_Timer.StartTimer();
 	m_ptMousePos = mouse;
 	m_pHoveredObj = NULL;
 
-	Inventory*	hoveredInv = NULL;
-	eInvInputCode mouseLoc = IIC_NONE;
+	HandleInventoryInput(mouse);
 
-	rect rInv(m_InvGrid.TOP_LEFT_PT, m_InvInputArea);
-	rect rEquip(m_EquipGrid.TOP_LEFT_PT, m_EquipInputArea);
-	if (rInv.IsPointInRect(mouse))
+	if (m_Timer.GetElapsed() > 0.2 && (Globals::g_pDI->KeyPressed(DIK_TAB) || Globals::g_pDI->KeyPressed(DIK_ESCAPE)))
 	{
-		mouseLoc = IIC_INV;
-		// inventory (available) slots
-		if (CheckInvForInput(m_vAvailable, m_InvGrid, hoveredInv, mouse))
-			m_bHoverInInv = true;
-	}
-	else if (rEquip.IsPointInRect(mouse))
-	{
-		mouseLoc = IIC_EQUIP;
-		// equip slots
-		if (CheckInvForInput(m_vEquipped, m_InvGrid, hoveredInv, mouse))
-			m_bHoverInInv = false;
-	}
-
-	if (mouseLoc != IIC_NONE && Globals::g_pDI->MouseButtonPressed(MOUSE_LEFT))
-	{
-		// the mouse is hovering an object and no object is being moved yet
-		if (m_pHoveredObj && !m_pMovingObj)
-		{
-			m_pMovingObj = m_pHoveredObj;
-			m_pMovingObjSrc = hoveredInv;
-			// remove the hovered obj from the appropriate list
-			RemoveObj(m_pHoveredObj, *hoveredInv, false);
-			// determine if the slot being hovered now contains another object
-			if (m_uiHoverObjID < hoveredInv->size())
-				m_pHoveredObj = (*hoveredInv)[m_uiHoverObjID];
-		}
-		// the user is replacing an object
-		else if (m_pHoveredObj && m_pMovingObj)
-		{
-			ReplaceObj(m_pMovingObj, *hoveredInv, m_uiHoverObjID);
-			m_pMovingObjSrc = hoveredInv;
-		}
-		// the user is either clicking to destroy the object (IIC_NONE),
-		// or is placing the object in the inv/equip area beyond 
-		// currently occupied slots
-		else if (!m_pHoveredObj && m_pMovingObj)
-		{
-			switch (mouseLoc)
-			{
-			case IIC_EQUIP:
-				{
-					if (AddObj(m_pMovingObj, false))
-					{
-						m_pMovingObj = NULL;
-						m_pMovingObjSrc = NULL;
-					}
-				}break;
-			case IIC_INV:
-				{
-					if (AddObj(m_pMovingObj, true))
-					{
-						m_pMovingObj = NULL;
-						m_pMovingObjSrc = NULL;
-					}
-				}break;
-			case IIC_NONE:
-				{
-					RemoveObj(m_pMovingObj, *m_pMovingObjSrc, true);
-					m_pMovingObj = NULL;
-					m_pMovingObjSrc = NULL;
-				}break;
-			}
-		}
+		Globals::g_bWindowOpen = false;
+		m_pObject->ToggleDisplay();
+		m_Timer.ResetTimer();
 	}
 }
 
@@ -263,4 +204,79 @@ void UIObjectInfoBase::DetermineObjPos( point &actualPt, point &startPt, int slo
 {
 	actualPt.x = startPt.x + (slotID % grid.NUM_COLS) * (OBJ_SIZE + grid.SPACE_BETWEEN);
 	actualPt.y = startPt.y + (slotID / grid.NUM_COLS) * (OBJ_SIZE + grid.SPACE_BETWEEN);
+}
+
+void UIObjectInfoBase::HandleInventoryInput( const POINT& mouse )
+{
+	Inventory*	hoveredInv = NULL;
+	eInvInputCode mouseLoc = IIC_NONE;
+
+	rect rInv(m_InvGrid.TOP_LEFT_PT, m_InvInputArea);
+	rect rEquip(m_EquipGrid.TOP_LEFT_PT, m_EquipInputArea);
+	if (rInv.IsPointInRect(mouse))
+	{
+		mouseLoc = IIC_INV;
+		// inventory (available) slots
+		if (CheckInvForInput(m_vAvailable, m_InvGrid, hoveredInv, mouse))
+			m_bHoverInInv = true;
+	}
+	else if (rEquip.IsPointInRect(mouse))
+	{
+		mouseLoc = IIC_EQUIP;
+		// equip slots
+		if (CheckInvForInput(m_vEquipped, m_InvGrid, hoveredInv, mouse))
+			m_bHoverInInv = false;
+	}
+
+	if (mouseLoc != IIC_NONE && Globals::g_pDI->MouseButtonPressed(MOUSE_LEFT))
+	{
+		// the mouse is hovering an object and no object is being moved yet
+		if (m_pHoveredObj && !m_pMovingObj)
+		{
+			m_pMovingObj = m_pHoveredObj;
+			m_pMovingObjSrc = hoveredInv;
+			// remove the hovered obj from the appropriate list
+			RemoveObj(m_pHoveredObj, *hoveredInv, false);
+			// determine if the slot being hovered now contains another object
+			if (m_uiHoverObjID < hoveredInv->size())
+				m_pHoveredObj = (*hoveredInv)[m_uiHoverObjID];
+		}
+		// the user is replacing an object
+		else if (m_pHoveredObj && m_pMovingObj)
+		{
+			ReplaceObj(m_pMovingObj, *hoveredInv, m_uiHoverObjID);
+			m_pMovingObjSrc = hoveredInv;
+		}
+		// the user is either clicking to destroy the object (IIC_NONE),
+		// or is placing the object in the inv/equip area beyond 
+		// currently occupied slots
+		else if (!m_pHoveredObj && m_pMovingObj)
+		{
+			switch (mouseLoc)
+			{
+			case IIC_EQUIP:
+				{
+					if (AddObj(m_pMovingObj, false))
+					{
+						m_pMovingObj = NULL;
+						m_pMovingObjSrc = NULL;
+					}
+				}break;
+			case IIC_INV:
+				{
+					if (AddObj(m_pMovingObj, true))
+					{
+						m_pMovingObj = NULL;
+						m_pMovingObjSrc = NULL;
+					}
+				}break;
+			case IIC_NONE:
+				{
+					RemoveObj(m_pMovingObj, *m_pMovingObjSrc, true);
+					m_pMovingObj = NULL;
+					m_pMovingObjSrc = NULL;
+				}break;
+			}
+		}
+	}
 }

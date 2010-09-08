@@ -11,7 +11,7 @@ class UICityInfo;
 class CCity : public CObject
 {
 	int		m_nCityType;// oriental, celtic, hut, etc..
-	int		m_nSize;	// how big in population is the city
+	int		m_nSize;	// how big in population is the city (not 0-based)
 	UICityInfo* m_pCityInfo;
 
 public:

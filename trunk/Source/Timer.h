@@ -57,7 +57,7 @@ public:
 	// if startTimer, the Update function will accumulate time
 	// if you want Update to trigger at a specific end time, pass in an end time here,
 	//		also may be set in StartTimer() or SetEndTime()
-	CTriggerTimer( bool autoUpdate = true, bool startTimer = true, double dEndTime = 0.0f);
+	CTriggerTimer( bool autoUpdate = true, bool startTimer = false, double dEndTime = 0.0f);
 
 	bool Update(double dElapsedTime = 0.0);
 

@@ -179,8 +179,9 @@ void COption::Render(float zPos, float scale, DWORD color)
 	if (m_bIsHovered)
 		color = HoveredColor;	// TODO::only set RGB (not alpha) components
 
+// 	rect rDest(m_Rect); rDest.left += 75; rDest.right = 0;
 	point strPos = Globals::g_pBitMapFont->DrawStringAutoCenter(Name.c_str(), m_Rect, zPos, scale, color);
 	// draw the ability's icon to the left of the string
 	if (m_pQBObj)
-		Globals::g_pTM->Render(m_pQBObj->ImageID, strPos.x - 42, strPos.y - 10, zPos, 1.0f, 1.0f, &m_pQBObj->SrcRect, 0.0f, 0.0f, 0.0f, color);
+		Globals::g_pTM->Render(m_pQBObj->ImageID, strPos.x - 42, strPos.y - 5, zPos, 1.0f, 1.0f, &m_pQBObj->SrcRect, 0.0f, 0.0f, 0.0f, color);
 }

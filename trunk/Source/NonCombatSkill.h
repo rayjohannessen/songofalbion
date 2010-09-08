@@ -2,6 +2,24 @@
 
 #include "AbilityObjectBase.h"
 
+struct NonCombatSkillProperties
+{
+
+	NonCombatSkillProperties(bool bDefault = true) 
+	{
+		if (bDefault)
+			Default();
+	}
+	NonCombatSkillProperties(int val1, int val2) 
+	{
+
+	}
+
+	void Default()
+	{
+	}
+};
+
 ////////////////////////// CNonCombatSkill ////////////////////////////////////////
 //	This class would render any effects related to the skill, call the
 //	appropriate attack function, and update any specific variables to this
@@ -16,13 +34,16 @@
 
 class CNonCombatSkill : public CAbilityObjectBase
 {
+	NonCombatSkillProperties m_Properties;
 
 public:
 	CNonCombatSkill() : CAbilityObjectBase() {}
-	CNonCombatSkill(eAbilityTypes type, point pos, string name, AbilityFunction abilityFunc, CQuickBarObject* qbObj, CAbilityProperties& props);
-	~CNonCombatSkill();
-	void Update(double dTimeStep, AbilityReturn& abilRetu);
+	CNonCombatSkill(eAbilityTypes type, point pos, string name, AbilityFunction abilityFunc, CQuickBarObject* qbObj, const NonCombatSkillProperties& props);
+	virtual ~CNonCombatSkill();
+	void Update(double dTimeStep, AbilityReturnBase* const);
 	void Render();
+
+	NonCombatSkillProperties* GetProps()	{ return &m_Properties; }
 };
 
 typedef CNonCombatSkill CSkill;	

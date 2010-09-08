@@ -7,15 +7,14 @@
 #include "UIObjectInfoBase.h"
 #include "BitmapFont.h"
 
-// just starting default values
-// grid sizes may change during game
+// grid number of rows/columns
 const int inv_grid_rows = 10;
 const int inv_grid_cols = 8;
 const int equip_grid_rows = 10;
 const int equip_grid_cols = 5;
 
-UICityInfo::UICityInfo(CCity* const city) : 
-	UIObjectInfoBase(OIT_CITY, 
+UICityInfo::UICityInfo(CObject* const city) : 
+	UIObjectInfoBase(city, OIT_CITY, 
 				 Globals::g_pAssets->GetGUIasts()->Equipped(OIT_CITY), 
 				 Globals::g_pAssets->GetGUIasts()->Info(OIT_CITY), 
 				 Globals::g_pAssets->GetGUIasts()->Inventory(OIT_CITY),
@@ -24,8 +23,7 @@ UICityInfo::UICityInfo(CCity* const city) :
 				 // inventory pos				// equip pos			// info pos
 				 point(450, 100),				point(10, 100),			point(750, 100),
 				 // inventory area size									// equip area size
-				 size(inv_grid_cols*68+16, inv_grid_rows*68+16),		size(equip_grid_cols*68+16, equip_grid_rows*68+16)),
-	m_pCity(city)
+				 size(inv_grid_cols*68+16, inv_grid_rows*68+16),		size(equip_grid_cols*68+16, equip_grid_rows*68+16))
 {
 
 }
@@ -39,10 +37,10 @@ UICityInfo::~UICityInfo()
 //////////////////////////////////////////////////////////////////////////
 void UICityInfo::Render()
 {
-	UIObjectInfoBase::Render();
+//	UIObjectInfoBase::Render();
 
 	// city name
-	Globals::g_pBitMapFont->DrawStringAutoCenter(m_pCity->GetName().c_str(), 
+	Globals::g_pBitMapFont->DrawStringAutoCenter(m_pObject->GetName().c_str(), 
 												 rect(10, 10+Globals::g_pBitMapFont->GetSize(), 0, Globals::g_ptScreenSize.width),
 												 DEPTH_INVOBJ, 1.5f, YELLOW_WHITE);
 }
@@ -54,7 +52,7 @@ void UICityInfo::Render()
 //////////////////////////////////////////////////////////////////////////
 void UICityInfo::Update(double dTimeStep)
 {
-
+	UIObjectInfoBase::Update(dTimeStep);
 }
 
 //////////////////////////////////////////////////////////////////////////

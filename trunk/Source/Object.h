@@ -11,11 +11,12 @@
 #include "ButtonDefines.h"
 #include "AbilityObjectBase.h"
 #include "Pathfinding.h"
+#include "ObjectDefines.h"
 using namespace Pathfinding;
+using namespace ObjectDefines;
 
-enum eObjType	{ OBJ_CITY, OBJ_UNIT, OBJ_BUILDING, };
 enum eAbSelType { AST_ATTACK = MOUSE_LEFT, AST_DEFENSE = MOUSE_RIGHT, };
-enum eInputType	{ IT_HOVER, IT_SELECT_L, IT_SELECT_R, IT_DESELECT, IT_NONE, };
+enum eInputStatus { IS_HOVER, IS_SELECT_L, IS_SELECT_R, IS_DESELECT, IS_NONE, };
 
 class CCombatSkill;
 
@@ -32,9 +33,10 @@ protected:
 	bool	m_bDisplayInfo;	// the info screen master display switch
 
 	eButtonName m_eDefaultAbilityType;
-	eInputType	m_eCurrInputStatus;		// if this object is hovered/selected...
+	eInputStatus m_eCurrInputStatus;	// if this object is hovered/selected...
 	// selection variables (used for units primarily)
-	string		m_strName;
+	string		m_strName;		// an actual name (unit = Llew, Tegid..) (city = Sycharth..)
+	string		m_strTypeName;	// UMKnight, Village, etc.. acts as map key for abilities
 	pointf		m_ptScreenPos;	// where the top-left of the selection rect starts
 	point		m_ptCoord;		// grid coordinates
 	point		m_ptSize;		// width and height (x, y)
@@ -60,7 +62,7 @@ public:
 
 	virtual ~CObject();
 	CObject();
-	CObject(int type, point coord, point wPos, string name, const char* faction, int factionID);
+	CObject(int type, point coord, point wPos, string name, const char* faction, int factionID, string typeName);
 	CObject(CObject& obj);
 
 
@@ -100,14 +102,14 @@ public:
 	inline point GetSize()	const			{ return m_ptSize;		}
 	inline rect* GetSrc()					{ return &m_rSrc;		}
 	inline rectf  GetSelectionRect()const	{ return m_rSelectionRect;}
-	inline string GetName()			const	{ return m_strName;		}
+	inline string GetName()			const	{ return m_strTypeName;	}
 	inline const char* GetFaction()	const	{ return m_szFaction;   }
 	inline short GetFactionID()		const	{ return m_nFactionID;	}
-	inline bool GetIsHovered()		const	{ return m_eCurrInputStatus == IT_HOVER; }
+	inline bool GetIsHovered()		const	{ return m_eCurrInputStatus == IS_HOVER; }
 	inline DWORD GetColor()			const	{ return m_dwColor;		}
 	inline float GetZDepth()		const	{ return m_fZDepth;		}
 	inline eButtonName GetDefAbilityType()	{ return m_eDefaultAbilityType;	}
-	inline eInputType GetCurrInputStatus() const { return m_eCurrInputStatus;}
+	inline eInputStatus GetCurrInputStatus() const { return m_eCurrInputStatus;}
 	inline CCombatSkill* GetDefCombatAbility()		{ return (CCombatSkill*)m_mAbilities[BN_COMBAT_SKILLS][0]; }
 	inline CCombatSkill* GetCurrAttackAbility()		{ if (m_pCurrAttackAbility) return m_pCurrAttackAbility; else return (m_pCurrAttackAbility = GetDefCombatAbility());	}
 	inline CCombatSkill* GetCurrDefenseAbility()	{ if (m_pCurrDefenseAbility) return m_pCurrDefenseAbility; else return (m_pCurrDefenseAbility = GetDefCombatAbility()); }
@@ -133,7 +135,7 @@ public:
 	inline void SetCurrDefenseAbility(CCombatSkill* ability){ m_pCurrDefenseAbility= ability;	}
 	inline void SetCurrAbilOfType(eAbSelType type, CCombatSkill* ability)	
 			{ if (type == AST_ATTACK) m_pCurrAttackAbility = ability; else if (type == AST_DEFENSE) m_pCurrDefenseAbility = ability; }
-	inline void SetInputStatus(eInputType status, DWORD clr) { m_eCurrInputStatus = status; m_dwColor = clr; }	
+	inline void SetInputStatus(eInputStatus status, DWORD clr) { m_eCurrInputStatus = status; m_dwColor = clr; }	
 	inline void ToggleDisplay()						{ m_bDisplayInfo = !m_bDisplayInfo;	}
 };
 

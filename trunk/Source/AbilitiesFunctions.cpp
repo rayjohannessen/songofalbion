@@ -6,6 +6,8 @@
 #include "Animation.h"
 #include "ObjectManager.h"
 #include "Globals.h"
+#include "CombatSkill.h"
+#include "NonCombatSkill.h"
 
 namespace CombatFunctions
 {
@@ -14,48 +16,53 @@ namespace CombatFunctions
 	//////////////////////////////////////////////////////////////////////////
 
 	// Ground units
-	void GroundBaseAttack(CObject* defender, CObject* attacker, AbilityReturn& abilRet)
+	void GroundBaseAttack(CObject* defender, CObject* attacker, AbilityReturnBase* abilRet)
 	{
-		abilRet.Clear();
-		abilRet.ApplyDamages = ((CUnit*)attacker)->GetCurrAnim().IsAtMiddlePoint();
-		if (abilRet.ApplyDamages)
+		CombatAbilityReturn* combAbil = ((CombatAbilityReturn*)abilRet);
+		combAbil->Reset();
+		combAbil->ApplyDamages = ((CUnit*)attacker)->GetCurrAnim().IsAtMiddlePoint();
+		if (combAbil->ApplyDamages)
 		{
-			formula_BasicAttacker(defender, attacker, abilRet);
+			formula_BasicAttacker(defender, attacker, *(CombatAbilityReturn*)abilRet);
 		}
 
 	}
 
 	// Air units
-	void AirBaseAttack(CObject* defender, CObject* attacker, AbilityReturn& abilRet)
+	void AirBaseAttack(CObject* defender, CObject* attacker, AbilityReturnBase* abilRet)
 	{
-		abilRet.Clear();
+		CombatAbilityReturn* combAbil = ((CombatAbilityReturn*)abilRet);
+		combAbil->Reset();
 	}
 
 	// Sea units
-	void SeaBaseAttack(CObject* defender, CObject* attacker, AbilityReturn& abilRet)
+	void SeaBaseAttack(CObject* defender, CObject* attacker, AbilityReturnBase* abilRet)
 	{
-		abilRet.Clear();
+		CombatAbilityReturn* combAbil = ((CombatAbilityReturn*)abilRet);
+		combAbil->Reset();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	//	Ground
 	//////////////////////////////////////////////////////////////////////////
-	void Charge(CObject* defender, CObject* attacker, AbilityReturn& abilRet)
+	void Charge(CObject* defender, CObject* attacker, AbilityReturnBase* abilRet)
 	{
-		abilRet.Clear();
-		abilRet.ApplyDamages = ((CUnit*)attacker)->GetCurrAnim().IsAtMiddlePoint();
-		if (abilRet.ApplyDamages)
+		CombatAbilityReturn* combAbil = ((CombatAbilityReturn*)abilRet);
+		combAbil->Reset();
+		combAbil->ApplyDamages = ((CUnit*)attacker)->GetCurrAnim().IsAtMiddlePoint();
+		if (combAbil->ApplyDamages)
 		{
-			formula_BasicAttacker(defender, attacker, abilRet);
+			formula_BasicAttacker(defender, attacker, *(CombatAbilityReturn*)abilRet);
 		}
 	}
-	void Flank(CObject* defender, CObject* attacker, AbilityReturn& abilRet)
+	void Flank(CObject* defender, CObject* attacker, AbilityReturnBase* abilRet)
 	{
-		abilRet.Clear();
-		abilRet.ApplyDamages = ((CUnit*)attacker)->GetCurrAnim().IsAtMiddlePoint();
-		if (abilRet.ApplyDamages)
+		CombatAbilityReturn* combAbil = ((CombatAbilityReturn*)abilRet);
+		combAbil->Reset();
+		combAbil->ApplyDamages = ((CUnit*)attacker)->GetCurrAnim().IsAtMiddlePoint();
+		if (combAbil->ApplyDamages)
 		{
-			formula_BasicAttacker(defender, attacker, abilRet);
+			formula_BasicAttacker(defender, attacker, *(CombatAbilityReturn*)abilRet);
 		}
 	}
 
@@ -78,7 +85,7 @@ namespace CombatFunctions
 	// could replace .1f with an experience-related formula
 	// allow for critical hits (call it something else in-game)
 	// TODO::add terrain into one of these formulas
-	void formula_BasicAttacker(CObject* _defender, CObject* _attacker, AbilityReturn& abilRet)
+	void formula_BasicAttacker(CObject* _defender, CObject* _attacker, CombatAbilityReturn& abilRet)
 	{
 		const static float rangeModifier = .2f;
 		float dmgToTarget = 0.0f;
@@ -86,8 +93,8 @@ namespace CombatFunctions
 		defender	= (CUnit*)_defender;
 		attacker	= (CUnit*)_attacker;
 
-		CAbilityProperties* attackerProps = &((CAbilityObjectBase*)attacker->GetCurrAttackAbility())->GetProps();
-		CAbilityProperties* defenderProps = &((CAbilityObjectBase*)defender->GetCurrDefenseAbility())->GetProps(); 
+		CombatSkillProperties* attackerProps = attacker->GetCurrAttackAbility()->GetProps();
+		CombatSkillProperties* defenderProps = defender->GetCurrDefenseAbility()->GetProps(); 
 
 		float attackerAttk  = (float)attacker->GetAttk();
 		float defenderDef	= (float)defender->GetAttk();
@@ -121,7 +128,7 @@ namespace CombatFunctions
 			abilRet.ObjsToEliminate.push_back(defender);
 	}
 
-	void formula_BasicDefender(CObject* _defender, CObject* _attacker, AbilityReturn& abilRet)
+	void formula_BasicDefender(CObject* _defender, CObject* _attacker, CombatAbilityReturn& abilRet)
 	{
 // 		const static float rangeModifier = .2f;
 // 		float dmgToAttacker = 0.0f;
@@ -186,4 +193,17 @@ namespace CombatFunctions
 			val = high;
 	}
 #pragma endregion
+}
+
+namespace NonCombatFunctions
+{
+	void HealUnit(CObject* targetObj, CObject* thisPtr, AbilityReturnBase* abilRet)
+	{
+
+	}
+
+	void PromoteUnit(CObject* targetObj, CObject* thisPtr, AbilityReturnBase* abilRet)
+	{
+
+	}
 }

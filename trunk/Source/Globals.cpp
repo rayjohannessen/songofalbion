@@ -33,7 +33,7 @@ CMap*					Globals::g_pMap			= NULL;
 ObjectManager*			Globals::g_pObjManager	= NULL;
 Players*				Globals::g_vPlayers		= NULL;
 CPlayer*				Globals::g_pCurrPlayer	= NULL;
-UnitNamesTypes*			Globals::g_vUnitNames	= NULL;	// initialized in CAssets
+ObjectNamesTypes*		Globals::g_vUnitNames	= NULL;	// initialized in CAssets
 CAnimationsManager*		Globals::g_pAnimManager	= NULL;	// initialized in CAssets
 CAbilitiesManager*		Globals::g_pAbilitiesManager = NULL;
 CMenu*					Globals::g_pMenus[NUM_MENUOPTION_TYPES] = {};
@@ -41,7 +41,7 @@ CMenu*					Globals::g_pMenusInGame[NUM_INGAME_MENU_TYPES] = {};
 
 bool Globals::InitGlobals(HWND hWnd, HINSTANCE hInstance, int nScreenWidth, int nScreenHeight, bool bIsWindowed)
 {
-	g_vUnitNames    = new UnitNamesTypes;
+	g_vUnitNames    = new ObjectNamesTypes;
 	g_pD3D			= CSGD_Direct3D::GetInstance();
 	g_pTM			= CSGD_TextureManager::GetInstance();
 	g_pDI			= CSGD_DirectInput::GetInstance();
