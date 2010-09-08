@@ -2,7 +2,7 @@
 
 class CObject;
 class CCombatSkill;
-struct AbilityReturn;
+struct CombatAbilityReturn;
 
 class CBattleManager
 {
@@ -31,6 +31,6 @@ public:
 	bool Update(double dElapsedTime);
 
 	// returns true if the battle is complete
-	bool OnAbilityFinished( AbilityReturn* abilRet = NULL);
-	void OnApplyDamages( AbilityReturn *abilRet );
+	bool OnAbilityFinished( CombatAbilityReturn* abilRet = NULL);
+	void OnApplyDamages( CombatAbilityReturn *abilRet );
 };

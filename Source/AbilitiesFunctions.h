@@ -23,19 +23,19 @@ namespace CombatFunctions
 	//////////////////////////////////////////////////////////////////////////
 
 	// Ground units
-	void GroundBaseAttack(CObject* targetObj, CObject* thisPtr, AbilityReturn& abilRet);
+	void GroundBaseAttack(CObject* targetObj, CObject* thisPtr, AbilityReturnBase* abilRet);
 
 	// Air units
-	void AirBaseAttack(CObject* targetObj, CObject* thisPtr, AbilityReturn& abilRet);
+	void AirBaseAttack(CObject* targetObj, CObject* thisPtr, AbilityReturnBase* abilRet);
 	
 	// Sea units
-	void SeaBaseAttack(CObject* targetObj, CObject* thisPtr, AbilityReturn& abilRet);
+	void SeaBaseAttack(CObject* targetObj, CObject* thisPtr, AbilityReturnBase* abilRet);
 
 	//////////////////////////////////////////////////////////////////////////
 	//	Ground
 	//////////////////////////////////////////////////////////////////////////
-	void Charge(CObject* targetObj, CObject* thisPtr, AbilityReturn& abilRet);
-	void Flank(CObject* targetObj, CObject* thisPtr, AbilityReturn& abilRet);
+	void Charge(CObject* targetObj, CObject* thisPtr, AbilityReturnBase* abilRet);
+	void Flank(CObject* targetObj, CObject* thisPtr, AbilityReturnBase* abilRet);
 
 	//////////////////////////////////////////////////////////////////////////
 	//	Air
@@ -47,15 +47,24 @@ namespace CombatFunctions
 
 
 	//////////////////////////////////////////////////////////////////////////
-	// FORMULAS - returns the object that has died (if any), otherwise NULL
+	// FORMULAS - returns the results in CombatAbilityReturn struct
 	//////////////////////////////////////////////////////////////////////////
-	void formula_BasicAttacker(CObject* targetObj, CObject* thisPtr, AbilityReturn& abilRet);
-	void formula_BasicDefender(CObject* targetObj, CObject* thisPtr, AbilityReturn& abilRet);
+	void formula_BasicAttacker(CObject* targetObj, CObject* thisPtr, CombatAbilityReturn& abilRet);
+	void formula_BasicDefender(CObject* targetObj, CObject* thisPtr, CombatAbilityReturn& abilRet);
 
+	// helpers
 	inline void clamp(float& val, float low = 0.0f, float high = 1.0f);
 	inline void clamp_low(float& val, float low = 0.0f);
 	inline void clamp_high(float& val, float high = 1.0f);
 
+	// battle constants
 	static const float BaseAtkBonus = 1.75f;
 	static const float BaseDefPenalty = 0.8f;
+}
+
+namespace NonCombatFunctions
+{
+	void HealUnit(CObject* targetObj, CObject* thisPtr, AbilityReturnBase* abilRet);
+
+	void PromoteUnit(CObject* targetObj, CObject* thisPtr, AbilityReturnBase* abilRet);
 }

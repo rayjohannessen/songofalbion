@@ -29,17 +29,33 @@ CUIWindowBase* BtnAction_OptionBox(CObject* obj, CButton& btn)
 
 			point btmRight = Globals::g_ptQBPos;
 			btmRight.x += 256; // size of the quick bar texture
-			btmRight.y -= 20;
+			btmRight.y -= 30;
 			CWindowVariablesBase* pVariables = new CWindowVariablesBase(btmRight, "Combat Skills", options, OptionProps());
 			pWindow = new CUIOptionsWindow(Globals::g_pAssets->GetGUIasts()->BlackPixel(), pVariables);
 			
 		}break;
 	case BN_SKILLS:		// same functionality as BN_NONCOMBAT_SKILLS, just a diff image (and therefore name)
 		{
+			OptionsList options;
+			OptionListFromAbilities(obj->GetUnlockedAbilities(btn.GetButtonName()), options);
+
+			point btmRight = Globals::g_ptQBPos;
+			btmRight.x += 256; // size of the quick bar texture
+			btmRight.y -= 30;
+			CWindowVariablesBase* pVariables = new CWindowVariablesBase(btmRight, "Skills", options, OptionProps());
+			pWindow = new CUIOptionsWindow(Globals::g_pAssets->GetGUIasts()->BlackPixel(), pVariables);
 
 		}break;
 	case BN_NONCOMBAT_SKILLS:
 		{
+			OptionsList options;
+			OptionListFromAbilities(obj->GetUnlockedAbilities(btn.GetButtonName()), options);
+
+			point btmRight = Globals::g_ptQBPos;
+			btmRight.x += 256; // size of the quick bar texture
+			btmRight.y -= 30;
+			CWindowVariablesBase* pVariables = new CWindowVariablesBase(btmRight, "NC Skills", options, OptionProps());
+			pWindow = new CUIOptionsWindow(Globals::g_pAssets->GetGUIasts()->BlackPixel(), pVariables);
 
 		}break;
 	case BN_GEAR:

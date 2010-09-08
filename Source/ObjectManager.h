@@ -24,9 +24,9 @@ public:
 
 	//////////////////////////////////////////////////////////////////////////
 	// add/remove object(s)
-	void AddObject(CObject*& obj, point& sPos);
 	void RemoveAll();
 	void RemoveObj(CPlayer* player, CObject* obj);
+	void AddObject(CObject* const obj, point& sPos);
 	//////////////////////////////////////////////////////////////////////////
 
 	void Input(const POINT& mouse);

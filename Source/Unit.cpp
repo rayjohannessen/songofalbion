@@ -51,19 +51,22 @@ CUnit::CUnit(CUnit& unit)
 }
 
 CUnit::CUnit( int nUnitType, int type, point& coord, point& sPos, string name, const char* faction, int factionID) : 
-	CObject(type, coord, sPos, name, faction, factionID), 
+	CObject(type, coord, sPos, name, faction, factionID, UnitDefines::gUnitNames[nUnitType]), 
+	m_bMovingToAttack(false),
 	m_pPath(NULL), 
-	m_pNeighborEnemy(NULL)
+	m_pNeighborEnemy(NULL),
+	m_nUnitType(nUnitType)	// most units' source rects should be the same size, use default size for now (w=128, h=128)
 {
-	// most units' source rects should be the same size, use default size for now (w=128, h=128)
-	m_nUnitType = nUnitType;
 	SetImageID(0);
 
-	ObjAnimations anims = Globals::g_pAnimManager->GetAnimations(m_strName);
+	//////////////////////////////////////////////////////////////////////////
+	// set anim-related values
+	ObjAnimations anims = Globals::g_pAnimManager->GetAnimations(m_strTypeName);
 	m_nNumAnims = anims.size();
 	for (int i = 0; i < m_nNumAnims; ++i)
 		m_mAnimations[anims[i].Name] = new CAnimation(DIR_E, anims[i]);
 	m_strCurrAnim = anims[0].Name;
+	//////////////////////////////////////////////////////////////////////////
 
 	switch (nUnitType)
 	{

@@ -7,10 +7,12 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "InventoryObject.h"
+#include "Timer.h"
 
 enum eObjectInfoType {OIT_UNIT, OIT_CITY, OIT_CASTLE, NUM_OIT};
 
 class UICityInfo;
+class CObject;
 
 class UIObjectInfoBase
 {
@@ -42,6 +44,7 @@ class UIObjectInfoBase
 	InventoryObject* m_pHoveredObj;	// any object being hovered by the mouse
 	Inventory*		 m_pMovingObjSrc;	// the inventory that the current movingObj came from
 	unsigned		 m_uiHoverObjID;	// cell id of hovered object
+	CObject*		 m_pObject;			// the object this info is for
 
 	int m_nEquippedImage;
 	int m_nInfoImage;		// for stats/description
@@ -59,6 +62,7 @@ class UIObjectInfoBase
 	Grid	  m_EquipGrid;	//	..
 	Inventory m_vEquipped;
 	Inventory m_vAvailable;
+	CTriggerTimer m_Timer;
 
 	// assumes the hovered object is the one being replaced
 	void ReplaceObj(InventoryObject* const placingObj, Inventory& intoInv, int invInd);
@@ -66,6 +70,7 @@ class UIObjectInfoBase
 	void DetermineObjPos( point &actualPt, point &startPt, int slotID, Grid& grid );
 	// returns true if an object is hovered
 	bool CheckInvForInput(Inventory& inventory, Grid& grid, Inventory* hoveredInv, const POINT& mouse);
+	void HandleInventoryInput( const POINT& mouse );
 
 	//////////////////////////////////////////////////////////////////////////
 	//	FUNCTION: RemoveObj
@@ -73,7 +78,7 @@ class UIObjectInfoBase
 	void RemoveObj(const InventoryObject* const invObj, Inventory& inventory, bool del);
 
 public:
-	UIObjectInfoBase(eObjectInfoType type, int equipID, int infoID, int inventoryID, Grid& gInv, Grid& gEquip,
+	UIObjectInfoBase(CObject* const obj, eObjectInfoType type, int equipID, int infoID, int inventoryID, Grid& gInv, Grid& gEquip,
 						const point& invPos, const point& equipPos, const point& infoPos, const size& invInput, const size& equipInput);
 	virtual ~UIObjectInfoBase() = 0 {};
 

@@ -16,16 +16,17 @@ using namespace Pathfinding;
 
 CObject::CObject() :
 	m_nImageID(-1),
-	m_eCurrInputStatus(IT_NONE),
+	m_eCurrInputStatus(IS_NONE),
 	m_strName("BOB"),
 	m_pCurrAttackAbility(NULL),
 	m_pCurrDefenseAbility(NULL)
 { }
 
-CObject::CObject(int type, point coord, point scrnPos, string name, const char* faction, int factionID) :
+CObject::CObject(int type, point coord, point scrnPos, string name, const char* faction, int factionID, string typeName) :
 	m_bDisplayInfo(false),
 	m_nImageID(-1),
 	m_nType(type),
+	m_strTypeName(typeName),
 	m_rSrc(0, 128, 0, 128),
 	m_rSelectionRect(scrnPos, point(128, 128)),
 	m_strName(name),
@@ -40,8 +41,7 @@ CObject::CObject(int type, point coord, point scrnPos, string name, const char* 
 	m_pCurrAttackAbility(NULL),
 	m_pCurrDefenseAbility(NULL),
 	m_fZDepth(DEPTH_OBJECT),
-	m_eCurrInputStatus(IT_NONE),
-	m_eDefaultAbilityType(BN_COMBAT_SKILLS)
+	m_eCurrInputStatus(IS_NONE)
 {
 	// set up the offset so the object is centered on the tiles
 	switch (type)
@@ -50,22 +50,25 @@ CObject::CObject(int type, point coord, point scrnPos, string name, const char* 
 		{
 			m_ptOffset = point(-5, 0);
 			m_fZDepth = DEPTH_CITY;
+			m_eDefaultAbilityType = BN_NONCOMBAT_SKILLS;
 		}break;		
 	case OBJ_UNIT:
 		{
 			m_ptOffset = point(20, -20);
 			m_fScaleX = m_fScaleY = 0.7f;
 			m_fZDepth = DEPTH_UNIT;
+			m_eDefaultAbilityType = BN_COMBAT_SKILLS;
 		}break;
 	case OBJ_BUILDING:
 		{
 			m_ptOffset = point(-5, 0);
 			m_fZDepth = DEPTH_BUILDING;
+			m_eDefaultAbilityType = BN_NONCOMBAT_SKILLS;
 		}break;		
 	}
 	
 	// setup starting abilities and quick bar slots
-	Globals::g_pAbilitiesManager->GetUnlockedStartingAbilities(m_strName, m_mAbilities);
+	Globals::g_pAbilitiesManager->GetUnlockedStartingAbilities(m_strTypeName, m_mAbilities);
 	ClearQBSlotORSlots();
 	AbilitiesIter iter, end; unsigned i;
 	for (iter = m_mAbilities[m_eDefaultAbilityType].begin(), end = m_mAbilities[m_eDefaultAbilityType].end(), i = 0; i < NUM_QB_SLOTS && iter != end; ++iter, ++i)
@@ -92,12 +95,8 @@ void CObject::Update(double dTimeStep, const pointf* moveAmt)
 }
 
 void CObject::Render(const rect& viewPort )
-{
-	// units draw themselves...
-	if (m_nType != OBJ_UNIT)																
-		Globals::g_pTM->Render(GetImageID(), (int)m_ptScreenPos.x, (int)m_ptScreenPos.y, m_fZDepth, m_fScaleX, m_fScaleY, GetSrc(), 0.0f, 0.0f, 0.0f, m_dwColor);	
-	
-	if (m_eCurrInputStatus < IT_DESELECT)	// this means anything needing to draw for being hovered/selected
+{	
+	if (m_eCurrInputStatus < IS_DESELECT)	// this means anything needing to draw for being hovered/selected
 	{
 		Globals::g_pTM->Render(Globals::g_pAssets->GetGUIasts()->FactionImages(m_nFactionID), (int)m_ptScreenPos.x+32, (int)m_ptScreenPos.y, m_fZDepth, 0.8f, 0.8f);
 

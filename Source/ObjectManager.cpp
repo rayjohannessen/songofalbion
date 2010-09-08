@@ -64,13 +64,13 @@ void ObjectManager::ChangeCurrObj(CObject *currObj)
 CObject* ObjectManager::StartTurn(CPlayer* currPlayer)
 {
 	m_lCurrPlayerObjects.clear();
-	int numUnits = currPlayer->GetNumUnits();
+	unsigned numUnits = currPlayer->GetNumUnits();
 	if (numUnits > 0)
 	{
-		for (int i = 0; i < numUnits; ++i)
+		for (unsigned i = 0; i < numUnits; ++i)
 		{
-			((CUnit*)currPlayer->GetUnits())[i].Reset();
-			m_lCurrPlayerObjects.push_back(&currPlayer->GetUnits()[i]);
+			currPlayer->GetUnits()[i]->Reset();
+			m_lCurrPlayerObjects.push_back(currPlayer->GetUnits()[i]);
 		}
 		m_iCurrObjIter = m_lCurrPlayerObjects.begin();
 		Globals::g_pMap->SelectObj((*m_iCurrObjIter));
@@ -82,8 +82,8 @@ CObject* ObjectManager::StartTurn(CPlayer* currPlayer)
 }
 void ObjectManager::EndTurn()
 {
-	if ( m_lCurrPlayerObjects.size() && (*m_iCurrObjIter) )
-		Globals::g_pMap->ActionIfSelected(*m_iCurrObjIter);
+	//if ( m_lCurrPlayerObjects.size() && (*m_iCurrObjIter) )
+		Globals::g_pMap->OnEndTurn();//ActionIfSelected(*m_iCurrObjIter);
 	Globals::GotoNextPlayer();
 }
 
@@ -91,33 +91,34 @@ void ObjectManager::Input(const POINT& mouse)
 {
 	m_iPlayersIter = Globals::GetPlayers().begin();
 	m_iPlayersIterEnd = Globals::GetPlayers().end();
+	unsigned numObjects;
 	for ( ; m_iPlayersIter != m_iPlayersIterEnd; ++m_iPlayersIter)
 	{
 		CPlayer* player = (*m_iPlayersIter);
 
 		// Draw buildings
-		CBuilding* bldng = player->GetBuildings(); int numBldngs = player->GetNumBldngs();
-		for (int i = 0; i < numBldngs; ++i)
+		CBuilding** bldng = player->GetBuildings(); numObjects = player->GetNumBldngs();
+		for (unsigned i = 0; i < numObjects; ++i)
 		{
-			if (bldng[i].GetImageID() == -1)
+			if (bldng[i]->GetImageID() == -1)
 				continue;
-			bldng[i].Input(mouse);
+			bldng[i]->Input(mouse);
 		}
 		// Draw cities
-		CCity* city = player->GetCities(); int numCities = player->GetNumCities();
-		for (int i = 0; i < numCities; ++i)
+		CCity** city = player->GetCities(); numObjects = player->GetNumCities();
+		for (unsigned i = 0; i < numObjects; ++i)
 		{
-			if (city[i].GetImageID() == -1)
+			if (city[i]->GetImageID() == -1)
 				continue;
-			city[i].Input(mouse);
+			city[i]->Input(mouse);
 		}
 		// Draw units
-		CUnit* unit = player->GetUnits(); int numUnits = player->GetNumUnits();	
-		for (int i = 0; i < numUnits; ++i)
+		CUnit** unit = player->GetUnits(); numObjects = player->GetNumUnits();	
+		for (unsigned i = 0; i < numObjects; ++i)
 		{
-			if (unit[i].GetImageID() == -1)
+			if (unit[i]->GetImageID() == -1)
 				continue;
-			unit[i].Input(mouse);
+			unit[i]->Input(mouse);
 		}
 	}
 }
@@ -126,33 +127,34 @@ void ObjectManager::Update(double dTimeStep, const pointf* moveAmt)
 {
 	m_iPlayersIter = Globals::GetPlayers().begin();
 	m_iPlayersIterEnd = Globals::GetPlayers().end();
+	unsigned numObjects;
 	for ( ; m_iPlayersIter != m_iPlayersIterEnd; ++m_iPlayersIter)
 	{
 		CPlayer* player = (*m_iPlayersIter);
 
 		// Draw buildings
-		CBuilding* bldng = player->GetBuildings(); int numBldngs = player->GetNumBldngs();
-		for (int i = 0; i < numBldngs; ++i)
+		CBuilding** bldng = player->GetBuildings(); numObjects = player->GetNumBldngs();
+		for (unsigned i = 0; i < numObjects; ++i)
 		{
-			if (bldng[i].GetImageID() == -1)
+			if (bldng[i]->GetImageID() == -1)
 				continue;
-			bldng[i].Update(dTimeStep, moveAmt);
+			bldng[i]->Update(dTimeStep, moveAmt);
 		}
 		// Draw cities
-		CCity* city = player->GetCities(); int numCities = player->GetNumCities();
-		for (int i = 0; i < numCities; ++i)
+		CCity** city = player->GetCities(); numObjects = player->GetNumCities();
+		for (unsigned i = 0; i < numObjects; ++i)
 		{
-			if (city[i].GetImageID() == -1)
+			if (city[i]->GetImageID() == -1)
 				continue;
-			city[i].Update(dTimeStep, moveAmt);
+			city[i]->Update(dTimeStep, moveAmt);
 		}
 		// Draw units
-		CUnit* unit = player->GetUnits(); int numUnits = player->GetNumUnits();	
-		for (int i = 0; i < numUnits; ++i)
+		CUnit** unit = player->GetUnits(); numObjects = player->GetNumUnits();	
+		for (unsigned i = 0; i < numObjects; ++i)
 		{
-			if (unit[i].GetImageID() == -1)
+			if (unit[i]->GetImageID() == -1)
 				continue;
-			unit[i].Update(dTimeStep, moveAmt);
+			unit[i]->Update(dTimeStep, moveAmt);
 		}
 	}
 }
@@ -161,33 +163,34 @@ void ObjectManager::Render()
 {
 	m_iPlayersIter = Globals::GetPlayers().begin();
 	m_iPlayersIterEnd = Globals::GetPlayers().end();
+	unsigned numObjects;
 	for ( ; m_iPlayersIter != m_iPlayersIterEnd; ++m_iPlayersIter)
 	{
 		CPlayer* player = (*m_iPlayersIter);
 
 		// Draw buildings
-		CBuilding* bldng = player->GetBuildings(); int numBldngs = player->GetNumBldngs();
-		for (int i = 0; i < numBldngs; ++i)
+		CBuilding** bldng = player->GetBuildings(); numObjects = player->GetNumBldngs();
+		for (unsigned i = 0; i < numObjects; ++i)
 		{
-			if (bldng[i].GetImageID() == -1)
+			if (bldng[i]->GetImageID() == -1)
 				continue;
-			bldng[i].Render(Globals::g_pMap->GetViewport());
+			bldng[i]->Render(Globals::g_pMap->GetViewport());
 		}
 		// Draw cities
-		CCity* city = player->GetCities(); int numCities = player->GetNumCities();
-		for (int i = 0; i < numCities; ++i)
+		CCity** city = player->GetCities(); numObjects = player->GetNumCities();
+		for (unsigned i = 0; i < numObjects; ++i)
 		{
-			if (city[i].GetImageID() == -1)
+			if (city[i]->GetImageID() == -1)
 				continue;
-			city[i].Render(Globals::g_pMap->GetViewport());
+			city[i]->Render(Globals::g_pMap->GetViewport());
 		}
 		// Draw units
-		CUnit* unit = player->GetUnits(); int numUnits = player->GetNumUnits();	
-		for (int i = 0; i < numUnits; ++i)
+		CUnit** unit = player->GetUnits(); numObjects = player->GetNumUnits();	
+		for (unsigned i = 0; i < numObjects; ++i)
 		{
-			if (unit[i].GetImageID() == -1)
+			if (unit[i]->GetImageID() == -1)
 				continue;
-			unit[i].Render(Globals::g_pMap->GetViewport());
+			unit[i]->Render(Globals::g_pMap->GetViewport());
 		}
 	}
 }
@@ -197,7 +200,7 @@ void ObjectManager::Init()
 
 }
 
-void ObjectManager::AddObject(CObject*& obj, point& sPos)
+void ObjectManager::AddObject(CObject* const obj, point& sPos)
 {
 	CPlayer* player = Globals::GetPlayerByFactionID(obj->GetFactionID());
 	switch (obj->GetType())
@@ -205,23 +208,20 @@ void ObjectManager::AddObject(CObject*& obj, point& sPos)
 	case OBJ_CITY:
 		{
 			obj->SetScrnPos(sPos);
-			player->AddCity(*((CCity*)obj));
 		}
 		break;
 	case OBJ_UNIT:
 		{
 			((CUnit*)obj)->SetScrnPos(sPos);
-			player->AddUnit(*((CUnit*)obj));
 		}
 		break;
 	case OBJ_BUILDING:
 		{
 			obj->SetScrnPos(sPos);
-			player->AddBuilding(*((CBuilding*)obj));
 		}
 		break;
 	}
-	SAFE_DELETE(obj);
+	player->AddObject(obj);
 }
 
 void ObjectManager::RemoveAll()
@@ -234,17 +234,17 @@ void ObjectManager::RemoveObj(CPlayer* player, CObject* pObj)
 {
 	Globals::g_pMap->ActionIfSelected(pObj);
 	// get type of hovered object
-	int numObj = 0;
+	unsigned numObj = 0;
 	switch (pObj->GetType())
 	{
 	case OBJ_CITY:
 		{
 			numObj = player->GetNumCities();
-			for (int i = 0; i < numObj; ++i)
+			for (unsigned i = 0; i < numObj; ++i)
 			{
-				if (pObj == &player->GetCities()[i])
+				if (pObj == player->GetCities()[i])
 				{
-					player->RemoveCity(i);
+					player->RemoveObject(OBJ_CITY, i);
 				}break;
 			}
 		}
@@ -252,14 +252,14 @@ void ObjectManager::RemoveObj(CPlayer* player, CObject* pObj)
 	case OBJ_UNIT:
 		{
 			numObj = player->GetNumUnits();
-			for (int i = 0; i < numObj; ++i)
+			for (unsigned i = 0; i < numObj; ++i)
 			{
-				if (pObj == &player->GetUnits()[i])
+				if (pObj == player->GetUnits()[i])
 				{
 					CUnit* unit = (CUnit*)pObj;
 					if (unit->GetNeighbor())
 						unit->GetNeighbor()->CenterUnit();
-					player->RemoveUnit(i);
+					player->RemoveObject(OBJ_UNIT, i);
 				}break;
 			}
 		}
@@ -267,11 +267,11 @@ void ObjectManager::RemoveObj(CPlayer* player, CObject* pObj)
 	case OBJ_BUILDING:
 		{
 			numObj = player->GetNumBldngs();
-			for (int i = 0; i < numObj; ++i)
+			for (unsigned i = 0; i < numObj; ++i)
 			{
-				if (pObj == &player->GetBuildings()[i])
+				if (pObj == player->GetBuildings()[i])
 				{
-					player->RemoveBldng(i);
+					player->RemoveObject(OBJ_BUILDING, i);
 				}break;
 			}
 		}
@@ -303,7 +303,7 @@ CUnit* ObjectManager::IsSpaceOccupied(const point& coord)
 		numUnits = player->GetNumUnits();
 		for (int i = 0; i < numUnits; ++i)
 		{
-			pUnit = &player->GetUnits()[i];
+			pUnit = player->GetUnits()[i];
 			if (pUnit->GetCoord() == coord)
 				return pUnit;
 		}

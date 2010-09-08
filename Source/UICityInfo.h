@@ -6,10 +6,9 @@ class CCity;
 
 class UICityInfo : public UIObjectInfoBase
 {
-	CCity*	m_pCity;	// the city that this object is for
 
 public:
-	UICityInfo(CCity* const city);
+	UICityInfo(CObject* const city);
 	~UICityInfo();
 
 	//////////////////////////////////////////////////////////////////////////

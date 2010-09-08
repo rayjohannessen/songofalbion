@@ -5,7 +5,7 @@
 
 class CObject;
 class TiXmlElement;
-struct UnitData;
+struct ObjectData;
 
 typedef string ObjectName;
 typedef string AbilityName;
@@ -19,18 +19,20 @@ typedef string AbilityName;
 //
 //////////////////////////////////////////////////////////////////////////
 
-enum eAttack 
+enum eAbility 
 {
 	A_BASE = 0,
 	A_CHARGE = 1, A_FLANK = 2,
-	NUM_ATTACKS
+	A_HEALUNIT = 3, A_PROMOTEUNIT = 4,
+	NUM_ABILITIES
 };
-struct AttackInfo 
+
+struct AbilityInfo 
 {
 	string Name;
 	AbilityFunction FuncPtr;
-	AttackInfo() {}
-	AttackInfo(const string name, AbilityFunction func) : Name(name), FuncPtr(func) {}
+	AbilityInfo() {}
+	AbilityInfo(const string name, AbilityFunction func) : Name(name), FuncPtr(func) {}
 };
 
 class CAbilitiesManager
@@ -53,7 +55,7 @@ class CAbilitiesManager
 	typedef vector<CQuickBarObject*> QuickBarObjects;
 	typedef vector<CQuickBarObject*>::iterator QBObjIter;
 
-	AbilityNames m_vAttackNames;	// filled with attack names that files have definitions for the corresponding attacks
+	AbilityNames m_vAbilityNames;	// filled with attack names that files have definitions for the corresponding attacks
 
 	ObjectAbilityMultimap	m_mObjectAbilities;
 	AbilityMultimapRange	m_Range;
@@ -75,7 +77,7 @@ class CAbilitiesManager
 	void GetCityInfo( TiXmlElement* pRoot );
 	void GetBuildingInfo( TiXmlElement* pRoot );
 
-	void InitUnitCombatBaseAbility(const UnitData* unitData);
+	void InitUnitCombatBaseAbility(const ObjectData* unitData);
 	bool LoadAbilityInfo(const string& path);
 
 public:
@@ -83,7 +85,7 @@ public:
 	void Init();
 	void Shutdown();
 
-	void AddAttackName(const string& attackName) { m_vAttackNames.push_back(attackName); }
+	void AddAttackName(const string& attackName) { m_vAbilityNames.push_back(attackName); }
 	//////////////////////////////////////////////////////////////////////////
 	// Accessors
 	CAbilityObjectBase* GetAbility(const string& unitName, const string& ability);

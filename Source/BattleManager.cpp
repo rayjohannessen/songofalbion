@@ -38,8 +38,8 @@ bool CBattleManager::Update(double dElapsedTime)
 
 	// TODO:: incorporate defensive abilities... (needing to update both abilities simultaneously)
 	// for now, just do the currently attacking object's ability
-	AbilityReturn abilRet;
-	m_pCurrAbility->Update(dElapsedTime, abilRet);
+	CombatAbilityReturn abilRet;
+	m_pCurrAbility->Update(dElapsedTime, &abilRet);
 
 	if (abilRet.ApplyDamages)
 		OnApplyDamages(&abilRet);
@@ -50,7 +50,7 @@ bool CBattleManager::Update(double dElapsedTime)
 	return battleComplete;
 }
 
-bool CBattleManager::OnAbilityFinished( AbilityReturn *abilRet )
+bool CBattleManager::OnAbilityFinished( CombatAbilityReturn *abilRet )
 {
 	// reset current - should be done at the beginning of an object's turn
 	m_pCurrAbility->ResetResultsApplied();
@@ -63,10 +63,10 @@ bool CBattleManager::OnAbilityFinished( AbilityReturn *abilRet )
 		m_pCurrentObj	= m_pDefender;
 		unit			= ((CUnit*)m_pCurrentObj);
 		// this unit is defending, see if it has any free counters
-		if (m_pCurrAbility->GetCombatProps().CurrFreeCounters > 0)
+		if (m_pCurrAbility->GetProps()->CurrFreeCounters > 0)
 		{
 			// a free counter-attack
-			--m_pCurrAbility->GetCombatProps().CurrFreeCounters;
+			--m_pCurrAbility->GetProps()->CurrFreeCounters;
 			unit->ChangeAnim("Attack");
 			unit->GetCurrAnim().Play();
 			return false;
@@ -93,7 +93,7 @@ bool CBattleManager::OnAbilityFinished( AbilityReturn *abilRet )
 // 			Reset();
 // 			return true;
 // 		}
-		m_pDefender->GetCurrDefenseAbility()->GetCombatProps().CurrFreeCounters = m_pCurrAbility->GetCombatProps().CurrFreeCounters;
+		m_pDefender->GetCurrDefenseAbility()->GetProps()->CurrFreeCounters = m_pCurrAbility->GetProps()->CurrFreeCounters;
 		Reset();
 		return true;	// the attacker is done as well, signal to end this battle
 	}
@@ -101,7 +101,7 @@ bool CBattleManager::OnAbilityFinished( AbilityReturn *abilRet )
 	return false;
 }
 
-void CBattleManager::OnApplyDamages( AbilityReturn *abilRet )
+void CBattleManager::OnApplyDamages( CombatAbilityReturn *abilRet )
 {
 	ObjIter iter = abilRet->ObjsToEliminate.begin();
 	ObjIter end  = abilRet->ObjsToEliminate.end();
