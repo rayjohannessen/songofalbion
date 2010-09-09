@@ -170,3 +170,45 @@ UIOptionsWindow
 Fixed bug where a tile-click was being registered when pressing "end turn"
 
 
+8/13/2010
+---------
+Menus
+	- Added themed art to main menu
+	- Options now correspond to images
+
+8/15/2010
+---------
+Menus
+	- Appropriate SFX added to option hovers/click
+	- Music plays during menus
+SFX
+	- Added SFX to button & option clicks
+
+8/20/2010
+---------
+Inventory (Unit, City, Building)
+	- Created base Inventory object with basic rendering functionality (not yet viewable in game)
+	- Created object info screen, with rendering and input functionality (no art assets created yet)
+	- Inventory screen can be brought up with 'TAB' (for city only right now)
+
+8/30/2010
+---------
+Abilities
+	- reworked minor components of ability system to allow for city abilities to be created and used
+
+
+9/02/2010
+---------
+Abilities
+	- Added files and framework for city abilities to be loaded & created
+
+9/07/2010
+---------
+Abilities
+	- Fixed minor bugs with abilities & QB selection/use
+	- Added 2 non-combat abilities to Villages (smallest city size), with art (not usable yet)
+		- heal unit
+		- promote unit
+
+
+
