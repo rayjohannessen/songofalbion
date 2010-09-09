@@ -213,6 +213,10 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
+				RelativePath=".\Resources\Objects\Cities\XML\CitiesAbilityInfo.xml"
+				>
+			</File>
+			<File
 				RelativePath=".\Resources\Objects\Units\XML\UnitsAbilityInfo.xml"
 				>
 			</File>
