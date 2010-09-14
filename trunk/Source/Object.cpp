@@ -70,10 +70,13 @@ CObject::CObject(int type, point coord, point scrnPos, string name, const char* 
 	// setup starting abilities and quick bar slots
 	Globals::g_pAbilitiesManager->GetUnlockedStartingAbilities(m_strTypeName, m_mAbilities);
 	ClearQBSlotORSlots();
-	AbilitiesIter iter, end; unsigned i;
-	for (iter = m_mAbilities[m_eDefaultAbilityType].begin(), end = m_mAbilities[m_eDefaultAbilityType].end(), i = 0; i < NUM_QB_SLOTS && iter != end; ++iter, ++i)
-		m_arrQBSlots[i] = (*iter)->GetQBObj();
-	m_pCurrAttackAbility = m_pCurrDefenseAbility = (CCombatSkill*)m_arrQBSlots[0]->Ability;
+	if (m_mAbilities.size())
+	{
+		AbilitiesIter iter, end; unsigned i;
+		for (iter = m_mAbilities[m_eDefaultAbilityType].begin(), end = m_mAbilities[m_eDefaultAbilityType].end(), i = 0; i < NUM_QB_SLOTS && iter != end; ++iter, ++i)
+			m_arrQBSlots[i] = (*iter)->GetQBObj();
+		m_pCurrAttackAbility = m_pCurrDefenseAbility = (CCombatSkill*)m_arrQBSlots[0]->Ability;
+	}
 }
 // copy c-tor
 CObject::CObject(CObject& obj)
