@@ -238,8 +238,8 @@ void CAbilitiesManager::Shutdown()
 	for (m_iBegin = m_mObjectAbilities.begin(), end = m_mObjectAbilities.end(); m_iBegin != end; ++m_iBegin)
 		SAFE_DELETE((*m_iBegin).second);
 	m_mObjectAbilities.clear();
-	QBObjIter qbIter, qbEnd;
-	for (qbIter = m_vQBObjects.begin(), qbEnd = m_vQBObjects.end(); qbIter != qbEnd; ++qbIter)
+
+	for (QBObjIter qbIter = m_vQBObjects.begin(), qbEnd = m_vQBObjects.end(); qbIter != qbEnd; ++qbIter)
 		SAFE_DELETE((*qbIter));
 	m_vQBObjects.clear();
 }
