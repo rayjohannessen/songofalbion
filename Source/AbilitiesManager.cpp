@@ -271,10 +271,14 @@ bool CAbilitiesManager::GetUnlockedStartingAbilities(const string &objName, Unlo
 	//	type of ability (the key), corresponding to all the starting abilities
 	if (m_mStartingUnlockedAbilities.size())
 	{
-		m_RangeUnlockedAbilities = m_mStartingUnlockedAbilities.equal_range(objName);
-		m_iBeginUnlockedAbilities = m_RangeUnlockedAbilities.first;
-		abilities = (*m_iBeginUnlockedAbilities).second;
-		return true;
+		unsigned count = m_mStartingUnlockedAbilities.count(objName);
+		if (count)
+		{
+			m_RangeUnlockedAbilities = m_mStartingUnlockedAbilities.equal_range(objName);
+			m_iBeginUnlockedAbilities = m_RangeUnlockedAbilities.first;
+			abilities = (*m_iBeginUnlockedAbilities).second;
+			return true;
+		}
 	}
 	return false;
 }
