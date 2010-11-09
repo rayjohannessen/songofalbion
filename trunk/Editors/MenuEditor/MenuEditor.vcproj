@@ -18,10 +18,10 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			CharacterSet="1"
+			CharacterSet="2"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -41,11 +41,12 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="&quot;..\Wrappers\FModSDK\inc&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				UsePrecompiledHeader="0"
+				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="4"
 			/>
@@ -60,7 +61,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				UseLibraryDependencyInputs="false"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -89,10 +92,10 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			CharacterSet="1"
+			CharacterSet="2"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -114,10 +117,11 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
+				AdditionalIncludeDirectories="&quot;..\Wrappers\FModSDK\inc&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="0"
+				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -170,18 +174,238 @@
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
+			<File
+				RelativePath=".\Application.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\BaseObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Globals.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\HUD.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\MainMenu.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\MenuEditorInterface.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ObjectCreatorProc.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ObjectProc.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Project.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\StdAfx.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\Structs.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Timer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Utilities.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Win32Window.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\WinMain.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\Application.h"
+				>
+			</File>
+			<File
+				RelativePath=".\BaseObject.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Defines.h"
+				>
+			</File>
+			<File
+				RelativePath=".\EditorWindowDetails.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Globals.h"
+				>
+			</File>
+			<File
+				RelativePath=".\HUD.h"
+				>
+			</File>
+			<File
+				RelativePath=".\IMenu.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MainMenu.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MenuEditorInterface.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ProcDefinitions.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Project.h"
+				>
+			</File>
+			<File
+				RelativePath=".\resource.h"
+				>
+			</File>
+			<File
+				RelativePath=".\StdAfx.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Structs.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Timer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Utilities.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Win32Window.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
+			<File
+				RelativePath=".\MenuEditor.rc"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Wrappers"
+			>
+			<File
+				RelativePath=".\Wrappers\CSGD_Direct3D.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Wrappers\CSGD_Direct3D.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Wrappers\CSGD_DirectInput.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Wrappers\CSGD_DirectInput.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Wrappers\CSGD_Flags.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Wrappers\CSGD_FModManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Wrappers\CSGD_FModManager.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Wrappers\CSGD_TextureManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Wrappers\CSGD_TextureManager.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Wrappers\fmod.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Wrappers\SGD_Util.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Wrappers\tinyxml\tinystr.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Wrappers\tinyxml\tinystr.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Wrappers\tinyxml\tinyxml.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Wrappers\tinyxml\tinyxml.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Wrappers\tinyxml\tinyxmlerror.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Wrappers\tinyxml\tinyxmlparser.cpp"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>
