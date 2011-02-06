@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////////
 //	File			:	"WinMain.cpp"
 //
-//	Author			:	David Brown (DB), modified slightly by Ramon Johannessen(RJ)
+//	Author			:	David Brown (DB), modified by Ramon Johannessen(RJ)
 //	Based in part on:
 //		-Window code from the book: "Physics for Game Developers" by David M. Bourg.
 //		-The previous WinMain.cpp by Jensen Rivera.
@@ -25,139 +25,12 @@ void ToggleFullscreenMode(HWND hWnd,
 						  int iWidth, int iHeight, int iBpp, int iRefreshRate);
 void SetDisplayMode(int iWidth, int iHeight, int iBpp, int iRefreshRate);
 
-
-
 // the app ptr
 CApplication* app;
 const char* g_szWINDOW_CLASS_NAME = "MENUEDITORWINDOWCLASS";	//	Window Class Name.
 const char* g_szWINDOW_TITLE	  = "Menu Editor";			//	Window Title.
 const int	g_nWINDOW_WIDTH		= 1024;						//	Window Width.
 const int	g_nWINDOW_HEIGHT	= 768;						//	Window Height.
-HINSTANCE	g_hInstance			= NULL;
-
-
-LRESULT CALLBACK WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	//	This is the main message handler of the system.
-
-	//	What is the message 
-	switch(msg)
-	{
-		case WM_COMMAND:
-		{
-			switch (LOWORD(wParam))
-			{
-			case ID_Exit:
-				{			
-					PostQuitMessage(0);
-				}break;
-			case ID_SaveProj:
-				{
-
-				}break;
-			case ID_LoadProj:
-				{
-
-				}break;
-			case ID_NewProj:
-				{
-
-				}break;
-			case ID_ObjectCreator:
-				{
-					Globals::g_pWin32Windows[EW_OBJ_CREATION]->Show(SW_SHOW);
-					Globals::g_pWin32Windows[EW_OBJ_CREATION]->Update();
-				}break;
-			}
-		}
-		//	To skip ALT pop up menu (system menu)
-		case WM_SYSKEYUP:
-		case WM_SYSCHAR:
-			{
-				return(0);
-			}break;		
-		//	Handle ALT+F4
-		case WM_CLOSE:
-			{
-				// Sends us a WM_DESTROY
-				DestroyWindow(hWnd);	
-			}break;
-		case WM_MOUSEMOVE:
-			{
-				//GetCursorPos()
-				//mouse.x = LOWORD(lParam);
-				//mouse.y = HIWORD(lParam);
-			}break;
-		//	and lose/gain focus
-		case WM_ACTIVATE:
-		{
-			//	gaining focus
-			if (LOWORD(wParam) != WA_INACTIVE)
-			{
-			}
-			else // losing focus
-			{
-			}
-		}break;
-		case WM_SETCURSOR:
-			{
-// 				if (LOWORD(lParam) == HTCLIENT && count > -2)
-// 				{
-// 					count = ShowCursor(FALSE);
-// 				}
-// 				else if (LOWORD(lParam) == HTCAPTION && count < 0)
-// 				{
-// 					count = ShowCursor(TRUE);
-// 				}
-			}break;
-		case WM_CREATE: 
-		{
-			//	Do initialization here
-			return(0);
-		}break;
-		case WM_PAINT:
-		{
-			//	Start painting
-			return(0);
-		}break;
-		case WM_DESTROY: 
-		{
-			//	Kill the application			
-			PostQuitMessage(0);
-			return(0);
-		}break;
-		default:
-		{
-
-		}break;		
-	}
-
-	//	Process any messages that we didn't take care of 
-	return (DefWindowProc(hWnd, msg, wParam, lParam));
-}
-
-
-// LRESULT CALLBACK DlgProc(HWND hWndDlg, UINT Msg, WPARAM wParam, LPARAM lParam)
-// {
-// 	switch(Msg)
-// 	{
-// 	case WM_INITDIALOG:
-// 		{
-// 			g_hwndDlg = hWndDlg;
-// 			return TRUE;
-// 		}
-// 
-// 	case WM_COMMAND:
-// 		switch(wParam)
-// 		{
-// 		case IDOK:
-// 			EndDialog(hWndDlg, 0);
-// 			return TRUE;
-// 		} break;
-// 	}
-// 
-// 	return FALSE;
-// }
 
 //	Checks to see if the game was already running in another window.
 //
@@ -189,14 +62,12 @@ BOOL CheckIfAlreadyRunning(void)
 //////////////////////////
 //		WinMain			//
 //////////////////////////
-//
 // THE APP
-//
 //////////////////////////
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	MSG		msg;	//	Generic message.
-	g_hInstance = hInstance;
+	Globals::g_hInstance = hInstance;
 
 	//////////////////////////////////////////////////////////////////////////
 	// Don't let more than one instance of the application exist
@@ -215,12 +86,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	//			and it will use that profile's creation parameters, etc..
 
 	// TODO : get values from some file, width/height...
+
+	// TODO : this WinMain will not be used in-game...
+	//			may have to add a function that can be inserted into the game's winproc
+	//			to catch events and be able to use EW_MAIN's original winproc
+
+	// ???Could also create a stand-alone menu dialogue-like window instead of using a menu?????
 	Globals::g_pWin32Windows[EW_MAIN]		 = new CWin32Window( WS_OVERLAPPEDWINDOW,
 														WS_EX_APPWINDOW,
 														LoadMenu(hInstance, MAKEINTRESOURCE(ID_Menu)),
 														true,
 														"Menu Editor");
-	Globals::g_pWin32Windows[EW_OBJ]			 = new CWin32Window( WS_OVERLAPPED | WS_BORDER | WS_SYSMENU,
+	Globals::g_pWin32Windows[EW_OBJ]		 = new CWin32Window( WS_OVERLAPPED | WS_BORDER | WS_SYSMENU,
 														WS_EX_APPWINDOW,
 														NULL,
 														false,
@@ -235,18 +112,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	string classNameObjCreation = "WndObjCreation";
 
 	// setup properties, anything that's not yet set
-	Globals::g_pWin32Windows[EW_MAIN]->SetWndClassProps( hInstance, WindowProc, 0, classNameMain.c_str());
-	Globals::g_pWin32Windows[EW_OBJ]->SetWndClassProps( hInstance, ObjProc, 0, classNameObj.c_str());
-	Globals::g_pWin32Windows[EW_OBJ_CREATION]->SetWndClassProps( hInstance, ObjCreatorProc, 0, classNameObjCreation.c_str());
+	Globals::g_pWin32Windows[EW_MAIN]->Win32SetWndClassProps( hInstance, WindowProc, 0, classNameMain.c_str());
+	Globals::g_pWin32Windows[EW_OBJ]->Win32SetWndClassProps( hInstance, ObjProc, 0, classNameObj.c_str());
+	Globals::g_pWin32Windows[EW_OBJ_CREATION]->Win32SetWndClassProps( hInstance, ObjCreatorProc, 0, classNameObjCreation.c_str());
 
 // #ifdef _DEBUG
 // 	DebugWnd->Init();
 // #endif
 
 	//	Create the main window
-	if ( !Globals::g_pWin32Windows[EW_MAIN]->Create(hInstance) )
+	if ( !Globals::g_pWin32Windows[EW_MAIN]->Create(hInstance, nCmdShow) )
 		return 0;
-
 
 	// this window should start to the right of the main window, so wait until after 
 	// the main window has been adjusted to set its rect
@@ -259,25 +135,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	//////////////////////////////////////////////////////////////////////////
 	// create side windows
-	for (unsigned i = 1; i < NUM_WINDOWS; ++i)
-	{
-		if(  Globals::g_pWin32Windows[i]->Create(hInstance) )
-		{
-			// good...
-			Globals::g_pWin32Windows[i]->Show(nCmdShow);
-			Globals::g_pWin32Windows[i]->Update();
-		}
-		else
-		{
-			// not good
-			int bad = 0;
-		}
-	}
+	for (unsigned i = 1; i < NUM_EDITOR_WINDOWS; ++i)
+		if( !Globals::g_pWin32Windows[i]->Create(hInstance, nCmdShow) )
+			return 0;
 
-	Globals::g_pWin32Windows[EW_MAIN]->Show(nCmdShow);
-	Globals::g_pWin32Windows[EW_MAIN]->Update();
+// 	Globals::g_pWin32Windows[EW_MAIN]->Win32ShowWnd(nCmdShow);
+// 	Globals::g_pWin32Windows[EW_MAIN]->Win32UpdateWnd();
 
-// 	DialogBox(hInstance, MAKEINTRESOURCE(IDD_FORMVIEW), Globals::g_pWin32Windows[EW_MAIN]->GetHWND(), reinterpret_cast<DLGPROC>(DlgProc));
+//	DialogBox(Globals::g_hInstance, MAKEINTRESOURCE(IDD_FORMVIEW), Globals::g_pWin32Windows[EW_MAIN]->GetHWND(), reinterpret_cast<DLGPROC>(NewProjDlgProc));
 // 	DWORD err = GetLastError();
 
 	//////////////////////////////////////////
@@ -285,7 +150,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	//////////////////////////////////////////
 	app = CApplication::GetInstance();
 	app->Init(Globals::g_pWin32Windows[EW_MAIN]->GetHWND(), hInstance, size(g_nWINDOW_WIDTH, g_nWINDOW_HEIGHT), g_bIS_WINDOWED, true);
-
 	//////////////////////////////////////////
 
 	//	Enter main event loop
@@ -307,6 +171,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		//////////////////////////////////
 		//	Put Game Logic Here
 		//////////////////////////////////
+
  		if(app->Main() == false)
  			break;
 		//////////////////////////////////
@@ -324,9 +189,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	/////////////////////////////////////////
 	
 	//	Unregister the window class
-	for (int i = 0; i < NUM_WINDOWS; ++i)
+	for (int i = 0; i < NUM_EDITOR_WINDOWS; ++i)
 	{
-		Globals::g_pWin32Windows[i]->UnregClass(hInstance);
+		Globals::g_pWin32Windows[i]->Destroy(hInstance);
 		delete Globals::g_pWin32Windows[i];
 	}
 

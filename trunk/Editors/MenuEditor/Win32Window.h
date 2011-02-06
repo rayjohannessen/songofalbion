@@ -2,50 +2,76 @@
 
 #include "EditorWindowDetails.h"
 
+class CMenu;
+
 class CWin32Window
 {
+	ClearClr m_ClearClr;
+	bool	m_bVisible;
 	bool	m_bCenter;
 	DWORD	m_dwStyle;
 	DWORD	m_dwExtendedStyle;
 	char*	m_szWindowTitle;
 	rect	m_rRect;
+	size    m_OrigSize;
 	HWND	m_hParentWnd;
 	HMENU	m_hMenu;
+	// TODO : add CMenu
+	CMenu*  m_pMenu;
 	// TODO : creation parameters
 
 	HWND		m_hHwnd;
 	WNDCLASSEX	m_WndClass;
 
-	void CenterWndInScreen();
+	void _CenterWndInScreen();
+	void _UnregClass(HINSTANCE hInstance);
 
 public:
 	CWin32Window(const WNDCLASSEX& wndClass,
-		DWORD style = WS_VISIBLE | WS_OVERLAPPEDWINDOW, 
-		DWORD extStyle = WS_EX_APPWINDOW, 
-		HMENU menu = NULL, 
-		bool center = true,
-		char* wndTitle = "WINDOW", 
-		HWND parentWnd = NULL, 
-		const rect& r = rect(0, 768, 0, 1024));
+				 DWORD style = WS_VISIBLE | WS_OVERLAPPEDWINDOW, 
+				 DWORD extStyle = WS_EX_APPWINDOW, 
+				 HMENU menu = NULL, 
+				 bool center = true,
+				 char* wndTitle = "WINDOW", 
+				 HWND parentWnd = NULL, 
+				 const rect& r = rect(0, 768, 0, 1024),
+				 const ClearClr& _clrClr = ClearClr(200, 250, 100));
 
-	// must call SetWndClassProps separately
+	// must call Win32SetWndClassProps separately
 	CWin32Window(DWORD style = WS_VISIBLE | WS_OVERLAPPEDWINDOW, 
-		DWORD extStyle = WS_EX_APPWINDOW,
-		HMENU menu = NULL,  
-		bool center = true,
-		char* wndTitle = "WINDOW", 
-		HWND parentWnd = NULL, 
-		const rect& r = rect(0, 768, 0, 1024));
+				 DWORD extStyle = WS_EX_APPWINDOW,
+				 HMENU menu = NULL,  
+				 bool center = true,
+				 char* wndTitle = "WINDOW", 
+				 HWND parentWnd = NULL, 
+				 const rect& r = rect(0, 768, 0, 1024),
+				 const ClearClr& _clrClr = ClearClr(200, 250, 100));
 
-	~CWin32Window();
+	virtual ~CWin32Window();
 
-	bool Create(HINSTANCE hInstance);
-	void UnregClass(HINSTANCE hInstance);
+	// Create & Destroy serve as both win32-related functionality
+	// and whatever derived classes may wish to add,
+	//
+	// NOTE: be sure to call these functions to make things work
+	virtual bool Create(HINSTANCE hInstance, int showCmd);
+	virtual void Destroy(HINSTANCE hInstance);
 
-	void Show(int showCmd);
-	void Update();
+	//////////////////////////////////////////////////////////////////////////
+	// these are Window's-related only functions
+	// they need to be called only after the window is created or a change
+	// is made to the window (minimizing and such)
+	// Any editor rendering and updating should be done with Render & Update
+	void Win32ShowWnd(int showCmd);
+	void Win32UpdateWnd();
+	// use this function for setting a windows procedure for this object that you define elsewhere
+	void Win32SetWndClassProps(HINSTANCE hInstance, WNDPROC wndProc, int wndExtra = 0, const char* className = 0);
+	//////////////////////////////////////////////////////////////////////////
 
-	void SetWndClassProps(HINSTANCE hInstance, WNDPROC wndProc, int wndExtra = 0, const char* className = 0);
+	// override these as needed
+	virtual void Render() {}
+	virtual void Update(float _dt) {}
+
+	void Center()	{ _CenterWndInScreen(); }
 
 	//////////////////////////////////////////////////////////////////////////
 	// MUTATORS
@@ -58,6 +84,9 @@ public:
 	inline rect GetRect()		const	{ return m_rRect;		}
 	inline HWND GetParentWnd()	const	{ return m_hParentWnd;	}
 	inline HWND GetHWND()		const	{ return m_hHwnd;		}
+	inline HMENU GetMenu()		const	{ return m_hMenu;		}
+	inline bool GetVisible()	const	{ return m_bVisible;	}
+	inline ClearClr GetClearClr() const { return m_ClearClr;	}
 };
 
 

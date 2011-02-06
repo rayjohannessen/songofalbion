@@ -1,9 +1,14 @@
 #include "StdAfx.h"
 #include "ProcDefinitions.h"
-
+#include "Globals.h"
+#include "Win32Window.h"
+#include "Resource.h"
 
 LRESULT CALLBACK ObjProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	if (Globals::g_hWndDlg)
+		return FALSE;
+
 	//	What is the message 
 	switch(msg)
 	{
@@ -14,24 +19,22 @@ LRESULT CALLBACK ObjProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 // 
 // 			}
 		}
-		//	To skip ALT pop up menu (system menu)
-	case WM_SYSKEYUP:
+	case WM_SYSKEYUP:	//	To skip ALT pop up menu (system menu)
 	case WM_SYSCHAR:
 		{
 			return(0);
 		}break;		
-		//	Handle ALT+F4
-	case WM_CLOSE:
+	case WM_CLOSE: //	Handle ALT+F4
 		{
-			// Sends us a WM_DESTROY
-			DestroyWindow(hWnd);	
+			Globals::g_pWin32Windows[EW_OBJ]->Win32ShowWnd(SW_MINIMIZE);
+			CheckMenuItem(Globals::g_pWin32Windows[EW_MAIN]->GetMenu(), ID_Objects, MF_UNCHECKED);
+			return 0;
 		}break;
 	case WM_MOUSEMOVE:
 		{
 
 		}break;
-		//	and lose/gain focus
-	case WM_ACTIVATE:
+	case WM_ACTIVATE: //	and lose/gain focus
 		{
 			//	gaining focus
 			if (LOWORD(wParam) != WA_INACTIVE)
@@ -58,7 +61,7 @@ LRESULT CALLBACK ObjProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_DESTROY: 
 		{
 			//	hide the window				
-			DestroyWindow(hWnd);	
+			//DestroyWindow(hWnd);	
 		}break;
 	default:
 		{
@@ -67,33 +70,4 @@ LRESULT CALLBACK ObjProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 	//	Process any messages that we didn't take care of 
 	return (DefWindowProc(hWnd, msg, wParam, lParam));
-}
-
-LRESULT CALLBACK DlgProc(HWND hWndDlg, UINT Msg, WPARAM wParam, LPARAM lParam)
-{
-	switch(Msg)
-	{
-	case WM_INITDIALOG:
-		{
-
-			return TRUE;
-		}
-	case WM_SHOWWINDOW:
-		{
-
-		}break;
-
-	case WM_CLOSE:
-		{
-			CloseWindow(hWndDlg);
-			return 0;
-		}
-	}
-	DWORD err = GetLastError();
-	if (err)
-	{
-		string e = "Error: " + int(err);
-		MessageBox(hWndDlg, e.c_str(), "Error", MB_OK);
-	}
-	return FALSE;
 }
