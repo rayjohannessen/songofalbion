@@ -1,0 +1,25 @@
+// Menu script
+ID_Menu MENU DISCARDABLE
+{
+    POPUP "File"
+    {
+		MENUITEM "New ME Project",  ID_NewProj
+		MENUITEM "Save ME Project", ID_SaveProj
+		MENUITEM "Load ME Project", ID_LoadProj
+        MENUITEM "Exit", ID_Exit
+    }
+    POPUP "Color"
+    {
+        MENUITEM "Red", ID_Red
+        MENUITEM "Green", ID_Green
+        MENUITEM "Blue", ID_Blue
+    }
+	POPUP "Help"
+	{
+		MENUITEM "Key Shortcuts", ID_KeyShortcuts
+	}
+}
+
+// ID_ObjectsWindow DIALOG DISCARDABLE
+//{
+//}
