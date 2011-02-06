@@ -9,10 +9,8 @@
 #include "HUD.h"
 #include "NonCombatSkill.h"
 #include "CombatSkill.h"
-#include "Pathfinding.h"
 #include "Map.h"
 #include "Wrappers/CSGD_DirectInput.h"
-using namespace Pathfinding;
 
 CObject::CObject() :
 	m_nImageID(-1),
@@ -41,7 +39,8 @@ CObject::CObject(int type, point coord, point scrnPos, string name, const char* 
 	m_pCurrAttackAbility(NULL),
 	m_pCurrDefenseAbility(NULL),
 	m_fZDepth(DEPTH_OBJECT),
-	m_eCurrInputStatus(IS_NONE)
+	m_eCurrInputStatus(IS_NONE),
+	m_pNeighborEnemy(NULL)
 {
 	// set up the offset so the object is centered on the tiles
 	switch (type)
@@ -75,7 +74,7 @@ CObject::CObject(int type, point coord, point scrnPos, string name, const char* 
 		AbilitiesIter iter, end; unsigned i;
 		for (iter = m_mAbilities[m_eDefaultAbilityType].begin(), end = m_mAbilities[m_eDefaultAbilityType].end(), i = 0; i < NUM_QB_SLOTS && iter != end; ++iter, ++i)
 			m_arrQBSlots[i] = (*iter)->GetQBObj();
-		m_pCurrAttackAbility = m_pCurrDefenseAbility = (CCombatSkill*)m_arrQBSlots[0]->Ability;
+		m_pCurrAttackAbility = m_pCurrDefenseAbility = (CCombatSkill*)m_mAbilities[BN_COMBAT_SKILLS][0];	// TODO:: assumes everything has a combat skill
 	}
 }
 // copy c-tor
@@ -121,7 +120,7 @@ bool CObject::IsOnQuickBar(const CQuickBarObject& qbObj)
 	return false;
 }
 
-CCombatSkill* CObject::GetCurrDefaultAbility(eButtonName& defType)	
+CCombatSkill* CObject::GetCurrDefCombatAbility(eButtonName& defType)	
 { 
 	defType = m_eDefaultAbilityType;
 	if (m_eDefaultAbilityType == BN_COMBAT_SKILLS) 

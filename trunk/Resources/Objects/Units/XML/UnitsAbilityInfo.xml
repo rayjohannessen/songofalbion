@@ -12,15 +12,11 @@
 
 <Units>
   <Unit type="0" name="UMKnight">
-    <CombatInfo>
-      
-      <CombatAbility startingAbility="0" type="2" rectid="2" attackModifier="2.0" defenseModifier="0.9" attackStamina="3" defenseStamina="2" freeCounter="0">
-        Flank
-      </CombatAbility>
-      <CombatAbility startingAbility="1" type="1" rectid="3" attackModifier="1.5" defenseModifier="1.3" attackStamina="2" defenseStamina="2" freeCounter="1">
-        Charge
-      </CombatAbility>
-      
+    
+    <CombatInfo>      
+      <CombatAbility startingAbility="0" type="2" rectid="2" attackModifier="2.0" defenseModifier="0.9" attackStamina="3" defenseStamina="2" freeCounter="0"> </CombatAbility>
+      <CombatAbility startingAbility="1" type="1" rectid="3" attackModifier="1.5" defenseModifier="1.3" attackStamina="2" defenseStamina="2" freeCounter="1"> </CombatAbility>
     </CombatInfo>
+    
   </Unit>
 </Units>

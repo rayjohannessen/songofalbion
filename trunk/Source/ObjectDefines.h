@@ -107,7 +107,7 @@ namespace ObjectDefines
 			case OBJ_CITY:
 				{
 					// all city types have these buttons 
-					for (eCityType cityType = CT_VILLAGE; cityType < NUM_CT; cityType = eCityType(cityType + 1))
+					for (eCityType cityType = (eCityType)0; cityType < NUM_CT; cityType = eCityType(cityType + 1))
 					{
 						(*g_pObjButtonsMap)[gCityTypeNames[cityType]].push_back(ButtonPair(BL_SLOT_1_1, BN_COMBAT_SKILLS));
 						(*g_pObjButtonsMap)[gCityTypeNames[cityType]].push_back(ButtonPair(BL_SLOT_1_2, BN_NONCOMBAT_SKILLS));
@@ -127,6 +127,13 @@ namespace ObjectDefines
 				}break;
 			case OBJ_BUILDING:
 				{
+					// all city types have these buttons 
+					for (eBuildingType eBldngType = (eBuildingType)0; eBldngType < NUM_BT; eBldngType = eBuildingType(eBldngType + 1))
+					{
+						(*g_pObjButtonsMap)[gBuildingNames[eBldngType]].push_back(ButtonPair(BL_SLOT_1_1, BN_COMBAT_SKILLS));
+						(*g_pObjButtonsMap)[gBuildingNames[eBldngType]].push_back(ButtonPair(BL_SLOT_1_2, BN_NONCOMBAT_SKILLS));
+						(*g_pObjButtonsMap)[gBuildingNames[eBldngType]].push_back(ButtonPair(BL_SLOT_1_3, BN_GEAR));
+					}
 
 				}break;
 			}

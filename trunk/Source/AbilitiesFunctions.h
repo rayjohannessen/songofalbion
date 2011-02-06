@@ -15,9 +15,6 @@ class CObject;
 
 namespace CombatFunctions
 {
-	// functions RETURN true if damage has been dealt to the target (i.e. target was indeed hit..play hit anim), false otherwise
-
-
 	//////////////////////////////////////////////////////////////////////////
 	//	Base attack functions
 	//////////////////////////////////////////////////////////////////////////
@@ -36,6 +33,7 @@ namespace CombatFunctions
 	//////////////////////////////////////////////////////////////////////////
 	void Charge(CObject* targetObj, CObject* thisPtr, AbilityReturnBase* abilRet);
 	void Flank(CObject* targetObj, CObject* thisPtr, AbilityReturnBase* abilRet);
+	void Fortify(CObject* defender, CObject* attacker, AbilityReturnBase* abilRet);
 
 	//////////////////////////////////////////////////////////////////////////
 	//	Air

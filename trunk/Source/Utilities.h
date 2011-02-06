@@ -17,6 +17,11 @@ namespace Utilities
 #define SAFE_DELETE_ARRAY(p)	if (p) { delete [] p; p = NULL; }
 #endif
 
+	//	Macro to safely shutdown classes.
+#ifndef SAFE_SHUTDOWN_SINGLETON
+#define SAFE_SHUTDOWN_SINGLETON(p)		if (p) { p->Shutdown(); p = NULL; }
+#endif
+
 	//	Macro for reporting Wrapper errors
 #ifndef DXERROR
 #define DXERROR(a)	{ OutputDebugString(a); OutputDebugString("\n"); return false; }

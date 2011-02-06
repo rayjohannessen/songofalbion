@@ -38,8 +38,7 @@ m_nRange(1),
 m_nNumAnims(0),
 m_strCurrAnim("NONE"),
 m_ptOriginalScrnOS(0.0f, 0.0f),
-m_pPath(NULL),
-m_pNeighborEnemy(NULL)
+m_pPath(NULL)
 {
 }
 
@@ -54,7 +53,6 @@ CUnit::CUnit( int nUnitType, int type, point& coord, point& sPos, string name, c
 	CObject(type, coord, sPos, name, faction, factionID, UnitDefines::gUnitNames[nUnitType]), 
 	m_bMovingToAttack(false),
 	m_pPath(NULL), 
-	m_pNeighborEnemy(NULL),
 	m_nUnitType(nUnitType)	// most units' source rects should be the same size, use default size for now (w=128, h=128)
 {
 	SetImageID(0);
@@ -289,7 +287,8 @@ void CUnit::SetNewPath(Path* const p)
 	// any current neighbor will be left behind. If a new one is found, it will be set then
 	if (m_pNeighborEnemy)
 	{
-		m_pNeighborEnemy->CenterUnit();
+		if (m_pNeighborEnemy->GetType() == OBJ_UNIT)
+			((CUnit*)m_pNeighborEnemy)->CenterUnit();
 		m_pNeighborEnemy->SetNeighbor(NULL);
 		SetNeighbor(NULL);
 	}
@@ -358,10 +357,13 @@ void CUnit::BeginMoveToAttack()
 	Globals::g_pMap->ToggleMapFlagOn(MF_ATTACKING);
 
 	// stand either to the left or right of the target, depending on where we're coming from
-	CUnit* target = ((CUnit*)Globals::g_pMap->GetTarget());
-	pointf targSPos = Globals::g_pMap->GetTarget()->GetSPos();
-	target->ChangeAnim(gAnimNames[AT_RUN]);
-	target->GetCurrAnim().Play();
+	CObject* target = (Globals::g_pMap->GetTarget());
+	pointf targSPos = target->GetSPos();
+	if (target->GetType() == OBJ_UNIT)
+	{
+		((CUnit*)target)->ChangeAnim(gAnimNames[AT_RUN]);
+		((CUnit*)target)->GetCurrAnim().Play();
+	}
 	target->SetNeighbor(this);
 	SetNeighbor(target);
 
@@ -373,9 +375,12 @@ void CUnit::BeginMoveToAttack()
 		SetFacing(DIR_E);
 
 		// move the target to the far side of the tile
-		targSPos.x += BATTLE_OS;
-		target->SetMoveToPt(targSPos);
-		target->SetFacing(DIR_W);
+		if (target->GetType() == OBJ_UNIT)
+		{
+			targSPos.x += BATTLE_OS;
+			((CUnit*)target)->SetMoveToPt(targSPos);
+			((CUnit*)target)->SetFacing(DIR_W);
+		}
 	}
 	else if (target->GetSPos().x < m_ptScreenPos.x)	// they're on the left side
 	{
@@ -384,9 +389,12 @@ void CUnit::BeginMoveToAttack()
 		SetFacing(DIR_W);
 
 		// move the target to the far side of the tile
-		targSPos.x -= BATTLE_OS;
-		target->SetMoveToPt(targSPos);
-		target->SetFacing(DIR_E);
+		if (target->GetType() == OBJ_UNIT)
+		{
+			targSPos.x -= BATTLE_OS;
+			((CUnit*)target)->SetMoveToPt(targSPos);
+			((CUnit*)target)->SetFacing(DIR_E);
+		}
 	}
 	else	// they're above/below
 	{
@@ -397,9 +405,12 @@ void CUnit::BeginMoveToAttack()
 			SetFacing(DIR_E);
 
 			// move the target to the far side of the tile
-			targSPos.x += BATTLE_OS;
-			target->SetMoveToPt(targSPos);
-			target->SetFacing(DIR_W);
+			if (target->GetType() == OBJ_UNIT)
+			{
+				targSPos.x += BATTLE_OS;
+				((CUnit*)target)->SetMoveToPt(targSPos);
+				((CUnit*)target)->SetFacing(DIR_W);
+			}
 		} 
 		else	// target is "below"
 		{
@@ -408,9 +419,12 @@ void CUnit::BeginMoveToAttack()
 			SetFacing(DIR_W);
 
 			// move the target to the far side of the tile
-			targSPos.x -= BATTLE_OS;
-			target->SetMoveToPt(targSPos);
-			target->SetFacing(DIR_E);
+			if (target->GetType() == OBJ_UNIT)
+			{
+				targSPos.x -= BATTLE_OS;
+				((CUnit*)target)->SetMoveToPt(targSPos);
+				((CUnit*)target)->SetFacing(DIR_E);
+			}
 		}
 	}
 

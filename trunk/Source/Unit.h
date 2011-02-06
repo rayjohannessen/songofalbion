@@ -26,7 +26,6 @@ class CUnit : public CObject
 	int m_nMagPts;
 	int m_nRange;		// in tiles
 	int m_nNumAnims;
-	CUnit* m_pNeighborEnemy;	// the enemy unit that shares the same tile (two units interlocked in battle)
 	string m_strCurrAnim;
 	Path*  m_pPath;
 	pointf m_ptOriginalScrnOS;
@@ -93,7 +92,7 @@ public:
 	inline int GetMP()			const		{ return m_nMagPts;						}
 	inline int GetMaxMagPts()   const    	{ return m_nMaxMP;						}
 	inline int GetRange()		const		{ return m_nRange;						}
-	inline CUnit* const GetNeighbor() const	{ return m_pNeighborEnemy;				}
+	inline CObject* const GetNeighbor()const{ return m_pNeighborEnemy;				}
 	inline string GetCurrAnimString()const	{ return m_strCurrAnim;					}
 	inline pointf GetOrigScOS() const		{ return m_ptOriginalScrnOS;			}
 	inline pointf GetMoveToPos()const		{ return m_ptMoveToScreenPos;			}
@@ -106,7 +105,6 @@ public:
 	inline void AddToVitality(int amt)			{ m_nVitality += amt; if (m_nVitality < 0) m_nVitality = 0; }
 	inline void DecrementStamina(int decAmt)	{ m_nStamina -= decAmt;			}
 	inline void SetMoveToPt(pointf pt)			{ m_ptMoveToScreenPos = pt;		}
-	inline void SetNeighbor(CUnit* const unit)	{ m_pNeighborEnemy = unit;		}
 	void Reset();
 	void SetNewPath(Path* const p);
 	void SetScrnPos(point& sPos);

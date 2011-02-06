@@ -210,5 +210,10 @@ Abilities
 		- heal unit
 		- promote unit
 
-
+1/24/2011
+---------
+MISC
+	- Fixed crash when disbanding unit
+	- Fixed crash when selecting building
+	- Added building/button matches for HUD
 

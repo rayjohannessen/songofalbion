@@ -11,8 +11,8 @@
 #include "ButtonDefines.h"
 #include "AbilityObjectBase.h"
 #include "Pathfinding.h"
-#include "ObjectDefines.h"
 using namespace Pathfinding;
+#include "ObjectDefines.h"
 using namespace ObjectDefines;
 
 enum eAbSelType { AST_ATTACK = MOUSE_LEFT, AST_DEFENSE = MOUSE_RIGHT, };
@@ -51,6 +51,7 @@ protected:
 	float m_fZDepth;
 	DWORD m_dwColor;
 
+	CObject* m_pNeighborEnemy;	// the enemy obj that shares the same tile (two units interlocked in battle)
 	CCombatSkill*  m_pCurrAttackAbility;
 	CCombatSkill*  m_pCurrDefenseAbility;
 	CQuickBarObject*	 m_arrQBSlots[NUM_QB_SLOTS];
@@ -114,7 +115,7 @@ public:
 	inline CCombatSkill* GetCurrAttackAbility()		{ if (m_pCurrAttackAbility) return m_pCurrAttackAbility; else return (m_pCurrAttackAbility = GetDefCombatAbility());	}
 	inline CCombatSkill* GetCurrDefenseAbility()	{ if (m_pCurrDefenseAbility) return m_pCurrDefenseAbility; else return (m_pCurrDefenseAbility = GetDefCombatAbility()); }
 	inline CCombatSkill* GetCurrAbilOfType(eAbSelType type) { if (type == AST_ATTACK) return m_pCurrAttackAbility; else return m_pCurrDefenseAbility; }
-	CCombatSkill* GetCurrDefaultAbility(eButtonName& defType);
+	CCombatSkill* GetCurrDefCombatAbility(eButtonName& defType);
 	inline CQuickBarObject** GetQBSlots()						{ return &m_arrQBSlots[0];	}
 	// returns the unlocked abilities for this object and the passed in eButtonName
 	inline UnlockedAbilitiesMap& GetAbilitiesMap()							{ return m_mAbilities;				}
@@ -137,6 +138,7 @@ public:
 			{ if (type == AST_ATTACK) m_pCurrAttackAbility = ability; else if (type == AST_DEFENSE) m_pCurrDefenseAbility = ability; }
 	inline void SetInputStatus(eInputStatus status, DWORD clr) { m_eCurrInputStatus = status; m_dwColor = clr; }	
 	inline void ToggleDisplay()						{ m_bDisplayInfo = !m_bDisplayInfo;	}
+	inline void SetNeighbor(CObject* const obj)		{ m_pNeighborEnemy = obj;		}
 };
 
 #endif

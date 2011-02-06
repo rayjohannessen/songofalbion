@@ -24,6 +24,7 @@ enum eAbility
 	A_BASE = 0,
 	A_CHARGE = 1, A_FLANK = 2,
 	A_HEALUNIT = 3, A_PROMOTEUNIT = 4,
+	A_FORTIFY = 5,
 	NUM_ABILITIES
 };
 

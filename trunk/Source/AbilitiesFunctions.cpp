@@ -41,7 +41,7 @@ namespace CombatFunctions
 		CombatAbilityReturn* combAbil = ((CombatAbilityReturn*)abilRet);
 		combAbil->Reset();
 	}
-
+// TODO:: rework/get this organized and a good final structure
 	//////////////////////////////////////////////////////////////////////////
 	//	Ground
 	//////////////////////////////////////////////////////////////////////////
@@ -56,6 +56,16 @@ namespace CombatFunctions
 		}
 	}
 	void Flank(CObject* defender, CObject* attacker, AbilityReturnBase* abilRet)
+	{
+		CombatAbilityReturn* combAbil = ((CombatAbilityReturn*)abilRet);
+		combAbil->Reset();
+		combAbil->ApplyDamages = ((CUnit*)attacker)->GetCurrAnim().IsAtMiddlePoint();
+		if (combAbil->ApplyDamages)
+		{
+			formula_BasicAttacker(defender, attacker, *(CombatAbilityReturn*)abilRet);
+		}
+	}
+	void Fortify(CObject* defender, CObject* attacker, AbilityReturnBase* abilRet)
 	{
 		CombatAbilityReturn* combAbil = ((CombatAbilityReturn*)abilRet);
 		combAbil->Reset();
