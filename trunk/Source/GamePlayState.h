@@ -11,7 +11,7 @@
 
 #include "IGameState.h"
 
-class CMenu;
+class CGameMenu;
 class CMap;
 class CPlayer;
 
@@ -20,7 +20,7 @@ class CGamePlayState : public IGameState
 {
 private:
 	bool m_bIsPaused;
-	CMenu* m_pCurrentMenuState;
+	CGameMenu* m_pCurrentMenuState;
 
 	int		m_nNumPlayers;
 

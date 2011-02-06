@@ -46,7 +46,7 @@ class CUIWindowBase;
 class CObject;
 class CButton;
 class COption;
-class CMenu;
+class CGameMenu;
 
 typedef CUIWindowBase* (*ButtonActionFP)(CObject*, CButton&);
 
