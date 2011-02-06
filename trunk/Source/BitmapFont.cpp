@@ -138,7 +138,7 @@ void CBitmapFont::LoadProfiles()
 				}break;
 			case 1:	// lowerCase
 				{
-					lowerCase = (bool)atoi(&(*c));
+					lowerCase = atoi(&(*c)) != 0;
 				}break;
 			case 2:	// numCols
 				{
