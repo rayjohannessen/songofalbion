@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	A_HEALUNIT = 3,
+  A_FORTIFY = 5,
+  
+-->
+
+<Buildings>
+  <Building type="0" name="Castle">
+    
+    <NonCombatInfo>      
+      <NonCombatAbility startingAbility="1" type="3" rectid="4"> </NonCombatAbility>      
+    </NonCombatInfo>
+
+    <CombatInfo>
+      <CombatAbility startingAbility="1" type="5" rectid="1" attackModifier="0.0" defenseModifier="2.0" attackStamina="0" defenseStamina="1" freeCounter="0"> </CombatAbility>
+    </CombatInfo>
+    
+  </Building>
+</Buildings>
