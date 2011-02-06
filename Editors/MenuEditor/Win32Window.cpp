@@ -9,7 +9,8 @@ CWin32Window::CWin32Window(
 						 bool center /*= true*/,
 						 char* wndTitle /*= "WINDOW"*/, 
 						 HWND parentWnd /*= NULL*/, 
-						 const rect& r /*= rect(0, 768, 0, 1024)*/)
+						 const rect& r /*= rect(0, 768, 0, 1024)*/,
+						 const ClearClr& _clrClr /*= ClearClr(200, 150, 100)*/)
 						 :
 m_bCenter(center),
 m_dwStyle(style),
@@ -18,7 +19,10 @@ m_szWindowTitle(wndTitle),
 m_rRect(r),
 m_hParentWnd(parentWnd),
 m_hMenu(menu),
-m_hHwnd(NULL)
+m_hHwnd(NULL),
+m_bVisible(true),
+m_ClearClr(_clrClr),
+m_pMenu(NULL)
 {
 	m_WndClass = wndClass;
 }
@@ -30,7 +34,8 @@ CWin32Window::CWin32Window(
 						 bool center /*= true*/,
 						 char* wndTitle /*= "WINDOW"*/, 
 						 HWND parentWnd /*= NULL*/, 
-						 const rect& r /*= rect(0, 768, 0, 1024)*/)
+						 const rect& r /*= rect(0, 768, 0, 1024)*/,
+						 const ClearClr& _clrClr /*= ClearClr(200, 150, 100)*/)
 						 :
 m_bCenter(center),
 m_dwStyle(style),
@@ -38,8 +43,13 @@ m_dwExtendedStyle(extStyle),
 m_szWindowTitle(wndTitle),
 m_rRect(r),
 m_hParentWnd(parentWnd),
-m_hMenu(menu)
+m_hMenu(menu),
+m_bVisible(true),
+m_ClearClr(_clrClr),
+m_pMenu(NULL)
 {
+	// TODO:: do MENUS this way
+//	m_pMenu = new CMenu();
 }
 
 CWin32Window::~CWin32Window()
@@ -47,7 +57,7 @@ CWin32Window::~CWin32Window()
 
 }
 
-bool CWin32Window::Create(HINSTANCE hInstance)
+bool CWin32Window::Create(HINSTANCE hInstance, int showCmd)
 {
 	// Register the window class
 	if ( !RegisterClassEx(&m_WndClass) )
@@ -60,6 +70,7 @@ bool CWin32Window::Create(HINSTANCE hInstance)
 	rWindow.right	= m_rRect.right;
 	rWindow.bottom	= m_rRect.bottom;
 
+	m_OrigSize = size(m_rRect.width(), m_rRect.height());
 	// Get the dimensions of a window that will have a client rect that
 	// will really be the resolution we're looking for.
 	AdjustWindowRectEx(&rWindow, 
@@ -70,7 +81,7 @@ bool CWin32Window::Create(HINSTANCE hInstance)
 	m_rRect = rWindow;
 
 	if (m_bCenter)
-		CenterWndInScreen();
+		_CenterWndInScreen();
 
 	//////////////////////////////////////////////////////////////////////////
 	//	Create the window
@@ -87,25 +98,33 @@ bool CWin32Window::Create(HINSTANCE hInstance)
 		hInstance,			//	Application Instance.
 		NULL);				//	Creation parameters.
 
+	if (m_hHwnd)
+	{
+		Win32ShowWnd(showCmd);
+		Win32UpdateWnd();
+	}
+
 	return (m_hHwnd != NULL);
 }
+void CWin32Window::Destroy(HINSTANCE hInstance)
+{
+	_UnregClass(hInstance);
+}
 
-void CWin32Window::Show(int showCmd)
+void CWin32Window::Win32ShowWnd(int showCmd)
 {
 	ShowWindow(m_hHwnd, showCmd);
-	DWORD err = GetLastError();
-	if (err != 0)
-	{
-		string s = "Show Error: "; s += int(err);
-		MessageBox(NULL, s.c_str(), "Window Error", MB_OK);
-	}
+	if (showCmd == SW_MINIMIZE)
+		m_bVisible = false;
+	if (showCmd == SW_RESTORE || showCmd == SW_SHOW)
+		m_bVisible = true;
 }
-void CWin32Window::Update()
+void CWin32Window::Win32UpdateWnd()
 {
 	UpdateWindow(m_hHwnd);
 }
 
-void CWin32Window::SetWndClassProps(HINSTANCE hInstance, WNDPROC wndProc, int wndExtra /*= 0*/, const char* className /*= 0*/)
+void CWin32Window::Win32SetWndClassProps(HINSTANCE hInstance, WNDPROC wndProc, int wndExtra /*= 0*/, const char* className /*= 0*/)
 {
 	m_WndClass.cbSize        = sizeof(m_WndClass);
 	m_WndClass.style         = CS_HREDRAW | CS_VREDRAW;
@@ -126,18 +145,28 @@ void CWin32Window::SetWndClassProps(HINSTANCE hInstance, WNDPROC wndProc, int wn
 		LR_DEFAULTCOLOR);
 }
 
-void CWin32Window::UnregClass(HINSTANCE hInstance)
-{
-	UnregisterClass(m_WndClass.lpszClassName, hInstance);
-}
 
 //////////////////////////////////////////////////////////////////////////
 // PRIVATE
-void CWin32Window::CenterWndInScreen()
+void CWin32Window::_CenterWndInScreen()
 {
-	// TODO : right & bottom used as width/height, should be changed
-	m_rRect.left = (GetSystemMetrics(SM_CXSCREEN)>>1) - (m_rRect.right>>1);	
-	m_rRect.top  = (GetSystemMetrics(SM_CYSCREEN)>>1) - (m_rRect.bottom>>1);
-	m_rRect.right = m_rRect.left + m_rRect.right;
-	m_rRect.bottom= m_rRect.top  + m_rRect.bottom;
+	m_rRect.left = (GetSystemMetrics(SM_CXSCREEN)>>1) - (m_OrigSize.width>>1);	
+	m_rRect.top  = (GetSystemMetrics(SM_CYSCREEN)>>1) - (m_OrigSize.height>>1);
+	m_rRect.right = m_rRect.left + m_OrigSize.width;
+	m_rRect.bottom= m_rRect.top  + m_OrigSize.height;
+
+	SetWindowPos(m_hHwnd, HWND_NOTOPMOST, 0, 0, 0, 0,
+		SWP_FRAMECHANGED | SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOSIZE);
+
+	SetWindowPos(m_hHwnd, 0,
+				m_rRect.left,
+				m_rRect.top,
+				m_rRect.width(),
+				m_rRect.height(),
+				SWP_NOZORDER);
+}
+
+void CWin32Window::_UnregClass(HINSTANCE hInstance)
+{
+	UnregisterClass(m_WndClass.lpszClassName, hInstance);
 }

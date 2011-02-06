@@ -6,15 +6,18 @@ class CApplication
 {
 	friend class MenuEditorInterface;
 
+
 	// all app data relevant to project stored in Globals::
 	CApplication(void) {}
 	~CApplication(void) {}
 	CApplication(CApplication&);
 	CApplication& operator= (CApplication&);
 
+	void _RenderAll();
 	// return false if exiting
-	bool UpdateAll(float fDeltaTime);
-	bool MainInGame(float fDeltaTime);
+	bool _UpdateAll(float _fDeltaTime);
+
+	bool _MainInGame(float fDeltaTime);
 
 public:
 

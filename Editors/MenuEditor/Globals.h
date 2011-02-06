@@ -8,11 +8,15 @@ class CSGD_DirectInput;
 class CProject;
 class CHUD;
 class CWin32Window;
+class EditorRenderer;
 
 class Globals
 {
 	static void InitCommon();
 public:
+	static HINSTANCE	g_hInstance;
+	static HWND			g_hWndDlg;
+
 	static CSGD_TextureManager*	g_pTM;
 	static CSGD_Direct3D*		g_pD3D;
 	static CSGD_DirectInput*	g_pDI;
@@ -20,9 +24,11 @@ public:
 	static CProject* g_pCurrProject;
 	static CHUD*	 g_pHUD;
 
+	static EditorRenderer*	g_pRenderer;
+
 	static size	g_ptScreenSize;
 
-	static CWin32Window* g_pWin32Windows[NUM_WINDOWS];
+	static CWin32Window* g_pWin32Windows[NUM_EDITOR_WINDOWS];
 
 	Globals(void);
 	~Globals(void);

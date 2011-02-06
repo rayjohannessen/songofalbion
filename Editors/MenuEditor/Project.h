@@ -8,12 +8,6 @@ class IMenu;
 
 class CProject
 {
-	struct ClearClr 
-	{
-		unsigned char R, G, B; // clear color
-		ClearClr(unsigned char r, unsigned char g, unsigned char b) : R(r), G(g), B(b) {}
-	};
-	ClearClr		m_ClearClr;
 	vector<IMenu*>	m_vMenus;
 
 public:
@@ -28,5 +22,4 @@ public:
 
 	//////////////////////////////////////////////////////////////////////////
 	// ACCESSORS
-	ClearClr GetClearClr() const { return m_ClearClr; }
 };

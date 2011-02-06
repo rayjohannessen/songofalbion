@@ -445,6 +445,7 @@ bool CSGD_DirectInput::InitMouse(HWND hWnd, bool bIsExclusive)
 		return false;
 	}
 
+	DWORD err = GetLastError();
 	m_pMouse = new CSGD_DIMouse(m_lpDIObject, hWnd, bIsExclusive);
 	
 	if (m_pMouse == NULL)
@@ -1266,7 +1267,7 @@ CSGD_DIKeyboard::CSGD_DIKeyboard(LPDIRECTINPUT8 pDI, HWND hWnd, bool bIsExclusiv
 	//	Acquire the Keyboard.
 	if (FAILED( m_lpDevice->Acquire() ))
 	{
-		DIERRBOX(hWnd, "Failed to acquire Keyboard.")
+		//DIERRBOX(hWnd, "Failed to acquire Keyboard.");
 	}	
 
 	ClearKeys();
@@ -1684,7 +1685,7 @@ CSGD_DIMouse::CSGD_DIMouse(LPDIRECTINPUT8 pDI, HWND hWnd, bool bIsExclusive)
 	//	Acquire the Mouse.
 	if (FAILED( m_lpDevice->Acquire() ))
 	{
-		DIERRBOX(hWnd, "Failed to acquire Mouse.")
+		//DIERRBOX(hWnd, "Failed to acquire Mouse.")
 	}	
 
 	// DIDC_ATTACHED 

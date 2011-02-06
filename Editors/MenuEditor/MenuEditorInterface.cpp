@@ -22,7 +22,7 @@ bool MenuEditorInterface::Init(LPDIRECT3DDEVICE9 d3d, D3DPRESENT_PARAMETERS& d3d
 
 void MenuEditorInterface::Update(float fDeltaTime)
 {
-	m_pApp->MainInGame(fDeltaTime);
+	m_pApp->_MainInGame(fDeltaTime);
 }
 
 void MenuEditorInterface::Shutdown()

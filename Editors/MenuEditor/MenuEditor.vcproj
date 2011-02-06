@@ -183,6 +183,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\EditorRenderer.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Globals.cpp"
 				>
 			</File>
@@ -208,6 +212,10 @@
 			</File>
 			<File
 				RelativePath=".\Project.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Renderable.cpp"
 				>
 			</File>
 			<File
@@ -250,6 +258,10 @@
 				RelativePath=".\WinMain.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\WinMainProc.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -266,6 +278,10 @@
 			</File>
 			<File
 				RelativePath=".\Defines.h"
+				>
+			</File>
+			<File
+				RelativePath=".\EditorRenderer.h"
 				>
 			</File>
 			<File
@@ -298,6 +314,10 @@
 			</File>
 			<File
 				RelativePath=".\Project.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Renderable.h"
 				>
 			</File>
 			<File

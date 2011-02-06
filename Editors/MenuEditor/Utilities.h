@@ -24,4 +24,7 @@ namespace Utilities
 
 void GetFilesInDirectory(const string& _dir, vector<string>& _files, vector<string>* extToIgnore = NULL);
 void GetFoldersInDirectory(const string& _dir, vector<string>& _folders, vector<string>* folderToIgnore = NULL);
+
+void Error(LPTSTR lpszFunction);
+
 }

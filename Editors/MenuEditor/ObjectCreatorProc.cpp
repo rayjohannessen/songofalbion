@@ -2,33 +2,33 @@
 #include "ProcDefinitions.h"
 #include "Globals.h"
 #include "Win32Window.h"
+#include "Resource.h"
 
 LRESULT CALLBACK ObjCreatorProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	if (Globals::g_hWndDlg)
+		return FALSE;
+
 	//	What is the message 
 	switch(msg)
 	{
 	case WM_COMMAND:
 		{
-			// 			switch (LOWORD(wParam))
-			// 			{
-			// 
-			// 			}
+// 			switch (LOWORD(wParam))
+// 			{
+// 
+// 			}
 		}
-		//	To skip ALT pop up menu (system menu)
-	case WM_SYSKEYUP:
+	case WM_SYSKEYUP: //	To skip ALT pop up menu (system menu)
 	case WM_SYSCHAR:
 		{
 			return(0);
 		}break;		
-		//	Handle ALT+F4
-	case WM_CLOSE:
+	case WM_CLOSE: //	Handle ALT + F4
 		{
-			// Sends us a WM_DESTROY
-			//CloseWindow(hWnd);
-			//Globals::g_pWin32Windows[EW_OBJ_CREATION]->SetHWND(hWnd);
-			//DestroyWindow(hWnd);	
-			ShowWindow(hWnd, SW_HIDE);
+			Globals::g_pWin32Windows[EW_OBJ_CREATION]->Win32ShowWnd(SW_MINIMIZE);
+			CheckMenuItem(Globals::g_pWin32Windows[EW_MAIN]->GetMenu(), ID_ObjectCreator, MF_UNCHECKED);
+			return 0;
 		}break;
 	case WM_MOUSEMOVE:
 		{
