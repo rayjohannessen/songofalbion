@@ -72,8 +72,12 @@ CObject::CObject(int type, point coord, point scrnPos, string name, const char* 
 	if (m_mAbilities.size())
 	{
 		AbilitiesIter iter, end; unsigned i;
-		for (iter = m_mAbilities[m_eDefaultAbilityType].begin(), end = m_mAbilities[m_eDefaultAbilityType].end(), i = 0; i < NUM_QB_SLOTS && iter != end; ++iter, ++i)
+		for (iter = m_mAbilities[m_eDefaultAbilityType].begin(), end = m_mAbilities[m_eDefaultAbilityType].end(), i = 0; 
+				i < NUM_QB_SLOTS && iter != end; 
+				++iter, ++i)
+		{
 			m_arrQBSlots[i] = (*iter)->GetQBObj();
+		}
 		m_pCurrAttackAbility = m_pCurrDefenseAbility = (CCombatSkill*)m_mAbilities[BN_COMBAT_SKILLS][0];	// TODO:: assumes everything has a combat skill
 	}
 }

@@ -78,6 +78,8 @@ class CAbilitiesManager
 	void GetCityInfo( TiXmlElement* pRoot );
 	void GetBuildingInfo( TiXmlElement* pRoot );
 
+	void GetObjectInfo( TiXmlElement* _root );
+
 	void InitUnitCombatBaseAbility(const ObjectData* unitData);
 	bool LoadAbilityInfo(const string& path);
 
