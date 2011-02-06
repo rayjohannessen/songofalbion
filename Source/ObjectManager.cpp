@@ -245,7 +245,8 @@ void ObjectManager::RemoveObj(CPlayer* player, CObject* pObj)
 				if (pObj == player->GetCities()[i])
 				{
 					player->RemoveObject(OBJ_CITY, i);
-				}break;
+					break;
+				}
 			}
 		}
 		break;
@@ -257,10 +258,11 @@ void ObjectManager::RemoveObj(CPlayer* player, CObject* pObj)
 				if (pObj == player->GetUnits()[i])
 				{
 					CUnit* unit = (CUnit*)pObj;
-					if (unit->GetNeighbor())
-						unit->GetNeighbor()->CenterUnit();
+					if (unit->GetNeighbor() && unit->GetNeighbor()->GetType() == OBJ_UNIT)
+						((CUnit*)unit->GetNeighbor())->CenterUnit();
 					player->RemoveObject(OBJ_UNIT, i);
-				}break;
+					break;
+				}
 			}
 		}
 		break;
@@ -272,7 +274,8 @@ void ObjectManager::RemoveObj(CPlayer* player, CObject* pObj)
 				if (pObj == player->GetBuildings()[i])
 				{
 					player->RemoveObject(OBJ_BUILDING, i);
-				}break;
+					break;
+				}
 			}
 		}
 		break;

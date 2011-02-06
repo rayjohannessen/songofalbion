@@ -259,8 +259,8 @@ bool CMap::DetermineMoveSpecifics(const point& pt)
 						{
 							m_vPath.clear();
 							InitiateAttack(false);
-							unit->SetNeighbor(((CUnit*)m_pEnemyObj));
-							((CUnit*)m_pEnemyObj)->SetNeighbor(unit);
+							unit->SetNeighbor(m_pEnemyObj);
+							m_pEnemyObj->SetNeighbor(unit);
 						}
 					}
 				}
@@ -1034,7 +1034,7 @@ bool CMap::HandleKBInput()
 		m_nCurrPlaceType = MSA_SELECT;
 	}
 	// bring up Combat skills (if applicable)
- 	else if (Globals::g_pDI->KeyPressed(DIK_C) && m_pCurrPlayerSelectedObj)
+ 	else if (Globals::g_pDI->KeyPressed(DIK_C) && m_pCurrPlayerSelectedObj /*&& m_pCurrPlayerSelectedObj->GetAbilitiesMap()[BN_COMBAT_SKILLS].size()*/)
 		Globals::g_pHUD->AddWindow(Globals::g_pHUD->GetButton(BL_SLOT_1_1)->SimulatePressed());
 	// show info screen of currently selected object
 	else if (Globals::g_pDI->KeyPressed(DIK_TAB) && m_pCurrPlayerSelectedObj)
@@ -1127,7 +1127,8 @@ void CMap::InitiateAttack(bool setfacing /*= true*/)
 	playerUnit->DecrementStamina(playerUnit->GetCurrAttackAbility()->GetProps()->AttackStam);
 
 	// TODO:: units will not turn to face if a surprise attack is happening:
-	((CUnit*)m_pEnemyObj)->SetFacing(playerUnit->GetOppositeFacing());
+	if (m_pEnemyObj->GetType() == OBJ_UNIT)
+		((CUnit*)m_pEnemyObj)->SetFacing(playerUnit->GetOppositeFacing());
 	
 	// animate attack..delay damage shown to user until attack is finished
 	if (playerUnit->GetCurrAnimString() != "Attack")

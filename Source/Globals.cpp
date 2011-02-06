@@ -83,41 +83,14 @@ bool Globals::InitGlobals(HWND hWnd, HINSTANCE hInstance, int nScreenWidth, int 
 		
 void Globals::ShutdownGlobals()
 {
-	if (g_pD3D)
-	{
-		g_pD3D->Shutdown();	
-		g_pD3D = NULL;
-	}
-	if (g_pTM)
-	{
-		g_pTM->Shutdown();	
-		g_pTM = NULL;
-	}
-	if (g_pDI)
-	{
-		g_pDI->Shutdown();
-		g_pDI = NULL;
-	}
-	if (g_pFMOD)
-	{
-		g_pFMOD->Shutdown();
-		g_pFMOD = NULL;
-	}
-	if (g_pAnimManager)
-	{
-		g_pAnimManager->Shutdown();
-		g_pAnimManager = NULL;
-	}
-	if (g_pAssets)
-	{
-		g_pAssets->Shutdown();
-		g_pAssets = NULL;
-	}
-	if (g_pAbilitiesManager)
-	{
-		g_pAbilitiesManager->Shutdown();
-		g_pAbilitiesManager = NULL;
-	}
+	SAFE_SHUTDOWN_SINGLETON(g_pD3D);
+	SAFE_SHUTDOWN_SINGLETON(g_pTM);
+	SAFE_SHUTDOWN_SINGLETON(g_pDI);
+	SAFE_SHUTDOWN_SINGLETON(g_pFMOD);
+	SAFE_SHUTDOWN_SINGLETON(g_pAnimManager);
+	SAFE_SHUTDOWN_SINGLETON(g_pAssets);
+	SAFE_SHUTDOWN_SINGLETON(g_pAbilitiesManager);
+
 	SAFE_DELETE(g_vUnitNames);
 	for (unsigned i = 0; i < NUM_MENUOPTION_TYPES; ++i)
 		SAFE_DELETE(g_pMenus[i]);
@@ -192,11 +165,7 @@ CPlayer* Globals::GetPlayerByFactionID(short id)
 
 void Globals::ShutdownHUD()
 {
-	if (g_pHUD)
-	{
-		g_pHUD->Shutdown();
-		g_pHUD = NULL;
-	}
+	SAFE_SHUTDOWN_SINGLETON(g_pHUD);
 }
 void Globals::ShutdownObjManager()
 {

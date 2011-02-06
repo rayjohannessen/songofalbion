@@ -90,7 +90,7 @@ void CPlayer::RemoveObject(eObjType type, unsigned index)
 			m_pCities[index]->SetImageID(-1);
 			// shift all the cities back that are in the array
 			// after the one that has been deleted
-			while (index++ < MAX_NUM_CITIES && m_pCities[index]->GetImageID() != -1)
+			while (++index < MAX_NUM_CITIES && m_pCities[index]->GetImageID() != -1)
 			{
 				m_pCities[index-1] = m_pCities[index];
 			}
@@ -101,7 +101,7 @@ void CPlayer::RemoveObject(eObjType type, unsigned index)
 			m_pUnits[index]->SetImageID(-1);
 			// shift all the units back that are in the array
 			// after the one that has been deleted
-			while (index++ < m_nNumUnits && m_pUnits[index]->GetImageID() != -1)
+			while (++index < m_nNumUnits && m_pUnits[index]->GetImageID() != -1)
 			{
 				m_pUnits[index-1] = m_pUnits[index];
 			}
@@ -112,7 +112,7 @@ void CPlayer::RemoveObject(eObjType type, unsigned index)
 			m_pBuildings[index]->SetImageID(-1);
 			// shift all the units back that are in the array
 			// after the one that has been deleted
-			while (index++ < MAX_NUM_BUILDINGS && m_pBuildings[index]->GetImageID() != -1)
+			while (++index < MAX_NUM_BUILDINGS && m_pBuildings[index]->GetImageID() != -1)
 			{
 				m_pBuildings[index-1] = m_pBuildings[index];
 			}

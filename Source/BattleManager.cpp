@@ -9,6 +9,7 @@
 #include "AbilityObjectBase.h"
 #include "CombatSkill.h"
 
+// TODO:: need to have ALL object types accounted for in combat
 bool CBattleManager::Update(double dElapsedTime)
 {
 	if (!m_pCurrAbility)	// nothing to do, get out
@@ -17,7 +18,7 @@ bool CBattleManager::Update(double dElapsedTime)
 	bool battleComplete = false;
 	if (m_bPerformingHit)
 	{
-		if (!((CUnit*)m_pCurrentObj)->GetCurrAnim().IsPlaying())	// wait until the unit being hit is done playing Hit anim
+		if (m_pCurrentObj->GetType() == OBJ_UNIT && !((CUnit*)m_pCurrentObj)->GetCurrAnim().IsPlaying())	// wait until the unit being hit is done playing Hit anim
 		{// mark ability as finished, go on to the next object
 			m_bPerformingHit = false;
 			battleComplete = OnAbilityFinished();
@@ -26,7 +27,7 @@ bool CBattleManager::Update(double dElapsedTime)
 	}
 	else if (m_bPerformingDeath)
 	{
-		if (!((CUnit*)m_pCurrentObj)->GetCurrAnim().IsPlaying())  // wait until the unit being killed is done playing Dying anim
+		if (m_pCurrentObj->GetType() == OBJ_UNIT && !((CUnit*)m_pCurrentObj)->GetCurrAnim().IsPlaying())  // wait until the unit being killed is done playing Dying anim
 		{
 			m_bPerformingDeath = false;
 			// TODO:: check if any units remain to continue the battle
@@ -44,8 +45,7 @@ bool CBattleManager::Update(double dElapsedTime)
 	if (abilRet.ApplyDamages)
 		OnApplyDamages(&abilRet);
 	else if(abilRet.Finished)
-		battleComplete = OnAbilityFinished(&abilRet);
-	
+		battleComplete = OnAbilityFinished(&abilRet);	
 
 	return battleComplete;
 }
@@ -55,26 +55,31 @@ bool CBattleManager::OnAbilityFinished( CombatAbilityReturn *abilRet )
 	// reset current - should be done at the beginning of an object's turn
 	m_pCurrAbility->ResetResultsApplied();
 
-	CUnit* unit;
 	// which object goes next?
 	if (m_pCurrentObj == m_pAttacker)
 	{
 		m_pCurrAbility	= m_pOrigDefenderAbil;
 		m_pCurrentObj	= m_pDefender;
-		unit			= ((CUnit*)m_pCurrentObj);
 		// this unit is defending, see if it has any free counters
 		if (m_pCurrAbility->GetProps()->CurrFreeCounters > 0)
 		{
 			// a free counter-attack
 			--m_pCurrAbility->GetProps()->CurrFreeCounters;
-			unit->ChangeAnim("Attack");
-			unit->GetCurrAnim().Play();
+			if (m_pCurrentObj->GetType() == OBJ_UNIT)
+			{
+				((CUnit*)m_pCurrentObj)->ChangeAnim("Attack");
+				((CUnit*)m_pCurrentObj)->GetCurrAnim().Play();
+			}
 			return false;
 		} 
-		else if (false /* TODO:: this player chose to use stamina to counter-attack*/ && unit->GetStamina() >= m_pCurrAbility->GetStaminaRequired(false))
+		else if (false /* TODO:: this player chose to use stamina to counter-attack*/ && m_pCurrentObj->GetType() == OBJ_UNIT && 
+				((CUnit*)m_pCurrentObj)->GetStamina() >= m_pCurrAbility->GetStaminaRequired(false))
 		{
-			unit->ChangeAnim("Attack");
-			unit->GetCurrAnim().Play();
+			if (m_pCurrentObj->GetType() == OBJ_UNIT)
+			{
+				((CUnit*)m_pCurrentObj)->ChangeAnim("Attack");
+				((CUnit*)m_pCurrentObj)->GetCurrAnim().Play();
+			}
 			return false;
 		}
 		// the defender cannot counter-attack, fall through to next if check
@@ -108,8 +113,11 @@ void CBattleManager::OnApplyDamages( CombatAbilityReturn *abilRet )
 	for ( ; iter != end; ++iter)
 	{
 		m_pCurrentObj = (*iter);
-		((CUnit*)(*iter))->ChangeAnim("Death");
-		((CUnit*)(*iter))->GetCurrAnim().Play();
+		if (m_pCurrentObj->GetType() == OBJ_UNIT)
+		{
+			((CUnit*)(*iter))->ChangeAnim("Death"); // TODO:: get "Death" anims for buildings/cities
+			((CUnit*)(*iter))->GetCurrAnim().Play();
+		}
 		// find victor
 		// TODO:: adjust for multiple objects...
 		if (m_pCurrentObj == m_pDefender)
@@ -130,8 +138,11 @@ void CBattleManager::OnApplyDamages( CombatAbilityReturn *abilRet )
 	end  = abilRet->HitObjs.end();
 	for ( ; iter != end; ++iter)
 	{
-		((CUnit*)(*iter))->ChangeAnim("Hit");
-		((CUnit*)(*iter))->GetCurrAnim().Play();
+		if (m_pCurrentObj->GetType() == OBJ_UNIT)	// TODO:: get "Hit" anims for buildings/cities
+		{
+			((CUnit*)(*iter))->ChangeAnim("Hit");
+			((CUnit*)(*iter))->GetCurrAnim().Play();
+		}
 	}
 }
 
@@ -169,16 +180,10 @@ void CBattleManager::Init(CObject* attacker, CObject* defender, CObject*& mapsVi
 void CBattleManager::GetSetAbility(CCombatSkill*& abilToSet, CObject* const obj, bool isAttackAbil)
 {
 	eButtonName defaultType;
-	CCombatSkill* currAbil = obj->GetCurrDefaultAbility(defaultType);
+	CCombatSkill* currAbil = obj->GetCurrDefCombatAbility(defaultType);	// CCombatSkill's only in battles
 	if (NULL == currAbil)
 	{// we have to grab the default ability
-		switch (defaultType)
-		{
-		case BN_COMBAT_SKILLS:
-			{
-				abilToSet = new CCombatSkill(*(CCombatSkill*)obj->GetAbilitiesMap()[BN_COMBAT_SKILLS][0]);
-			}break;
-		}
+		abilToSet = new CCombatSkill(*(CCombatSkill*)obj->GetAbilitiesMap()[BN_COMBAT_SKILLS][0]);
 		if (isAttackAbil)
 			obj->SetCurrAttackAbility(abilToSet);
 		else
@@ -186,16 +191,10 @@ void CBattleManager::GetSetAbility(CCombatSkill*& abilToSet, CObject* const obj,
 	}
 	else	// use the current ability
 	{
-		switch (defaultType)
-		{
-		case BN_COMBAT_SKILLS:
-			{
-				if (isAttackAbil)
-					abilToSet = new CCombatSkill(*obj->GetCurrAttackAbility());
-				else
-					abilToSet = new CCombatSkill(*obj->GetCurrDefenseAbility());
-			}break;
-		}
+		if (isAttackAbil)
+			abilToSet = new CCombatSkill(*obj->GetCurrAttackAbility());
+		else
+			abilToSet = new CCombatSkill(*obj->GetCurrDefenseAbility());
 	}
 }
 
