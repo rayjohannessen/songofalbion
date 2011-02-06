@@ -7,14 +7,14 @@
 
 class CPlayer;
 class CTimer;
-class CMenu;
+class CGameMenu;
 
 class CGame
 {
 private:
 	//pointers to other classes
 	IGameState*			m_pCurrentState;
-	CMenu*				m_pCurrMenu;
+	CGameMenu*				m_pCurrMenu;
 	string				m_sCurrProfName;
 
 	// variables
@@ -95,7 +95,7 @@ public:
 	inline float		GetSFXVolume()		const	{return m_fSFXVolume;	}
 	inline float		GetMusicVolume()	const	{return m_fMusicVolume;	}
 	inline string		GetProfName()		const	{return m_sCurrProfName;}
-	inline CMenu* const GetCurrMenu()		const	{return m_pCurrMenu;	}
+	inline CGameMenu* const GetCurrMenu()		const	{return m_pCurrMenu;	}
 	inline const IGameState* const GetCurrState()	const	{return m_pCurrentState;}
 	// 	bool GetIsPaused()			{return m_bIsPaused;}
 

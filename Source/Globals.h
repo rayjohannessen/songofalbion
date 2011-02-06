@@ -16,7 +16,7 @@ class CPlayer;
 class CAnimationsManager;
 class CUnit; 
 class CAbilitiesManager;
-class CMenu;
+class CGameMenu;
 class DebugWindow;
 enum eAnimationDirections;
 
@@ -61,8 +61,8 @@ public:
 	static ObjectNamesTypes*		g_vUnitNames;
 	static CAnimationsManager*		g_pAnimManager; 	// initialized in CAssets
 	static CAbilitiesManager*		g_pAbilitiesManager;
-	static CMenu*					g_pMenus[NUM_MENUOPTION_TYPES];
-	static CMenu*					g_pMenusInGame[NUM_INGAME_MENU_TYPES];
+	static CGameMenu*					g_pMenus[NUM_MENUOPTION_TYPES];
+	static CGameMenu*					g_pMenusInGame[NUM_INGAME_MENU_TYPES];
 	static short					g_nNumPlayers;
 	static short					g_nPlayerFactionID;
 	static bool						g_bWindowOpen;

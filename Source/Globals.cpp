@@ -36,8 +36,8 @@ CPlayer*				Globals::g_pCurrPlayer	= NULL;
 ObjectNamesTypes*		Globals::g_vUnitNames	= NULL;	// initialized in CAssets
 CAnimationsManager*		Globals::g_pAnimManager	= NULL;	// initialized in CAssets
 CAbilitiesManager*		Globals::g_pAbilitiesManager = NULL;
-CMenu*					Globals::g_pMenus[NUM_MENUOPTION_TYPES] = {};
-CMenu*					Globals::g_pMenusInGame[NUM_INGAME_MENU_TYPES] = {};
+CGameMenu*					Globals::g_pMenus[NUM_MENUOPTION_TYPES] = {};
+CGameMenu*					Globals::g_pMenusInGame[NUM_INGAME_MENU_TYPES] = {};
 
 bool Globals::InitGlobals(HWND hWnd, HINSTANCE hInstance, int nScreenWidth, int nScreenHeight, bool bIsWindowed)
 {
@@ -262,11 +262,11 @@ void Globals::InitMenus()
 
 	point pos((g_ptScreenSize.width >> 1) - (11*g_pBitMapFont->GetSize() >> 1) + 50, 330 );	// 11 is the size of the longest menu name string
 	int menuMusic = Globals::g_pAssets->GetMenuSnds()->MenuMusic(MOT_MAIN);
-	g_pMenus[MOT_MAIN]	 = new CMenu(Globals::g_pAssets->GetGUIasts()->MenuBGs(MOT_MAIN), rect(0,768,0,1024),
+	g_pMenus[MOT_MAIN]	 = new CGameMenu(Globals::g_pAssets->GetGUIasts()->MenuBGs(MOT_MAIN), rect(0,768,0,1024),
 									 menuMusic, pos, MOT_MAIN, options, MainMenu::Render, MainMenu::Update, MainMenu::Input, false);
-	g_pMenus[MOT_HELP]	 = new CMenu(Globals::g_pAssets->GetGUIasts()->MenuBGs(MOT_HELP), rect(0,768,0,1024),
+	g_pMenus[MOT_HELP]	 = new CGameMenu(Globals::g_pAssets->GetGUIasts()->MenuBGs(MOT_HELP), rect(0,768,0,1024),
 									menuMusic, pos, MOT_HELP, options, HelpMenu::Render, HelpMenu::Update, HelpMenu::Input);
-	g_pMenus[MOT_OPTIONS]= new CMenu(Globals::g_pAssets->GetGUIasts()->MenuBGs(MOT_OPTIONS), rect(0,446,0,711),
+	g_pMenus[MOT_OPTIONS]= new CGameMenu(Globals::g_pAssets->GetGUIasts()->MenuBGs(MOT_OPTIONS), rect(0,446,0,711),
 									menuMusic, pos, MOT_OPTIONS, options, OptionMenu::Render, OptionMenu::Update, OptionMenu::Input);
 
 	//////////////////////////////////////////////////////////////////////////
@@ -278,8 +278,8 @@ void Globals::InitMenus()
 	optionsInGame.push_back(MenuOption(MOT_MAIN,	string("Main"),		OptionAction_MainMenu,	menuClick));
 	optionsInGame.push_back(MenuOption(MOT_EXIT,	string("Exit"),		OptionAction_Exit,		menuClick));
 	// these need an offset for the fact that there's no main menu
-	g_pMenusInGame[MOT_HELP-1]	  = new CMenu(Globals::g_pAssets->GetGUIasts()->MenuBGs(MOT_HELP), rect(0,768,0,1024), menuMusic, pos, MOT_HELP, optionsInGame, HelpMenu::Render, HelpMenu::Update, HelpMenu::Input);
-	g_pMenusInGame[MOT_OPTIONS-1] = new CMenu(Globals::g_pAssets->GetGUIasts()->MenuBGs(MOT_OPTIONS), rect(0,446,0,711),  menuMusic, pos, MOT_OPTIONS, optionsInGame, OptionMenu::Render, OptionMenu::Update, OptionMenu::Input);
+	g_pMenusInGame[MOT_HELP-1]	  = new CGameMenu(Globals::g_pAssets->GetGUIasts()->MenuBGs(MOT_HELP), rect(0,768,0,1024), menuMusic, pos, MOT_HELP, optionsInGame, HelpMenu::Render, HelpMenu::Update, HelpMenu::Input);
+	g_pMenusInGame[MOT_OPTIONS-1] = new CGameMenu(Globals::g_pAssets->GetGUIasts()->MenuBGs(MOT_OPTIONS), rect(0,446,0,711),  menuMusic, pos, MOT_OPTIONS, optionsInGame, OptionMenu::Render, OptionMenu::Update, OptionMenu::Input);
 }
 //////////////////////////////////////////////////////////////////////////
 

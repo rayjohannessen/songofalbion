@@ -7,7 +7,7 @@
 #include "Wrappers/CSGD_TextureManager.h"
 #include "Wrappers/CSGD_DirectInput.h"
 
-CMenu::CMenu(int bgImageID, const rect& bgSrc, int musicID, point& optionsStartPos, eMenuOptionType menuType, MenuOptions& options,
+CGameMenu::CGameMenu(int bgImageID, const rect& bgSrc, int musicID, point& optionsStartPos, eMenuOptionType menuType, MenuOptions& options,
 			 RenderPtr renderFunc, UpdatePtr updateFunc, InputPtr inputFunc, bool optionsInLine /*= true*/,
 			 DWORD clr /*= YELLOW_WHITE*/, DWORD hoverClr /*= LIGHT_RED*/, int itemSpacing /*= 30*/, const point& bgPos /*= point(0, 0)*/) 
 	:
@@ -54,12 +54,12 @@ m_rBGSrc(bgSrc)
 		CenterBGImage();
 	}
 }
-CMenu::~CMenu()
+CGameMenu::~CGameMenu()
 {
 
 }
 
-void CMenu::Render()
+void CGameMenu::Render()
 {
 	if (m_nBGImageID > -1)
  		Globals::g_pTM->Render(m_nBGImageID, m_ptBGPos.x, m_ptBGPos.y, 1.0f, 1.0f, 1.0f, &m_rBGSrc, 0.0f, 0.0f, 0.0f, 0xaaffffff);
@@ -96,13 +96,13 @@ void CMenu::Render()
 	m_fpRender(this);
 }
 
-void CMenu::Update(double dTimeStep)
+void CGameMenu::Update(double dTimeStep)
 {
 	m_fpUpdate(dTimeStep, this);
 }
 
 static eMenuOptionType prevHov = NUM_MENUOPTION_TYPES;
-bool CMenu::Input(double elapsedTime, const POINT& mousePt)
+bool CGameMenu::Input(double elapsedTime, const POINT& mousePt)
 {
 	// keyboard input
 	if (Globals::g_pDI->KeyPressed(DIK_ESCAPE))
@@ -160,12 +160,12 @@ bool CMenu::Input(double elapsedTime, const POINT& mousePt)
 	return false;
 }
 
-void CMenu::Enter()
+void CGameMenu::Enter()
 {
 	if (m_nMusicID > -1 && !Globals::g_pFMOD->IsSoundPlaying(m_nMusicID))
 		Globals::g_pFMOD->PlaySound(m_nMusicID);
 }
-void CMenu::Exit(eMenuOptionType changeTo)
+void CGameMenu::Exit(eMenuOptionType changeTo)
 {
 	if (m_nMusicID > -1 && changeTo == NUM_MENUOPTION_TYPES)	// only stop sound if we're changing to a non-menu (going into game for instance)
 	{
@@ -177,7 +177,7 @@ void CMenu::Exit(eMenuOptionType changeTo)
 //////////////////////////////////////////////////////////////////////////
 // protected
 //////////////////////////////////////////////////////////////////////////
-void CMenu::CenterBGImage()
+void CGameMenu::CenterBGImage()
 {
 	m_ptBGPos = point((Globals::g_ptScreenSize.width >> 1) - (m_rBGSrc.width() >> 1), 
 					  (Globals::g_ptScreenSize.height >> 1) - (m_rBGSrc.height() >> 1));

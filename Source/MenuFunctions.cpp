@@ -8,17 +8,17 @@
 
 namespace HelpMenu
 {
-	void Render(CMenu* const menu)
+	void Render(CGameMenu* const menu)
 	{
 
 	}
 
-	void Update(double fElapsed, CMenu* const menu)
+	void Update(double fElapsed, CGameMenu* const menu)
 	{
 
 	}
 
-	bool Input(double fElapsed, const POINT& mouse, CMenu* const menu)
+	bool Input(double fElapsed, const POINT& mouse, CGameMenu* const menu)
 	{
 
 		return true;
@@ -27,17 +27,17 @@ namespace HelpMenu
 
 namespace OptionMenu
 {
-	void Render(CMenu* const menu)
+	void Render(CGameMenu* const menu)
 	{
 		MenuOptIter iter, end;
 	}
 
-	void Update(double fElapsed, CMenu* const menu)
+	void Update(double fElapsed, CGameMenu* const menu)
 	{
 
 	}
 
-	bool Input(double fElapsed, const POINT& mouse, CMenu* const menu)
+	bool Input(double fElapsed, const POINT& mouse, CGameMenu* const menu)
 	{
 
 		return true;
@@ -46,17 +46,17 @@ namespace OptionMenu
 
 namespace MainMenu
 {
-	void Render(CMenu* const menu)
+	void Render(CGameMenu* const menu)
 	{
 		MenuOptIter iter, end;
 	}
 
-	void Update(double fElapsed, CMenu* const menu)
+	void Update(double fElapsed, CGameMenu* const menu)
 	{
 
 	}
 
-	bool Input(double fElapsed, const POINT& mouse, CMenu* const menu)
+	bool Input(double fElapsed, const POINT& mouse, CGameMenu* const menu)
 	{
 
 		return true;
