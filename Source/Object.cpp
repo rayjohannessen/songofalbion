@@ -71,6 +71,7 @@ CObject::CObject(int type, point coord, point scrnPos, string name, const char* 
 	ClearQBSlotORSlots();
 	if (m_mAbilities.size())
 	{
+		// add this object's default ability type objects to the quickbar slots
 		AbilitiesIter iter, end; unsigned i;
 		for (iter = m_mAbilities[m_eDefaultAbilityType].begin(), end = m_mAbilities[m_eDefaultAbilityType].end(), i = 0; 
 				i < NUM_QB_SLOTS && iter != end; 

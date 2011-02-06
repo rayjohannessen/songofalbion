@@ -11,17 +11,6 @@
 using namespace CombatFunctions;
 using namespace NonCombatFunctions;
 
-// correspond to eAbility enums
-// TODO:: maybe change this ?? put name in XML file instead?
-const static AbilityInfo arrAbilityInfo[NUM_ABILITIES] =
-{
-	AbilityInfo("Attack", NULL),
-	AbilityInfo("Charge", Charge),
-	AbilityInfo("Flank", Flank),
-	AbilityInfo("Heal Unit", HealUnit),
-	AbilityInfo("Promote Unit", PromoteUnit),
-	AbilityInfo("Fortify", Fortify)
-};
 
 CAbilitiesManager* CAbilitiesManager::GetInstance()
 {
@@ -43,6 +32,13 @@ void CAbilitiesManager::Shutdown()
 
 void CAbilitiesManager::Init()
 {
+	m_mAbilityInfo["Attack"] = AbilityInfo("Attack", NULL);
+	m_mAbilityInfo["Charge"] = AbilityInfo("Charge", Charge);
+	m_mAbilityInfo["Flank"] = AbilityInfo("Flank", Flank);
+	m_mAbilityInfo["Heal_Unit"] = AbilityInfo("Heal_Unit", HealUnit);
+	m_mAbilityInfo["Promote_Unit"] = AbilityInfo("Promote_Unit", PromoteUnit);
+	m_mAbilityInfo["Fortify"] = AbilityInfo("Fortify", Fortify);
+
 	if( !LoadAbilityInfo("Resources/Objects/") )
 		MessageBox(NULL, "Some or all Attack info failed to load.", "Error", MB_OK);
 }
@@ -81,7 +77,7 @@ void CAbilitiesManager::GetObjectInfo( TiXmlElement* _root )
 {
 	TiXmlElement* pObject = _root->FirstChildElement();
 	string strObjType = pObject->Value();
-	eAbility eAbilityEnum;
+	AbilityName strAbilityName;
 	bool bIsStartingAbility;
 	int  rectId;
 	
@@ -92,7 +88,7 @@ void CAbilitiesManager::GetObjectInfo( TiXmlElement* _root )
 		nameAndType.Type = atoi(pObject->Attribute("type"));	// type (ground, air, sea...)
 		nameAndType.Name = pObject->Attribute("name");			// load in name
 
-		if (strObjType == "Unit")
+		if (strObjType == "Unit")	// unit-specific base attacks have to be initialized first
 		{
 			Globals::g_vUnitNames->push_back(nameAndType);
 			InitUnitCombatBaseAbility(&nameAndType);
@@ -107,7 +103,7 @@ void CAbilitiesManager::GetObjectInfo( TiXmlElement* _root )
 			while (pAttack)	// continue while there are more attacks
 			{
 				bIsStartingAbility	= atoi(pAttack->Attribute("startingAbility")) != 0; // != is to avoid int to bool perf warning 
-				eAbilityEnum		= (eAbility)atoi(pAttack->Attribute("type"));
+				strAbilityName		= pAttack->Attribute("name");
 				rectId				= atoi(pAttack->Attribute("rectid"));
 
 				// load in any modifiers to the attack
@@ -118,14 +114,14 @@ void CAbilitiesManager::GetObjectInfo( TiXmlElement* _root )
 				CSkillProps.AttackStam = atoi(pAttack->Attribute("attackStamina"));
 				CSkillProps.FreeCounters = atoi(pAttack->Attribute("freeCounter"));
 
-				Globals::g_pAbilitiesManager->AddAttackName(arrAbilityInfo[eAbilityEnum].Name);
+				Globals::g_pAbilitiesManager->AddAttackName(m_mAbilityInfo[strAbilityName].Name);
 
 				CQuickBarObject* qbObj = new CQuickBarObject(Globals::g_pAssets->GetGUIasts()->AbilityImages(), "Basic Attack bla bla", rectId);
 				m_vQBObjects.push_back(qbObj);
 				CCombatSkill* combatSkill = new CCombatSkill(ABT_COMBAT_SKILL, 
 															 point(0,0), 
-															 arrAbilityInfo[eAbilityEnum].Name, 
-															 arrAbilityInfo[eAbilityEnum].FuncPtr, 
+															 m_mAbilityInfo[strAbilityName].Name, 
+															 m_mAbilityInfo[strAbilityName].FuncPtr, 
 															 qbObj, 
 															 CSkillProps);
 				m_mObjectAbilities.insert(make_pair(nameAndType.Name, combatSkill));
@@ -158,17 +154,17 @@ void CAbilitiesManager::GetObjectInfo( TiXmlElement* _root )
 				while (pAbility)	// continue while there are more abilities
 				{
 					bIsStartingAbility	= atoi(pAbility->Attribute("startingAbility")) != 0;
-					eAbilityEnum		= (eAbility)atoi(pAbility->Attribute("type"));
+					strAbilityName		= pAbility->Attribute("name");
 					rectId				= atoi(pAbility->Attribute("rectid"));
 
-					Globals::g_pAbilitiesManager->AddAttackName(arrAbilityInfo[eAbilityEnum].Name);
+					Globals::g_pAbilitiesManager->AddAttackName(m_mAbilityInfo[strAbilityName].Name);
 
 					CQuickBarObject* qbObj = new CQuickBarObject(Globals::g_pAssets->GetGUIasts()->AbilityImages(), "NonCombat Ability desc", rectId);
 					m_vQBObjects.push_back(qbObj);
 					CNonCombatSkill* nonCombatSkill = new CNonCombatSkill(ABT_NONCOMBAT_SKILL, 
 																		  point(0,0), 
-																		  arrAbilityInfo[eAbilityEnum].Name, 
-																		  arrAbilityInfo[eAbilityEnum].FuncPtr, 
+																		  m_mAbilityInfo[strAbilityName].Name, 
+																		  m_mAbilityInfo[strAbilityName].FuncPtr, 
 																		  qbObj, 
 																		  NonCombatSkillProperties());
 
@@ -216,7 +212,7 @@ void CAbilitiesManager::InitUnitCombatBaseAbility(const ObjectData* unitData)
 	}
 
 	qbObj = new CQuickBarObject(Globals::g_pAssets->GetGUIasts()->AbilityImages(), "Basic Attack bla bla", 1);
-	ability = new CCombatSkill(ABT_COMBAT_SKILL, point(0, 0), arrAbilityInfo[A_BASE].Name, abilityFunc, qbObj, CombatSkillProperties());
+	ability = new CCombatSkill(ABT_COMBAT_SKILL, point(0, 0), m_mAbilityInfo["Attack"].Name, abilityFunc, qbObj, CombatSkillProperties());
 	m_vQBObjects.push_back(qbObj);
 	m_mObjectAbilities.insert( make_pair( unitData->Name, ability ) );
 

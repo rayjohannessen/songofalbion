@@ -19,14 +19,14 @@ typedef string AbilityName;
 //
 //////////////////////////////////////////////////////////////////////////
 
-enum eAbility 
-{
-	A_BASE = 0,
-	A_CHARGE = 1, A_FLANK = 2,
-	A_HEALUNIT = 3, A_PROMOTEUNIT = 4,
-	A_FORTIFY = 5,
-	NUM_ABILITIES
-};
+// enum eAbility 
+// {
+// 	A_BASE = 0,
+// 	A_CHARGE = 1, A_FLANK = 2,
+// 	A_HEALUNIT = 3, A_PROMOTEUNIT = 4,
+// 	A_FORTIFY = 5,
+// 	NUM_ABILITIES
+// };
 
 struct AbilityInfo 
 {
@@ -38,6 +38,10 @@ struct AbilityInfo
 
 class CAbilitiesManager
 {
+	// for loading abilities:
+	typedef map<AbilityName, AbilityInfo> AbilityInfoMap;
+	AbilityInfoMap m_mAbilityInfo;
+
 	typedef vector<AbilityName> AbilityNames;		// all of the ability names (separated by types into individual variable vectors)
 	typedef pair<ObjectName, AbilityName> ObjectAbilityPair;			// an object name paired with its ability names
 	typedef pair<AbilityName, CAbilityObjectBase*> AbilityNameFuncPair;			// an ability name (string) paired with its ability
