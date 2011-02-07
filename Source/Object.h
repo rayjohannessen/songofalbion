@@ -19,6 +19,7 @@ enum eAbSelType { AST_ATTACK = MOUSE_LEFT, AST_DEFENSE = MOUSE_RIGHT, };
 enum eInputStatus { IS_HOVER, IS_SELECT_L, IS_SELECT_R, IS_DESELECT, IS_NONE, };
 
 class CCombatSkill;
+class CUnit;
 
 class CObject
 {
@@ -29,6 +30,7 @@ class CObject
 	rect	m_rSrc;		// source from the city images sheet
 
 protected:
+	typedef vector<CUnit* const> Garrison;
 
 	bool	m_bDisplayInfo;	// the info screen master display switch
 
