@@ -12,10 +12,6 @@ class CGameMenu;
 class CGame
 {
 private:
-	//pointers to other classes
-	IGameState*			m_pCurrentState;
-	CGameMenu*				m_pCurrMenu;
-	string				m_sCurrProfName;
 
 	// variables
 	bool	m_bInGameplay;	// used for differentiating which menus to use, i.e., in-game or regular
@@ -24,20 +20,22 @@ private:
 	int		m_nScreenHeight;
 	float	m_fSFXVolume;
 	float	m_fMusicVolume;
+	string	m_sCurrProfName;
 	double	m_dTimeStep;
+
 	//PLAYERINFO m_PlayerInfo;
 
-	CTimer* m_pTimer;
+	//pointers to other classes
+	IGameState*		m_pCurrentState;
+	CGameMenu*		m_pCurrMenu;
+	CTimer*			m_pTimer;
 
-	//Constructor
+	//////////////////////////////////////////////////////////////////////////
+
 	CGame(void);
-	//Copy Constructor
 	CGame(const CGame&);
-	//Assignment Operator
 	CGame& operator=(const CGame&);
-	//Destructor
 	~CGame(void);
-
 
 public:
 	void ChangeMenu(eMenuOptionType mt);

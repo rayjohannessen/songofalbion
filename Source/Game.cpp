@@ -9,7 +9,6 @@
 #include "Globals.h"
 #include "Timer.h"
 #include "Menu.h"
-#include <ctime>
 
 //#include "MessageSystem.h"
 //#include "Factory.h"
@@ -40,6 +39,7 @@ CGame* CGame::GetInstance(void)
 void CGame::Initialize(HWND hWnd, HINSTANCE hInstance, int nScreenWidth, int nScreenHeight, bool bIsWindowed)
 {
 	m_pTimer = new CTimer();
+
 	m_nScreenWidth = nScreenWidth;
 	m_nScreenHeight = nScreenHeight;
 
