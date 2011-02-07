@@ -11,7 +11,7 @@ CCity::CCity() : CObject(), m_nCityType(0), m_nSize(0), m_pCityInfo(NULL)
 }
 CCity::~CCity()
 { 
-	SAFE_DELETE(m_pCityInfo); 
+	SAFE_DELETE(m_pCityInfo);
 }
 
 CCity::CCity(int type, int cityType, int size, point coord, point sPos, string name, const char* faction, int factionID)
