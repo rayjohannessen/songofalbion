@@ -217,3 +217,7 @@ MISC
 	- Fixed crash when selecting building
 	- Added building/button matches for HUD
 
+2/05/2011
+---------
+Abilities
+	- Reworked ability loading/creation structure to be cleaner/simpler
