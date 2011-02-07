@@ -62,13 +62,14 @@ BEGIN
     PUSHBUTTON      "Button2",IDC_BUTTON2,35,93,50,14
 END
 
-IDD_DLGFIRST DIALOG 260, 200, 300, 150
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_DLGFIRST DIALOG  260, 200, 300, 150
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "New Project Properties"
 FONT 8, "MS Shell Dlg"
 BEGIN
-    DEFPUSHBUTTON   "CREATE", IDOK, 130, 130, 50, 14
+    DEFPUSHBUTTON   "CREATE",IDOK,130,130,50,14
 END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -82,30 +83,29 @@ BEGIN
         MENUITEM "New ME Project",              ID_NewProj
         MENUITEM "Save ME Project",             ID_SaveProj, GRAYED
         MENUITEM "Load ME Project",             ID_LoadProj
-		MENUITEM "Close ME Project",			ID_CloseProj, GRAYED
+        MENUITEM "Close ME Project",            ID_CloseProj, GRAYED
         MENUITEM "Exit",                        ID_Exit
     END
-	POPUP "Edit"
-	BEGIN
-		MENUITEM "Project Properties"			ID_ProjProps, GRAYED
-	END
-	POPUP "Object Creator"
-	BEGIN	
-		MENUITEM "Create New Object"			ID_CreateNewObj
-	END
-	POPUP "Objects"
-	BEGIN
-		MENUITEM "Edit Selected"				ID_EditSelected
-	END
+    POPUP "Edit"
+    BEGIN
+        MENUITEM "Project Properties",          ID_ProjProps, GRAYED
+    END
+    POPUP "Object Creator"
+    BEGIN
+        MENUITEM "Create New Object",           ID_CreateNewObj
+    END
+    POPUP "Objects"
+    BEGIN
+        MENUITEM "Edit Selected",               ID_EditSelected
+    END
     POPUP "Window Options"
     BEGIN
         MENUITEM "Objects",                     ID_Objects, CHECKED
-        MENUITEM "Object Creator",				ID_ObjectCreator, CHECKED
-
-		POPUP "Main Window"
-		BEGIN
-			MENUITEM "Center"					ID_MainWindow_Center, GRAYED
-		END
+        MENUITEM "Object Creator",              ID_ObjectCreator, CHECKED
+        POPUP "Main Window"
+        BEGIN
+            MENUITEM "Center",                      ID_MainWindow_Center, GRAYED
+        END
     END
     POPUP "Help"
     BEGIN
@@ -131,6 +131,44 @@ BEGIN
     END
 END
 #endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x17L
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "FileDescription", "MenuEdit Application"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "MenuEdit"
+            VALUE "LegalCopyright", "Copyright (C) 2011"
+            VALUE "OriginalFilename", "MenuEdit.exe"
+            VALUE "ProductName", "MenuEdit Application"
+            VALUE "ProductVersion", "1, 0, 0, 1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
 
 #endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////

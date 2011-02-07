@@ -15,11 +15,15 @@
 
 //#define VLD_AGGREGATE_DUPLICATES
 //#define VLD_MAX_DATA_DUMP 0
-#include <vld.h>
+#ifdef _DEBUG
+	#include <vld.h>
+#endif // _DEBUG
+
 #include "Game.h"
 #include "Globals.h"
 #include "Timer.h"
-//#include "../resource.h"
+#include "resource.h"
+#include "Versioning.h"
 
 void ToggleFullscreenMode(HWND hWnd, 
 						  int iWidth, int iHeight, int iBpp, int iRefreshRate);
@@ -32,6 +36,7 @@ const int	g_nWINDOW_WIDTH			= 1024;						//	Window Width.
 const int	g_nWINDOW_HEIGHT		= 768;						//	Window Height.
 POINT mouse;
 int count;
+Versioning*	g_pVersioning;
 
 //	Windowed or Full screen depending on project setting
 #ifdef _DEBUG
@@ -180,8 +185,7 @@ BOOL RegisterWindowClass(HINSTANCE hInstance)
 	winClassEx.cbClsExtra		= 0;
 	winClassEx.cbWndExtra		= 0;
 	winClassEx.hInstance		= hInstance;
-	//winClassEx.hIcon			= LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
-	winClassEx.hIcon			= LoadIcon(NULL, IDC_ARROW);
+	winClassEx.hIcon			= LoadIcon(hInstance, MAKEINTRESOURCE(IDI_WND_ICON));
 	winClassEx.hIconSm			= NULL;
 	winClassEx.hCursor			= LoadCursor(NULL, IDC_ARROW);
 	winClassEx.hbrBackground	= (HBRUSH)GetStockObject(BLACK_BRUSH);
@@ -233,10 +237,15 @@ HWND MakeWindow(HINSTANCE hInstance)
 	int nWindowWidth	= rWindow.right - rWindow.left;
 	int nWindowHeight	= rWindow.bottom - rWindow.top;
 
+	g_pVersioning = new Versioning();
+	const char* version = g_pVersioning->SetupVersion("Song of Albion.exe", " v");
+	char buff[64];
+	sprintf_s(buff, "Song of Albion%s", version);
+
 	//	Create the window
 	return CreateWindowEx(WS_EX_APPWINDOW,											//	Extended Style flags.
 						  g_szWINDOW_CLASS_NAME,									//	Window Class Name.
-						  g_szWINDOW_TITLE,											//	Title of the Window.
+						  buff,														//	Title of the Window.
 						  dwWindowStyleFlags,										//	Window Style Flags.
 						  (GetSystemMetrics(SM_CXSCREEN)>>1) - (nWindowWidth>>1),	//	Window Start Point (x, y). 
 						  (GetSystemMetrics(SM_CYSCREEN)>>1) - (nWindowHeight>>1),	//		-Does the math to center the window over the desktop.
@@ -325,6 +334,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	//	Shutdown Game Here
 	/////////////////////////////////////////
 	Globals::g_pGame->Shutdown();
+
+	SAFE_DELETE(g_pVersioning);
 
 	/////////////////////////////////////////
 	

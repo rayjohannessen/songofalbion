@@ -19,11 +19,11 @@ using std::list;
 #include "FModSDK/inc/fmod.hpp"
 #include "FModSDK/inc/fmod_errors.h"
 
-#if _DEBUG
-	#pragma comment( lib, "./fmodexL_vc.lib" ) 
-#else
+// #if _DEBUG
+// 	#pragma comment( lib, "./fmodexL_vc.lib" ) 
+// #else
 	#pragma comment( lib, "fmodex_vc.lib" ) 
-#endif
+//#endif
 
 //	Flag for Loading a Sound and Having it loop.
 #define SGD_FMOD_LOOPING	FMOD_LOOP_NORMAL | FMOD_DEFAULT

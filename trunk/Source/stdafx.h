@@ -17,8 +17,10 @@ using std::string;
 using namespace std;
 #include <deque>
 
+
 #include <d3d9.h>
 #include <cmath>
+#include <ctime>
 #include "Structs.h"
 
 //////////////////////////////////////////////////////////////////////////
