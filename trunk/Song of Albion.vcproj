@@ -153,6 +153,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="copy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;$(SolutionDir)&quot;"
 			/>
 		</Configuration>
 	</Configurations>
