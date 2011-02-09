@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;..\Wrappers\FModSDK\inc&quot;"
+				AdditionalIncludeDirectories="&quot;..\Wrappers\FModSDK\inc&quot;;&quot;..\Wrappers\tinyxml&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -424,6 +424,10 @@
 			</File>
 			<File
 				RelativePath=".\Wrappers\tinyxml\tinyxmlparser.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Wrappers\tinyxml\xmltest.cpp"
 				>
 			</File>
 		</Filter>
