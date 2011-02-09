@@ -16,8 +16,8 @@
 #include <list>
 using std::vector;
 using std::list;
-#include "FModSDK/inc/fmod.hpp"
-#include "FModSDK/inc/fmod_errors.h"
+#include <fmod.hpp>
+#include <fmod_errors.h>
 
 #if _DEBUG
 	#pragma comment( lib, "./fmodexL_vc.lib" ) 

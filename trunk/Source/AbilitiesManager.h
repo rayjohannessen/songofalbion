@@ -47,16 +47,14 @@ class CAbilitiesManager
 	typedef pair<AbilityName, CAbilityObjectBase*> AbilityNameFuncPair;			// an ability name (string) paired with its ability
 	typedef multimap<ObjectName, CAbilityObjectBase*> ObjectAbilityMultimap;		// multimap of all objects and all their abilities
 	typedef multimap<ObjectName, CAbilityObjectBase*>::iterator ObjectAbilityIter;	// the iterator
-	typedef pair<multimap<ObjectName, CAbilityObjectBase*>::iterator,					// the range for the multimap of objects and their abilities
-				 multimap<ObjectName, CAbilityObjectBase*>::iterator> AbilityMultimapRange;
+	typedef pair<ObjectAbilityIter,	ObjectAbilityIter> AbilityMultimapRange; // the range for the multimap of objects and their abilities
 
 	typedef int ButtonEnum;	// i.e., the button type (eButtonName)
 	typedef vector<CAbilityObjectBase*> Abilities;
 	typedef map<eButtonName, vector<CAbilityObjectBase*>> UnlockedAbilitiesMap;	// the unlocked abilities map for a specific button (part of the following multimap)
-	typedef multimap<ObjectName, map<eButtonName, vector<CAbilityObjectBase*>>> UnlockedAbilitiesMultimap;	// multimap of each object's abilities, which correspond to button enums
-	typedef multimap<ObjectName, map<eButtonName, vector<CAbilityObjectBase*>>>::iterator UnlockedAbilitiesIter; // the iterator
-	typedef pair<multimap<ObjectName, map<eButtonName, vector<CAbilityObjectBase*>>>::iterator,		// the range for the multimap of objects and their unlocked abilities
-		multimap<ObjectName, map<eButtonName, vector<CAbilityObjectBase*>>>::iterator> UnlockedAbilitiesRange;
+	typedef multimap<ObjectName, UnlockedAbilitiesMap> UnlockedAbilitiesMultimap;	// multimap of each object's abilities, which correspond to button enums
+	typedef multimap<ObjectName, UnlockedAbilitiesMap>::iterator UnlockedAbilitiesIter; // the iterator
+	typedef pair<UnlockedAbilitiesIter,	UnlockedAbilitiesIter> UnlockedAbilitiesRange; 	// the range for the multimap of objects and their unlocked abilities
 	typedef vector<CQuickBarObject*> QuickBarObjects;
 	typedef vector<CQuickBarObject*>::iterator QBObjIter;
 
