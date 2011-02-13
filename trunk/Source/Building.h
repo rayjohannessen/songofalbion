@@ -7,10 +7,10 @@ class CUnit;
 
 class CBuilding : public CObject
 {
-	int m_nBuildingType;	// castle, tower...
-	int m_nMaxHP;
-	int m_nHitPts;
-	int m_nCapacity;	// how many troops can it hold?
+	int			m_nBuildingType;	// castle, tower...
+	int			m_nMaxHP;
+	int			m_nHitPts;
+	unsigned	m_uiGarrisonCapacity;	// how many troops can it hold?	
 
 	Garrison    m_vGarrison;	// the units that are inside the building
 
@@ -29,8 +29,17 @@ public:
 
 	//////////////////////////////////////////////////////////////////////////
 	// MUTATORS
-	inline void GarrisonUnit(CUnit* const _unit) { m_vGarrison.push_back(_unit); }
+	inline bool GarrisonUnit(CUnit* const _unit) 
+	{ 
+		if (m_vGarrison.size() < m_uiGarrisonCapacity)
+		{
+			m_vGarrison.push_back(_unit); 
+			return true;
+		}
+		return false;
+	}
 
+	void SetPostBaseCTORVars();
 };
 
 #endif

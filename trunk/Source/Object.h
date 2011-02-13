@@ -14,6 +14,7 @@
 using namespace Pathfinding;
 #include "ObjectDefines.h"
 using namespace ObjectDefines;
+#include "ObjInterface.h"
 
 enum eAbSelType { AST_ATTACK = MOUSE_LEFT, AST_DEFENSE = MOUSE_RIGHT, };
 enum eInputStatus { IS_HOVER, IS_SELECT_L, IS_SELECT_R, IS_DESELECT, IS_NONE, };
@@ -21,7 +22,7 @@ enum eInputStatus { IS_HOVER, IS_SELECT_L, IS_SELECT_R, IS_DESELECT, IS_NONE, };
 class CCombatSkill;
 class CUnit;
 
-class CObject
+class CObject : public ObjInterface
 {
 	typedef map<eButtonName, vector<CAbilityObjectBase*>> UnlockedAbilitiesMap;
 
@@ -67,7 +68,6 @@ public:
 	CObject();
 	CObject(int type, point coord, point wPos, string name, const char* faction, int factionID, string typeName);
 	CObject(CObject& obj);
-
 
 	//////////////////////////////////////////////////////////////////////////
 	// FUNCTION: Render
@@ -126,6 +126,7 @@ public:
 
 	//////////////////////////////////////////////////////////////////////////
 	// mutators
+	inline void ToggleDisplay()				{ m_bDisplayInfo = !m_bDisplayInfo;	}
 	inline void SetImageID(int id)			{m_nImageID = id;	}
 	inline void SetSrcRect(rect& r)			{m_rSrc = r;		}
 	inline void SetColor(DWORD clr)			{m_dwColor = clr;	}
@@ -139,8 +140,10 @@ public:
 	inline void SetCurrAbilOfType(eAbSelType type, CCombatSkill* ability)	
 			{ if (type == AST_ATTACK) m_pCurrAttackAbility = ability; else if (type == AST_DEFENSE) m_pCurrDefenseAbility = ability; }
 	inline void SetInputStatus(eInputStatus status, DWORD clr) { m_eCurrInputStatus = status; m_dwColor = clr; }	
-	inline void ToggleDisplay()						{ m_bDisplayInfo = !m_bDisplayInfo;	}
-	inline void SetNeighbor(CObject* const obj)		{ m_pNeighborEnemy = obj;		}
+	inline void SetNeighbor(CObject* const obj)		{ m_pNeighborEnemy = obj;	}
+
+	void SetStartingAbilities();
+	virtual void SetPostBaseCTORVars() {}
 };
 
 #endif

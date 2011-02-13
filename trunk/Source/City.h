@@ -24,9 +24,9 @@ public:
 	CCity(int type, int cityType, int size, point coord, point sPos, 
 			string name, const char* faction = "Llwyddi", int factionID = 0);
 
-	void Update(double dTimeStep, const pointf* moveAmt = NULL);
-	void Render(const rect& viewPort);
-	void Input(const POINT& mouse);
+	virtual void Update(double dTimeStep, const pointf* moveAmt = NULL);
+	virtual void Render(const rect& viewPort);
+	virtual void Input(const POINT& mouse);
 
 	//////////////////////////////////////////////////////////////////////////
 	// accessors
@@ -36,6 +36,16 @@ public:
 
 	//////////////////////////////////////////////////////////////////////////
 	// mutators
-	void GarrisonUnit(CUnit* const _unit) { m_vGarrison.push_back(_unit); }
+	bool GarrisonUnit(CUnit* const _unit) 
+	{ 
+		if (m_vGarrison.size() < m_uiGarrisonCapacity) 
+		{
+			m_vGarrison.push_back(_unit); 
+			return true;
+		}
+		return false;
+	}
+
+	void SetPostBaseCTORVars();
 };
 #endif

@@ -22,24 +22,24 @@ CUnit::~CUnit()
 		m_mAnimations.clear();
 	}
 }
-CUnit::CUnit() : 
-CObject(),
-m_bMovingToAttack(false),
-m_nUnitType(-1),
-m_nMaxVitality(0),
-m_nVitality(0),
-m_nAtt(0),
-m_nDef(0),
-m_nMaxStamina(0),
-m_nStamina(0),
-m_nMaxMP(0),
-m_nMagPts(0),
-m_nRange(1),
-m_nNumAnims(0),
-m_strCurrAnim("NONE"),
-m_ptOriginalScrnOS(0.0f, 0.0f),
-m_pPath(NULL)
+CUnit::CUnit() : CObject(),
+	m_bMovingToAttack(false),
+	m_nUnitType(-1),
+	m_nMaxVitality(0),
+	m_nVitality(0),
+	m_nAtt(0),
+	m_nDef(0),
+	m_nMaxStamina(0),
+	m_nStamina(0),
+	m_nMaxMP(0),
+	m_nMagPts(0),
+	m_nRange(1),
+	m_nNumAnims(0),
+	m_strCurrAnim("NONE"),
+	m_ptOriginalScrnOS(0.0f, 0.0f),
+	m_pPath(NULL)
 {
+	SetPostBaseCTORVars();
 }
 
 CUnit::CUnit(CUnit& unit)
@@ -56,6 +56,8 @@ CUnit::CUnit( int nUnitType, int type, point& coord, point& sPos, string name, c
 	m_nUnitType(nUnitType)	// most units' source rects should be the same size, use default size for now (w=128, h=128)
 {
 	SetImageID(0);
+
+	SetPostBaseCTORVars();
 
 	//////////////////////////////////////////////////////////////////////////
 	// set anim-related values
@@ -99,6 +101,7 @@ CUnit& CUnit::operator= (CUnit& unit)
 void CUnit::DeepCopyAll( CUnit &unit ) 
 {
 	ClearAnims();
+	m_bMovingToAttack	= false;
 	m_nUnitType  		= unit.GetUnitType();
 	m_nMaxVitality	 	= unit.GetMaxVit();
 	m_nVitality	 		= unit.GetVitality();
@@ -113,7 +116,6 @@ void CUnit::DeepCopyAll( CUnit &unit )
 	m_strCurrAnim	  	= unit.GetCurrAnimString();
 	m_ptOriginalScrnOS	= unit.GetOrigScOS();
 	m_Timer				= unit.m_Timer;
-	m_bMovingToAttack	= false;
 	SetNeighbor(unit.GetNeighbor());
 
 	UnitAnims::iterator iter, end;
@@ -320,6 +322,16 @@ void CUnit::Reset()
 void CUnit::CenterUnit()
 {
 	NextMove(m_ptCoord, 0, NUM_DIRECTIONS);
+}
+
+void CUnit::SetPostBaseCTORVars()
+{
+	// set up the offset so the object is centered on the tiles
+	m_ptOffset = point(20, -20);
+	m_fScaleX = m_fScaleY = 0.7f;
+	m_fZDepth = DEPTH_UNIT;
+	m_eDefaultAbilityType = BN_COMBAT_SKILLS;
+	SetStartingAbilities();
 }
 //////////////////////////////////////////////////////////////////////////
 //	PRIVATE FUNCTIONS

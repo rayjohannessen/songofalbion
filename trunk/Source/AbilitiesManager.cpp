@@ -237,15 +237,6 @@ CAbilityObjectBase* CAbilitiesManager::GetAbility(const string &unitName, const 
 	return NULL;
 }
 
-// vector<string> CAbilitiesManager::GetAllAttackStrings(const string &unitName)
-// {
-// 	m_Range = m_mObjectAbilities.equal_range(unitName);
-// 	vector<string> attacks;
-// 	for ( m_iBegin = m_Range.first; m_iBegin != m_Range.second; ++m_iBegin)
-// 		attacks.push_back((*m_iBegin).second.first);
-// 	return attacks;
-// }
-
 bool CAbilitiesManager::GetUnlockedStartingAbilities(const string &objName, UnlockedAbilitiesMap& abilities)
 {
 	// gotten from a multimap of Object names, containing a map of ability enums for the 
@@ -263,4 +254,3 @@ bool CAbilitiesManager::GetUnlockedStartingAbilities(const string &objName, Unlo
 	}
 	return false;
 }
-
