@@ -19,15 +19,6 @@ typedef string AbilityName;
 //
 //////////////////////////////////////////////////////////////////////////
 
-// enum eAbility 
-// {
-// 	A_BASE = 0,
-// 	A_CHARGE = 1, A_FLANK = 2,
-// 	A_HEALUNIT = 3, A_PROMOTEUNIT = 4,
-// 	A_FORTIFY = 5,
-// 	NUM_ABILITIES
-// };
-
 struct AbilityInfo 
 {
 	string Name;
@@ -94,7 +85,6 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	// Accessors
 	CAbilityObjectBase* GetAbility(const string& unitName, const string& ability);
-//	vector<string> GetAllAttackStrings(const string& unitName);
 
 	// fills out "abilities", returns true if abilities exist for the "objName" given
 	bool GetUnlockedStartingAbilities(const string& objName, UnlockedAbilitiesMap& abilities);

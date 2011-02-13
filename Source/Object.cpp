@@ -41,47 +41,9 @@ CObject::CObject(int type, point coord, point scrnPos, string name, const char* 
 	m_fZDepth(DEPTH_OBJECT),
 	m_eCurrInputStatus(IS_NONE),
 	m_pNeighborEnemy(NULL)
-{
-	// set up the offset so the object is centered on the tiles
-	switch (type)
-	{
-	case OBJ_CITY:
-		{
-			m_ptOffset = point(-5, 0);
-			m_fZDepth = DEPTH_CITY;
-			m_eDefaultAbilityType = BN_NONCOMBAT_SKILLS;
-		}break;		
-	case OBJ_UNIT:
-		{
-			m_ptOffset = point(20, -20);
-			m_fScaleX = m_fScaleY = 0.7f;
-			m_fZDepth = DEPTH_UNIT;
-			m_eDefaultAbilityType = BN_COMBAT_SKILLS;
-		}break;
-	case OBJ_BUILDING:
-		{
-			m_ptOffset = point(-5, 0);
-			m_fZDepth = DEPTH_BUILDING;
-			m_eDefaultAbilityType = BN_NONCOMBAT_SKILLS;
-		}break;		
-	}
-	
-	// setup starting abilities and quick bar slots
-	Globals::g_pAbilitiesManager->GetUnlockedStartingAbilities(m_strTypeName, m_mAbilities);
-	ClearQBSlotORSlots();
-	if (m_mAbilities.size())
-	{
-		// add this object's default ability type objects to the quickbar slots
-		AbilitiesIter iter, end; unsigned i;
-		for (iter = m_mAbilities[m_eDefaultAbilityType].begin(), end = m_mAbilities[m_eDefaultAbilityType].end(), i = 0; 
-				i < NUM_QB_SLOTS && iter != end; 
-				++iter, ++i)
-		{
-			m_arrQBSlots[i] = (*iter)->GetQBObj();
-		}
-		m_pCurrAttackAbility = m_pCurrDefenseAbility = (CCombatSkill*)m_mAbilities[BN_COMBAT_SKILLS][0];	// TODO:: assumes everything has a combat skill
-	}
+{	
 }
+
 // copy c-tor
 CObject::CObject(CObject& obj)
 {
@@ -140,6 +102,25 @@ void CObject::FindPathToTarget(const point& tileCoord, Path &path)
 	A_Star(Globals::g_pMap->GetL1Tiles()[m_ptCoord.y * Globals::g_pMap->GetNumCols() + m_ptCoord.x], 
 		Globals::g_pMap->GetL1Tiles()[tileCoord.y * Globals::g_pMap->GetNumCols() + tileCoord.x], path, 
 		/*this,*/ Globals::g_pMap->GetL1Tiles(), Globals::g_pMap->GetL2Tiles(), Globals::g_pMap->GetNumColsRows());
+}
+
+void CObject::SetStartingAbilities()
+{
+	// setup starting abilities and quick bar slots
+	Globals::g_pAbilitiesManager->GetUnlockedStartingAbilities(m_strTypeName, m_mAbilities);
+	ClearQBSlotORSlots();
+	if (m_mAbilities.size())
+	{
+		// add this object's default ability type objects to the quickbar slots
+		AbilitiesIter iter, end; unsigned i;
+		for (iter = m_mAbilities[m_eDefaultAbilityType].begin(), end = m_mAbilities[m_eDefaultAbilityType].end(), i = 0; 
+			i < NUM_QB_SLOTS && iter != end; 
+			++iter, ++i)
+		{
+			m_arrQBSlots[i] = (*iter)->GetQBObj();
+		}
+		m_pCurrAttackAbility = m_pCurrDefenseAbility = (CCombatSkill*)m_mAbilities[BN_COMBAT_SKILLS][0];	// TODO:: assumes everything has a combat skill
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////

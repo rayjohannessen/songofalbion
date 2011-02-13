@@ -17,10 +17,10 @@ class CUnit : public CObject
 	bool m_bMovingToAttack;
 	int m_nUnitType;
 	int m_nMaxVitality;
-	int m_nVitality;		// referred to as vitality
+	int m_nVitality;
 	int m_nAtt;
 	int m_nDef;
-	int m_nMaxStamina;	// referred to as Stamina
+	int m_nMaxStamina;
 	int m_nStamina;
 	int m_nMaxMP;
 	int m_nMagPts;
@@ -102,12 +102,13 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	// mutators
 	inline void SetFacing(eAnimationDirections facing)	{ m_mAnimations[m_strCurrAnim]->CurrDir(facing);	}
-	inline void AddToVitality(int amt)			{ m_nVitality += amt; if (m_nVitality < 0) m_nVitality = 0; }
-	inline void DecrementStamina(int decAmt)	{ m_nStamina -= decAmt;			}
-	inline void SetMoveToPt(pointf pt)			{ m_ptMoveToScreenPos = pt;		}
+	inline void AddToVitality(int amt)					{ m_nVitality += amt; if (m_nVitality < 0) m_nVitality = 0; }
+	inline void DecrementStamina(int decAmt)			{ m_nStamina -= decAmt;			}
+	inline void SetMoveToPt(pointf pt)					{ m_ptMoveToScreenPos = pt;		}
 	void Reset();
 	void SetNewPath(Path* const p);
 	void SetScrnPos(point& sPos);
+	void SetPostBaseCTORVars();
 	inline void SetScreenPosWithoutOS(const pointf& pt);
 
 	CTriggerTimer m_Timer;

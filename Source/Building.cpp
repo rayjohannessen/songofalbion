@@ -4,14 +4,14 @@
 #include "Globals.h"
 #include "Assets.h"
 
-CBuilding::CBuilding() 
-:	CObject(), 
+CBuilding::CBuilding() :
+	CObject(), 
 	m_nBuildingType(0),
 	m_nMaxHP(0),
 	m_nHitPts(0),
-	m_nCapacity(0)
+	m_uiGarrisonCapacity(0)
 {
-
+	SetPostBaseCTORVars();
 }
 
 CBuilding::CBuilding(eBuildingType buildingType, int type, point coord, point sPos, string name, const char* faction, int factionID)
@@ -25,11 +25,12 @@ CBuilding::CBuilding(eBuildingType buildingType, int type, point coord, point sP
 		SetSrcRect(rect(0, 64, 128, 256));
 		m_ptSize = point(128, 64);
 		m_nMaxHP = m_nHitPts = 1000;
-		m_nCapacity = 20;
+		m_uiGarrisonCapacity = 20;
 		break;
 	case BT_TOWER:
 		break;
 	}
+	SetPostBaseCTORVars();
 }
 
 void CBuilding::Update(double dTimeStep, const pointf* moveAmt/*double xOS, double yOS*/)
@@ -48,4 +49,12 @@ void CBuilding::Render( const rect& viewPort )
 
 		CObject::Render(viewPort);
 	}
+}
+
+void CBuilding::SetPostBaseCTORVars()
+{
+	m_ptOffset = point(-5, 0);
+	m_fZDepth = DEPTH_BUILDING;
+	m_eDefaultAbilityType = BN_NONCOMBAT_SKILLS;
+	SetStartingAbilities();
 }

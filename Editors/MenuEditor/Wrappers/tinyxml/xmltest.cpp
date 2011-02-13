@@ -1,11 +1,10 @@
 /*
    Test program for TinyXML.
 */
-
-#include <StdAfx.h>
+#include <stdafx.h>
 
 #ifdef TIXML_USE_STL
-#include <iostream>
+	#include <iostream>
 	#include <sstream>
 	using namespace std;
 #else

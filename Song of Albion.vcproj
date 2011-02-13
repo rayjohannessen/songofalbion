@@ -411,6 +411,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\ObjInterface.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\UICityInfo.cpp"
 				>
 			</File>

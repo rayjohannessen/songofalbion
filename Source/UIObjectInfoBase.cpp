@@ -5,21 +5,24 @@
 #include "Assets.h"
 #include "Object.h"
 
-UIObjectInfoBase::UIObjectInfoBase(CObject* const obj, eObjectInfoType type, int equipID, int infoID, int inventoryID, Grid& gInv, Grid& gEquip,
-								   const point& invPos, const point& equipPos, const point& infoPos, const size& invInput, const size& equipInput) :
-m_eType(type),
-m_pObject(obj),
-m_nEquippedImage(equipID),
-m_nInfoImage(infoID),
-m_nInventoryImage(inventoryID),
-m_uiInventorySlots(gInv.NUM_COLS*gInv.NUM_ROWS),
-m_InvInputArea(invInput),
-m_EquipInputArea(equipInput),
-m_InvGrid(gInv),
-m_EquipGrid(gEquip),
-m_pMovingObj(NULL),
-m_pHoveredObj(NULL),
-m_pMovingObjSrc(NULL)
+UIObjectInfoBase::UIObjectInfoBase(CObject* const obj, eObjectInfoType type, 
+								   int equipID, int infoID, int inventoryID, 
+								   Grid& gInv, Grid& gEquip,
+								   const point& invPos, const point& equipPos, const point& infoPos, 
+								   const size& invInput, const size& equipInput) :
+	m_eType(type),
+	m_pObject(obj),
+	m_nEquippedImage(equipID),
+	m_nInfoImage(infoID),
+	m_nInventoryImage(inventoryID),
+	m_uiInventorySlots(gInv.NUM_COLS*gInv.NUM_ROWS),
+	m_InvInputArea(invInput),
+	m_EquipInputArea(equipInput),
+	m_InvGrid(gInv),
+	m_EquipGrid(gEquip),
+	m_pMovingObj(NULL),
+	m_pHoveredObj(NULL),
+	m_pMovingObjSrc(NULL)
 {
 	
 }
